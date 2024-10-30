@@ -20,7 +20,7 @@ public class MentorApp extends Application {
 
   @Override
   public void start(Stage stage) throws Exception {
-    //
+    //..
     ViewManager sm = new ViewManager(stage);
 
     sm.addView(ViewManager.LOGIN, createLoginView());
