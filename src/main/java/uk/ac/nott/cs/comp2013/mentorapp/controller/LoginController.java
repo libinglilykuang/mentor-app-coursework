@@ -13,16 +13,6 @@ public class LoginController {
     this.repo = model;
   }
 
-  /*public boolean onLoginClick(String username, String password) {
-    Optional<User> user = repo.selectById(username);
-    if (user.isEmpty()) {
-      System.out.println("User not found: " + username);
-      return false;
-    }
-    User u = user.get();
-    return u.getUsername().equals(username) && u.getPassword().equals(password);
-  }*/
-
   public boolean onLoginClick(String username, String password) {
     Optional<User> userOptional = repo.selectById(username);
     if (userOptional.isEmpty()) {
