@@ -14,24 +14,32 @@ public class LoginController {
   }
 
   public boolean onLoginClick(String username, String password) {
-    Optional<User> userOptional = repo.selectById(username);
-    if (userOptional.isEmpty()) {
-      System.out.println("User not found: " + username);
+    Optional<User> user = repo.selectById(username);
+    /*if (user.isEmpty()) {
       return false;
     }
-    User u = userOptional.get();
 
-    if (u.getPassword().equals(password)) {
-      currentUser = u;
-      return true;
-    } else {
-      System.out.println("Invalid password for user: " + username);
-      return false;
+    User u = user.get();
+    return u.getUsername().equals(username) && u.getPassword().equals(password);
+  }*/
+    if (user.isPresent()) {
+      User u = user.get();
+      if (u.getPassword().equals(password)) {
+        currentUser = u;
+        System.out.println("Login successful for user: " + username);
+        return true;
+      }else {
+        System.out.println("Incorrect password for user: " + username); // 调试输出
+      }
+    }else {
+      System.out.println("User not found: " + username);
     }
+
+    currentUser = null;
+    return false;
   }
 
   public User getCurrentUser() {
     return currentUser;
   }
 }
-

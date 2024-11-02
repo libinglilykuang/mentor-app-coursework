@@ -14,6 +14,9 @@ public class ViewManager {
 
   public static final String LOGIN = "login_view";
   public static final String DUMMY = "dummy_view";
+  public static final String MENTEE = "mentee_view";
+  public static final String MENTOR = "mentor_view";
+  public static final String ADMIN = "admin_view";
 
   private final Stage stage;
   private final Map<String, Parent> scenes = new HashMap<>();
@@ -48,11 +51,13 @@ public class ViewManager {
    */
   public void setStageView(String key) {
     if (!scenes.containsKey(key)) {
+      System.out.println("View not found for key: " + key);
       return;
     }
 
     Scene s = new Scene(scenes.get(key));
     stage.setScene(s);
+    System.out.println("Switched to view: " + key);
   }
 
 }

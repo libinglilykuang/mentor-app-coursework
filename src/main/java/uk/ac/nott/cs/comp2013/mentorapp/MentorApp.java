@@ -7,8 +7,8 @@ import uk.ac.nott.cs.comp2013.mentorapp.model.HashMapRepository;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.Administrator;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentee;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentor;
-import uk.ac.nott.cs.comp2013.mentorapp.view.LoginView;
-import uk.ac.nott.cs.comp2013.mentorapp.view.ViewManager;
+import uk.ac.nott.cs.comp2013.mentorapp.model.user.User;
+import uk.ac.nott.cs.comp2013.mentorapp.view.*;
 
 public class MentorApp extends Application {
 
@@ -16,16 +16,32 @@ public class MentorApp extends Application {
     Application.launch(args);
   }
 
+  private HashMapRepository<User, String> createRepository() {
+    HashMapRepository<User, String> repo = new HashMapRepository<>();
+    repo.insert(new Mentee("mentee1", "password1"));
+    repo.insert(new Mentor("mentor1", "password2"));
+    repo.insert(new Administrator("admin1", "password3"));
+    return repo;
+  }
+
   private LoginView createLoginView() {
-    //LoginController controller = new LoginController(new HashMapRepository<>());
-    HashMapRepository<uk.ac.nott.cs.comp2013.mentorapp.model.user.User, String> userRepository = new HashMapRepository<>();
+    LoginController controller = new LoginController(createRepository());
+    LoginView loginView = new LoginView(controller);
 
-    userRepository.insert(new Mentee("mentee1", "password123", ""));
-    userRepository.insert(new Mentor("mentor1", "password456"));
-    userRepository.insert(new Administrator("admin1", "adminpass"));
+    loginView.setOnViewChange(event -> {
+      User currentUser = controller.getCurrentUser();
+      if (currentUser != null) {
+        String viewKey = switch (currentUser.getRole()) {
+          case MENTEE -> ViewManager.MENTEE;
+          case MENTOR -> ViewManager.MENTOR;
+          case ADMIN -> ViewManager.ADMIN;
+        };
+        ViewManager viewManager = (ViewManager) event.getSource();
+        viewManager.setStageView(viewKey);
+      }
+    });
 
-    LoginController controller = new LoginController(userRepository);
-    return new LoginView(controller);
+    return loginView;
   }
 
   @Override
@@ -33,8 +49,12 @@ public class MentorApp extends Application {
     ViewManager sm = new ViewManager(stage);
 
     sm.addView(ViewManager.LOGIN, createLoginView());
+    sm.addView(ViewManager.MENTEE, new MenteeView());
+    sm.addView(ViewManager.MENTOR, new MentorView());
+    sm.addView(ViewManager.ADMIN, new AdminView());
 
     sm.setStageView(ViewManager.LOGIN);
+    stage.setTitle("Mentor App");
     stage.show();
   }
 }
