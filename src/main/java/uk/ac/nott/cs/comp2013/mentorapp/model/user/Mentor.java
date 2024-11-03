@@ -57,6 +57,9 @@ public class Mentor implements User, HasAvailability {
 
   @Override
   public void setEndAvailability(LocalDateTime date) {
+    if (this.startAvailability != null && date.isBefore(this.startAvailability)) {
+      throw new IllegalArgumentException("End availability cannot be earlier than start availability.");
+    }
     this.endAvailability = date;
   }
 
