@@ -8,7 +8,7 @@ public class MenteeView extends VBox {
     public MenteeView() {
         getChildren().add(new Label("Welcome, Mentee!"));
 
-        Button btnViewActivities = new Button("View Available Activities");
+        Button btnViewActivities = new Button("Sign up for activities");
 
         Button btnAssignedSessions = new Button("View Assigned Sessions");
 

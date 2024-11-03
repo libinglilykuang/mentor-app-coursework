@@ -1,7 +1,6 @@
 package uk.ac.nott.cs.comp2013.mentorapp.controller;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -28,6 +27,7 @@ public class LoginControllerTests {
     when(model.selectById("user")).thenReturn(Optional.empty());
     boolean loginResult = controller.onLoginClick("user", "password");
     assertFalse(loginResult);
+    assertNull(controller.getCurrentUser());
   }
 
   @Test
@@ -35,13 +35,16 @@ public class LoginControllerTests {
     when(model.selectById("user")).thenReturn(Optional.of(new Mentee("user", "password")));
     boolean loginResult = controller.onLoginClick("user", "logmein");
     assertFalse(loginResult);
+    assertNull(controller.getCurrentUser());
   }
 
   @Test
   public void testLoginClickGood() {
-    when(model.selectById("user")).thenReturn(Optional.of(new Mentee("user", "password")));
+    Mentee user = new Mentee("user", "password");
+    when(model.selectById("user")).thenReturn(Optional.of(user));
     boolean loginResult = controller.onLoginClick("user", "password");
     assertTrue(loginResult);
+    assertEquals(user, controller.getCurrentUser());
   }
 
 }
