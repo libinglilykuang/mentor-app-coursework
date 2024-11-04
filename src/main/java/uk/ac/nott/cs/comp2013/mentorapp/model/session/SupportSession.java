@@ -1,6 +1,5 @@
 package uk.ac.nott.cs.comp2013.mentorapp.model.session;
 
-
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentee;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentor;
 

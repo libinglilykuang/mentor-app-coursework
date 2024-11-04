@@ -32,7 +32,7 @@ public class AdminController {
             if (mentor.isAvailable()) {
                 if (mentor.assignMentee(mentee)) {
                     mentee.assignMentor(mentor);
-                    createSupportSession(mentor, mentee); // 自动创建会话
+                    createSupportSession(mentor, mentee);
                     System.out.println("Mentee " + menteeId + " successfully paired with Mentor " + mentorId);
                     return true;
                 }

@@ -15,7 +15,6 @@ import java.util.List;
 public class AdminView extends VBox {
     private AdminController adminController;
     private AdminPairingView pairingView;
-    private Button btnPairMentorStudent;
 
     public AdminView() {
         HashMapRepository<User, String> userRepository = new HashMapRepository<>();
