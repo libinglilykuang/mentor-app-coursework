@@ -4,6 +4,7 @@ public class Mentee implements User, HasCv {
 
   private UserRole role = UserRole.MENTEE;
   private String username, password, cvText;
+  private Mentor assignedMentor;
 
   public Mentee(String username, String password) {
     this(username, password, "");
@@ -65,5 +66,18 @@ public class Mentee implements User, HasCv {
   @Override
   public int hashCode() {
     return username.hashCode();
+  }
+
+  public Mentor getAssignedMentor() {
+    return assignedMentor;
+  }
+
+  public void assignMentor(Mentor mentor) {
+    this.assignedMentor = mentor;
+  }
+
+  @Override
+  public String toString() {
+    return username;
   }
 }

@@ -3,10 +3,10 @@ package uk.ac.nott.cs.comp2013.mentorapp.model.user;
 import java.time.LocalDateTime;
 
 public class Mentor implements User, HasAvailability {
-
   private UserRole role = UserRole.MENTOR;
   private String username, password;
   private LocalDateTime startAvailability, endAvailability;
+  private Mentee assignedMentee;
 
   public Mentor(String username, String password) {
     this(username, password, null, null);
@@ -84,5 +84,27 @@ public class Mentor implements User, HasAvailability {
   @Override
   public int hashCode() {
     return username.hashCode();
+  }
+
+  public Mentee getAssignedMentee() {
+    return assignedMentee;
+  }
+
+  public boolean assignMentee(Mentee mentee) {
+    if (isAvailable()) {
+      this.assignedMentee = mentee;
+      return true;
+    } else {
+      throw new IllegalStateException("This mentor is already assigned to a mentee for the current period.");
+    }
+  }
+
+  public boolean isAvailable() {
+    return this.assignedMentee == null;
+  }
+
+  @Override
+  public String toString() {
+    return  username;
   }
 }
