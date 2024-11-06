@@ -1,10 +1,13 @@
 package uk.ac.nott.cs.comp2013.mentorapp.model.user;
 
+import uk.ac.nott.cs.comp2013.mentorapp.model.session.SupportType;
+
 public class Mentee implements User, HasCv {
 
   private UserRole role = UserRole.MENTEE;
   private String username, password, cvText;
   private Mentor assignedMentor;
+  private SupportType supportRequest;
 
   public Mentee(String username, String password) {
     this(username, password, "");
@@ -74,6 +77,18 @@ public class Mentee implements User, HasCv {
 
   public void assignMentor(Mentor mentor) {
     this.assignedMentor = mentor;
+  }
+
+  public SupportType getSupportRequest() {
+    return supportRequest;
+  }
+
+  public void setSupportRequest(SupportType supportRequest) {
+    this.supportRequest = supportRequest;
+  }
+
+  public boolean hasRequestedSupport() {
+    return supportRequest != null;
   }
 
   @Override

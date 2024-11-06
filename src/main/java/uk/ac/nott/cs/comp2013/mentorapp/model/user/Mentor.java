@@ -1,12 +1,14 @@
 package uk.ac.nott.cs.comp2013.mentorapp.model.user;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Mentor implements User, HasAvailability {
   private UserRole role = UserRole.MENTOR;
   private String username, password;
   private LocalDateTime startAvailability, endAvailability;
   private Mentee assignedMentee;
+  private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
   public Mentor(String username, String password) {
     this(username, password, null, null);
@@ -100,11 +102,35 @@ public class Mentor implements User, HasAvailability {
   }
 
   public boolean isAvailable() {
-    return this.assignedMentee == null;
+    if (assignedMentee != null) {
+      System.out.println("Mentor " + username + " is not available because they already have an assigned mentee.");
+      return false;
+    }
+
+    if (startAvailability == null || endAvailability == null) {
+      System.out.println("Mentor " + username + " is not available because availability times are not set.");
+      return false;
+    }
+
+    LocalDateTime now = LocalDateTime.now();
+
+    boolean withinAvailability = !now.isAfter(endAvailability);
+    if (!withinAvailability) {
+      System.out.println("Mentor " + username + " is not available because the availability period has ended.");
+      return false;
+    }
+
+    System.out.println("Mentor " + username + " is available: true");
+    return true;
   }
 
   @Override
   public String toString() {
-    return  username;
+    String availability = "Unavailable";
+    if (startAvailability != null && endAvailability != null) {
+      availability = startAvailability.format(formatter) + " - " + endAvailability.format(formatter);
+    }
+    return "Mentor: " + username + " | Available: " + availability;
+
   }
 }
