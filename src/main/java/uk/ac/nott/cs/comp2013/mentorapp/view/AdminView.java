@@ -2,92 +2,82 @@ package uk.ac.nott.cs.comp2013.mentorapp.view;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.scene.layout.VBox;
-
 import uk.ac.nott.cs.comp2013.mentorapp.controller.AdminController;
-import uk.ac.nott.cs.comp2013.mentorapp.model.HashMapRepository;
-import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentee;
-import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentor;
-import uk.ac.nott.cs.comp2013.mentorapp.model.user.User;
-
-import java.util.List;
 
 public class AdminView extends VBox {
-    private AdminController adminController;
-    private AdminPairingView pairingView;
-    private final ListView<String> menteeListView = new ListView<>();
-    private final ListView<Mentor> mentorListView = new ListView<>();
-    private final Label statusLabel = new Label();
+    private final AdminController adminController;
+    private final AdminPairingView pairingView;
 
     public AdminView(AdminController adminController) {
         this.adminController = adminController;
-        Button pairButton = new Button("Pair Mentor and Mentee");
-        pairButton.setOnAction(e -> pairSelectedMenteeAndMentor());
+        this.pairingView = new AdminPairingView(adminController);
 
-        //menteeListView.getItems().addAll(adminController.getAllUnpairedMentees());
-        //mentorListView.getItems().addAll(adminController.getAvailableMentors());
-
-        refreshLists();
-
-        getChildren().addAll(new Label("Unpaired Mentees"), menteeListView,
-                new Label("Available Mentors"), mentorListView,
-                pairButton, statusLabel);
+        buildMainMenu();
     }
 
-    private void pairSelectedMenteeAndMentor() {
-        String selectedMenteeInfo = menteeListView.getSelectionModel().getSelectedItem();
-        Mentee selectedMentee = getMenteeFromInfo(selectedMenteeInfo);
-        Mentor selectedMentor = mentorListView.getSelectionModel().getSelectedItem();
+    private void buildMainMenu() {
+        getChildren().clear();
 
-        if (selectedMentee != null && selectedMentor != null) {
-            boolean success = adminController.pairMenteeWithMentor(selectedMentee.getUsername(), selectedMentor.getUsername());
-            if (success) {
-                statusLabel.setText("Paired " + selectedMentee.getUsername() + " with " + selectedMentor.getUsername());
-                refreshLists();
-            } else {
-                statusLabel.setText("Failed to pair. Mentor already has a mentee.");
-            }
-        } else {
-            statusLabel.setText("Please select both a mentee and a mentor.");
-        }
-    }
-
-    private void refreshLists() {
-        menteeListView.getItems().clear();
-        List<Mentee> unpairedMentees = adminController.getAllUnpairedMentees();
-        for (Mentee mentee : unpairedMentees) {
-            String menteeInfo = mentee.getUsername() + " - Request: " + mentee.getSupportRequest();
-            menteeListView.getItems().add(menteeInfo);
-        }
-
-        mentorListView.getItems().setAll(adminController.getAvailableMentors());
-    }
-
-    public void buildView() {
-        getChildren().add(new Label("Welcome, Admin!"));
-
+        Label welcomeLabel = new Label("Welcome, Admin!");
         Button btnPairMentorStudent = new Button("Pair Mentor and Student");
+        Button btnViewReports = new Button("View Assigned Report");
 
-        getChildren().add(btnPairMentorStudent);
+        btnPairMentorStudent.setOnAction(e -> showPairingInterface());
+        btnViewReports.setOnAction(e -> showReportInterface());
 
-        btnPairMentorStudent.setOnAction(e -> {
-            List<Mentee> unpairedMentees = adminController.getAllUnpairedMentees();
-            List<Mentor> availableMentors = adminController.getAvailableMentors();
-            pairingView.updateMenteeListView(unpairedMentees);
-            pairingView.updateMentorListView(availableMentors);
-
-            getChildren().clear();
-            getChildren().add(pairingView);
-        });
+        getChildren().addAll(welcomeLabel, btnPairMentorStudent, btnViewReports);
     }
 
-    private Mentee getMenteeFromInfo(String menteeInfo) {
-        if (menteeInfo == null) return null;
-        String menteeUsername = menteeInfo.split(" - ")[0];
-        return adminController.getAllUnpairedMentees().stream()
-                .filter(mentee -> mentee.getUsername().equals(menteeUsername))
-                .findFirst()
-                .orElse(null);
+    private void showPairingInterface() {
+        getChildren().clear();
+
+        if (pairingView.lookup("#backButton") == null) {
+            Button backButton = new Button("Return to Main Menu");
+            backButton.setId("backButton");
+            styleBackButton(backButton);
+
+            backButton.setOnAction(e -> buildMainMenu());
+            pairingView.getChildren().add(backButton);
+        }
+
+        getChildren().add(pairingView);
+    }
+
+    private void styleBackButton(Button button) {
+        button.setStyle("-fx-background-color: #ff5722; " +
+                "-fx-text-fill: white; " +
+                "-fx-font-weight: bold; " +
+                "-fx-font-size: 14px; " +
+                "-fx-padding: 10px 20px; " +
+                "-fx-border-radius: 5px; " +
+                "-fx-background-radius: 5px;");
+
+        button.setOnMouseEntered(e -> button.setStyle(
+                "-fx-background-color: #e64a19; " +
+                        "-fx-text-fill: white; " +
+                        "-fx-font-weight: bold; " +
+                        "-fx-font-size: 14px; " +
+                        "-fx-padding: 10px 20px; " +
+                        "-fx-border-radius: 5px; " +
+                        "-fx-background-radius: 5px;"));
+
+        button.setOnMouseExited(e -> button.setStyle(
+                "-fx-background-color: #ff5722; " +
+                        "-fx-text-fill: white; " +
+                        "-fx-font-weight: bold; " +
+                        "-fx-font-size: 14px; " +
+                        "-fx-padding: 10px 20px; " +
+                        "-fx-border-radius: 5px; " +
+                        "-fx-background-radius: 5px;"));
+    }
+
+    private void showReportInterface() {
+        getChildren().clear();
+        Label reportLabel = new Label("Assigned Report View");
+        Button backButton = new Button("Return to Main Menu");
+        backButton.setOnAction(e -> buildMainMenu());
+
+        getChildren().addAll(reportLabel, backButton);
     }
 }
