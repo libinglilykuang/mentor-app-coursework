@@ -2,6 +2,11 @@ package uk.ac.nott.cs.comp2013.mentorapp;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
+import java.io.FileReader;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.List;
 import uk.ac.nott.cs.comp2013.mentorapp.controller.AdminController;
 import uk.ac.nott.cs.comp2013.mentorapp.controller.LoginController;
 import uk.ac.nott.cs.comp2013.mentorapp.controller.MenteeController;
@@ -11,9 +16,9 @@ import uk.ac.nott.cs.comp2013.mentorapp.model.user.Administrator;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentee;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentor;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.User;
+import uk.ac.nott.cs.comp2013.mentorapp.util.CsvCleaner;
 import uk.ac.nott.cs.comp2013.mentorapp.view.*;
-
-import java.time.LocalDateTime;
+import com.opencsv.CSVReader;
 
 public class MentorApp extends Application {
   private HashMapRepository<User, String> repo;
@@ -22,22 +27,52 @@ public class MentorApp extends Application {
     Application.launch(args);
   }
 
-  private void createRepository() {
-    repo = new HashMapRepository<>();
-    repo.insert(new Mentee("mentee1", "1"));
-    repo.insert(new Mentee("mentee2", "2","Review CV"));
-    repo.insert(new Mentor("mentor1", "3"));
-    repo.insert(new Mentor("mentor2", "3",LocalDateTime.of(2024, 11, 5, 9, 0),
-            LocalDateTime.of(2024, 11, 25, 17, 0)));
-    repo.insert(new Mentor("mentor3", "3",LocalDateTime.of(2025, 11, 5, 9, 0),
-            LocalDateTime.of(2025, 11, 25, 17, 0)));
-    repo.insert(new Administrator("admin1", "4"));
-    //return repo;
-  }
+    private void createRepository() {
+        String rawCsvPath = "src/main/resources/MOCK_DATA.csv";
+        String cleanedCsvPath = "src/main/resources/CLEANED_MOCK_DATA.csv";
+        CsvCleaner.cleanCsv(rawCsvPath, cleanedCsvPath);
+
+        repo = new HashMapRepository<>();
+        try (CSVReader reader = new CSVReader(new FileReader(cleanedCsvPath))) {
+            List<String[]> records = reader.readAll();
+            for (String[] record : records) {
+                String username = record[0];
+                String password = record[1];
+                String role = record[2];
+                String extraInfo = record.length > 3 ? record[3] : "";
+                String startDate = record.length > 4 ? record[4] : null;
+                String endDate = record.length > 5 ? record[5] : null;
+
+                // Skip header rows
+                if ("ROLE".equalsIgnoreCase(role) || role.isEmpty()) {
+                    continue;
+                }
+                switch (role) {
+                    case "MENTEE" -> repo.insert(new Mentee(username, password, extraInfo));
+                    case "MENTOR" -> {
+                        LocalDateTime start = parseDateSafely(startDate);
+                        LocalDateTime end = parseDateSafely(endDate);
+                        repo.insert(new Mentor(username, password, start, end));
+                    }
+                    case "ADMIN" -> repo.insert(new Administrator(username, password));
+                }
+            }
+        } catch (Exception e) {}
+    }
+
+    // Utility method to parse dates safely without throwing exceptions
+    private LocalDateTime parseDateSafely(String date) {
+        if (date == null || date.isEmpty()) {
+            return null;
+        }
+        try {
+            return LocalDateTime.ofInstant(Instant.parse(date), ZoneId.systemDefault());
+        } catch (Exception e) {
+            return null; // Return null if the date is invalid
+        }
+    }
 
   private LoginView createLoginView() {
-    //LoginController controller = new LoginController(createRepository());
-    //LoginView loginView = new LoginView(controller);
     LoginController controller = new LoginController(repo);
     LoginView loginView = new LoginView(controller);
 
@@ -59,25 +94,40 @@ public class MentorApp extends Application {
 
   @Override
   public void start(Stage stage) throws Exception {
-    createRepository();
-    ViewManager sm = new ViewManager(stage);
+    try {
+        createRepository();
 
-    sm.addView(ViewManager.LOGIN, createLoginView());
+        // Ensure repository is initialized and has users
+        if (repo == null || repo.selectAll().isEmpty()) {
+          throw new IllegalStateException("Repository is not properly initialized or contains no users.");
+        }
 
-    Mentee mentee = (Mentee) repo.selectById("mentee1").orElse(null);
-    MenteeController menteeController = new MenteeController(mentee);
-    menteeController.requestSupport(SupportType.CV_REVIEW);
-    MenteeView menteeView = new MenteeView(menteeController);
-    sm.addView(ViewManager.MENTEE, menteeView);
+        ViewManager sm = new ViewManager(stage);
+        sm.addView(ViewManager.LOGIN, createLoginView());
 
-    //sm.addView(ViewManager.MENTEE, new MenteeView());
-    sm.addView(ViewManager.MENTOR, new MentorView());
-    //sm.addView(ViewManager.ADMIN, new AdminView());
-    AdminController adminController = new AdminController(repo);
-    sm.addView(ViewManager.ADMIN, new AdminView(adminController));
+        // Dynamically select the first available Mentee
+        Mentee mentee = repo.selectAll()
+                .stream()
+                .filter(user -> user instanceof Mentee)
+                .map(user -> (Mentee) user)
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("No Mentee found in the repository."));
 
-    sm.setStageView(ViewManager.LOGIN);
-    stage.setTitle("Mentor App");
-    stage.show();
+        MenteeController menteeController = new MenteeController(mentee);
+        menteeController.requestSupport(SupportType.CV_REVIEW);
+        MenteeView menteeView = new MenteeView(menteeController);
+        sm.addView(ViewManager.MENTEE, menteeView);
+
+        sm.addView(ViewManager.MENTOR, new MentorView());
+        AdminController adminController = new AdminController(repo);
+        sm.addView(ViewManager.ADMIN, new AdminView(adminController));
+
+        sm.setStageView(ViewManager.LOGIN);
+        stage.setTitle("Mentor App");
+        stage.show();
+      } catch (Exception e) {
+        System.err.println("Error during application start:");
+        e.printStackTrace();
+      }
   }
 }

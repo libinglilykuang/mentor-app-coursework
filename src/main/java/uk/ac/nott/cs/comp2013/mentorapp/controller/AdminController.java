@@ -76,10 +76,10 @@ public class AdminController {
         for (User user : userRepository.selectAll()) {
             if (user instanceof Mentor mentor && mentor.isAvailable()) {
                 availableMentors.add(mentor);
-                System.out.println("Adding available mentor: " + mentor.getUsername());
+                //System.out.println("Adding available mentor: " + mentor.getUsername());
             }
         }
-        System.out.println("Total available mentors: " + availableMentors.size());
+        //System.out.println("Total available mentors: " + availableMentors.size());
         return availableMentors;
     }
 }

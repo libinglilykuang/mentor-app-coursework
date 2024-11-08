@@ -3,13 +3,14 @@ package uk.ac.nott.cs.comp2013.mentorapp.view;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import uk.ac.nott.cs.comp2013.mentorapp.controller.AdminController;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentee;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentor;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+
 
 public class AdminPairingView extends VBox {
     private final AdminController adminController;
@@ -24,6 +25,25 @@ public class AdminPairingView extends VBox {
     }
 
     private void buildView() {
+        Image image = new Image(getClass().getResource("/pairing_image.png").toExternalForm());
+        ImageView imageView = new ImageView(image);
+
+        imageView.setFitWidth(180);
+        imageView.setFitHeight(180);
+        imageView.setPreserveRatio(true);
+
+        VBox imageContainer = new VBox(imageView);
+        imageContainer.setAlignment(Pos.TOP_LEFT);
+        imageContainer.setPadding(new Insets(10));
+
+        Label pairingLabel = new Label("Pairing Interface");
+        pairingLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #0b3d61;");
+        pairingLabel.setAlignment(Pos.CENTER);
+
+        HBox topContainer = new HBox(20, imageContainer, pairingLabel);
+        topContainer.setAlignment(Pos.CENTER_LEFT);
+        topContainer.setPadding(new Insets(10));
+
         Button pairButton = new Button("Pair Mentor and Mentee");
         pairButton.setStyle("-fx-background-color: #0b3d61; -fx-text-fill: white; -fx-font-weight: bold;" +
                 "-fx-font-size: 14px; -fx-padding: 10px 20px; -fx-border-radius: 5px; -fx-background-radius: 5px;");
@@ -81,14 +101,11 @@ public class AdminPairingView extends VBox {
         buttonContainer.setAlignment(Pos.CENTER);
         buttonContainer.setPrefHeight(80);
 
-        Label pairingLabel = new Label("Pairing Interface");
-        pairingLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #0b3d61;");
-        pairingLabel.setAlignment(Pos.CENTER);
-        HBox pairingLabelContainer = new HBox(pairingLabel);
+        /*HBox pairingLabelContainer = new HBox(pairingLabel);
         pairingLabelContainer.setAlignment(Pos.CENTER);
-        pairingLabelContainer.setPadding(new Insets(10));
+        pairingLabelContainer.setPadding(new Insets(10));*/
 
-        getChildren().addAll(pairingLabelContainer, listsContainer, buttonContainer);
+        getChildren().addAll(topContainer, listsContainer, buttonContainer);
         setSpacing(20);
         setAlignment(Pos.TOP_CENTER);
     }
