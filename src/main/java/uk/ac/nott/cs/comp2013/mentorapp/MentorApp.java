@@ -1,6 +1,7 @@
 package uk.ac.nott.cs.comp2013.mentorapp;
 
 import javafx.application.Application;
+import javafx.scene.Scene;
 import javafx.stage.Stage;
 import java.io.FileReader;
 import java.time.Instant;
@@ -119,6 +120,7 @@ public class MentorApp extends Application {
         sm.addView(ViewManager.MENTEE, menteeView);
 
         sm.addView(ViewManager.MENTOR, new MentorView());
+
         AdminController adminController = new AdminController(repo);
         sm.addView(ViewManager.ADMIN, new AdminView(adminController));
 
