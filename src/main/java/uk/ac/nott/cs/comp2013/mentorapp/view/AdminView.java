@@ -1,8 +1,10 @@
 package uk.ac.nott.cs.comp2013.mentorapp.view;
 
+import javafx.application.Platform;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import uk.ac.nott.cs.comp2013.mentorapp.controller.AdminController;
 
 public class AdminView extends VBox {
@@ -31,53 +33,23 @@ public class AdminView extends VBox {
 
     private void showPairingInterface() {
         getChildren().clear();
+        // Create the pairing view
+        AdminPairingView pairingView = new AdminPairingView(adminController);
 
-        if (pairingView.lookup("#backButton") == null) {
-            Button backButton = new Button("Return to Main Menu");
-            backButton.setId("backButton");
-            styleBackButton(backButton);
-
-            backButton.setOnAction(e -> buildMainMenu());
-            pairingView.getChildren().add(backButton);
-        }
-
+        // Set desired size for pairing window
+        Platform.runLater(() -> {
+            Stage stage = (Stage) getScene().getWindow();
+            stage.setWidth(900); // Set pairing window width
+            stage.setHeight(700); // Set pairing window height
+            stage.setMinWidth(800); // Set minimum width
+            stage.setMinHeight(600); // Set minimum height
+        });
         getChildren().add(pairingView);
     }
 
-    private void styleBackButton(Button button) {
-        button.setStyle("-fx-background-color: #ff5722; " +
-                "-fx-text-fill: white; " +
-                "-fx-font-weight: bold; " +
-                "-fx-font-size: 14px; " +
-                "-fx-padding: 10px 20px; " +
-                "-fx-border-radius: 5px; " +
-                "-fx-background-radius: 5px;");
-
-        button.setOnMouseEntered(e -> button.setStyle(
-                "-fx-background-color: #e64a19; " +
-                        "-fx-text-fill: white; " +
-                        "-fx-font-weight: bold; " +
-                        "-fx-font-size: 14px; " +
-                        "-fx-padding: 10px 20px; " +
-                        "-fx-border-radius: 5px; " +
-                        "-fx-background-radius: 5px;"));
-
-        button.setOnMouseExited(e -> button.setStyle(
-                "-fx-background-color: #ff5722; " +
-                        "-fx-text-fill: white; " +
-                        "-fx-font-weight: bold; " +
-                        "-fx-font-size: 14px; " +
-                        "-fx-padding: 10px 20px; " +
-                        "-fx-border-radius: 5px; " +
-                        "-fx-background-radius: 5px;"));
-    }
 
     private void showReportInterface() {
-        getChildren().clear();
-        Label reportLabel = new Label("Assigned Report View");
-        Button backButton = new Button("Return to Main Menu");
-        backButton.setOnAction(e -> buildMainMenu());
-
-        getChildren().addAll(reportLabel, backButton);
+        AssignedReportWindow reportWindow = new AssignedReportWindow(adminController);
+        reportWindow.showAndWait();
     }
 }

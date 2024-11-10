@@ -124,13 +124,18 @@ public class Mentor implements User, HasAvailability {
     return true;
   }
 
+  /*@Override
+  public String toString() {
+    return username; // For compatibility with existing logic
+  }*/
   @Override
   public String toString() {
     String availability = "Unavailable";
     if (startAvailability != null && endAvailability != null) {
       availability = startAvailability.format(formatter) + " - " + endAvailability.format(formatter);
     }
-    return "Mentor: " + username + " | Available: " + availability;
-
+    return username + "       " + availability;
   }
+
+
 }

@@ -93,6 +93,6 @@ public class Mentee implements User, HasCv {
 
   @Override
   public String toString() {
-    return "Mentee: "+username;
+    return username;
   }
 }
