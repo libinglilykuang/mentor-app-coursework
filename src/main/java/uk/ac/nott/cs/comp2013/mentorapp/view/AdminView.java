@@ -104,6 +104,5 @@ public class AdminView extends VBox {
 
     private void showReportInterface() {
         getScene().setRoot(new AssignedReportView(adminController));
-
     }
 }
