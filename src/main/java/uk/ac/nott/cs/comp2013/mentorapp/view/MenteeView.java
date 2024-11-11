@@ -35,11 +35,15 @@ public class MenteeView extends VBox {
         Button btnViewActivities =createStyledButton("Sign up for Activities", "#0b3d61", "#04253d");
         btnViewActivities.setOnAction(e -> {
             Stage stage = (Stage) getScene().getWindow();
-            stage.setScene(new Scene(new ActivitySignUpView(controller, stage), 400, 300));
+            stage.setScene(new Scene(new ActivitySignUpView(controller), 400, 300));
         });
         btnViewActivities.setPrefWidth(350);
 
-        Button btnAssignedSessions = createStyledButton("View Assigned Sessions","#0b3d61", "#04253d");
+        Button btnAssignedSessions = createStyledButton("View Assigned Mentor","#0b3d61", "#04253d");
+        btnAssignedSessions.setOnAction(e -> {
+            Stage stage = (Stage) getScene().getWindow();
+            stage.setScene(new Scene(new AssignedMentorView(controller), 800, 600));
+        });
         btnAssignedSessions.setPrefWidth(350);
 
         setSpacing(20);

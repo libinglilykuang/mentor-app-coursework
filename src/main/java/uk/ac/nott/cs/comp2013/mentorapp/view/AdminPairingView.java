@@ -176,7 +176,6 @@ public class AdminPairingView extends VBox {
         viewReportLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #ff5722; -fx-font-weight: bold; -fx-underline: true; -fx-cursor: hand;");
 
         getScene().setRoot(new AssignedReportView(adminController));
-
     }
 
     private void setupListViewSelection() {

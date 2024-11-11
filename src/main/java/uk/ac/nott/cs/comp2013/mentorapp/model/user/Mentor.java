@@ -116,18 +116,12 @@ public class Mentor implements User, HasAvailability {
 
     boolean withinAvailability = !now.isAfter(endAvailability);
     if (!withinAvailability) {
-      //System.out.println("Mentor " + username + " is not available because the availability period has ended.");
       return false;
     }
 
-    //System.out.println("Mentor " + username + " is available: true");
     return true;
   }
 
-  /*@Override
-  public String toString() {
-    return username; // For compatibility with existing logic
-  }*/
   @Override
   public String toString() {
     String availability = "Unavailable";
