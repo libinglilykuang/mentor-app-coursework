@@ -1,22 +1,14 @@
 package uk.ac.nott.cs.comp2013.mentorapp.view;
 
-import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 import uk.ac.nott.cs.comp2013.mentorapp.controller.MenteeController;
-import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentor;
-
 import java.net.URL;
-import java.util.List;
 
 public class AssignedMentorView extends VBox {
     private final MenteeController menteeController;
@@ -44,19 +36,11 @@ public class AssignedMentorView extends VBox {
         Label signingLabel = new Label("Signing up for Activities");
         Label viewMentorLabel = new Label("View Assigned Mentor");
         Label menteeHomeLabel = new Label("Home");
-
-        updateStyles(viewMentorLabel, menteeHomeLabel, signingLabel);
-
-        // Set styles for labels
-        menteeHomeLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #0b3d61; -fx-font-weight: bold; -fx-underline: false; -fx-cursor: hand;");
-        menteeHomeLabel.setOnMouseClicked(e -> switchToMenteeHome(menteeHomeLabel,signingLabel,viewMentorLabel));
-
-        // Set styles and actions for labels
-        signingLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #ff5722; -fx-font-weight: bold; -fx-underline: true; -fx-cursor: hand;");
-        signingLabel.setOnMouseClicked(e -> switchToSigningView(menteeHomeLabel,signingLabel,viewMentorLabel));
-
-        viewMentorLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #0b3d61; -fx-font-weight: bold; -fx-underline: false; -fx-cursor: hand;");
-        viewMentorLabel.setOnMouseClicked(e -> openReportWindow(menteeHomeLabel,signingLabel,viewMentorLabel));
+        menteeHomeLabel.setStyle(getInactiveStyle());
+        signingLabel.setStyle(getInactiveStyle());
+        viewMentorLabel.setStyle(getActiveStyle());
+        menteeHomeLabel.setOnMouseClicked(e -> getScene().setRoot(new MenteeView(menteeController)));
+        signingLabel.setOnMouseClicked(e -> getScene().setRoot(new ActivitySignUpView(menteeController)));
 
         // Label container
         HBox labelContainer = new HBox(20,  menteeHomeLabel,signingLabel,viewMentorLabel);
@@ -108,36 +92,12 @@ public class AssignedMentorView extends VBox {
         return activityCard;
     }
 
-    private void switchToMenteeHome(Label menteeHomeLabel, Label signingLabel, Label viewMentorLabel) {
-        updateStyles(menteeHomeLabel, signingLabel, viewMentorLabel);
-        Scene scene = getScene();
-        if (scene != null) {
-            scene.setRoot(new MenteeView(menteeController));
-        }
+    private String getActiveStyle() {
+        return "-fx-font-size: 16px; -fx-text-fill: #ff5722; -fx-font-weight: bold; -fx-underline: true; -fx-cursor: hand;";
     }
 
-    private void switchToSigningView(Label menteeHomeLabel, Label signingLabel, Label viewMentorLabel) {
-        updateStyles(signingLabel, menteeHomeLabel, viewMentorLabel);
-        Scene scene = getScene();
-        if (scene != null) {
-            scene.setRoot(new ActivitySignUpView(menteeController));
-        }
+    private String getInactiveStyle() {
+        return "-fx-font-size: 16px; -fx-text-fill: #0b3d61; -fx-font-weight: bold; -fx-underline: false; -fx-cursor: hand;";
     }
-
-    private void openReportWindow(Label menteeHomeLabel, Label signingLabel, Label viewMentorLabel) {
-        updateStyles(viewMentorLabel, menteeHomeLabel, signingLabel);
-        Scene scene = getScene();
-        if (scene != null) {
-            scene.setRoot(new AssignedMentorView(menteeController));
-        }
-    }
-
-    private void updateStyles(Label activeLabel, Label... otherLabels) {
-        activeLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #ff5722; -fx-font-weight: bold; -fx-underline: true; -fx-cursor: hand;");
-        for (Label label : otherLabels) {
-            label.setStyle("-fx-font-size: 16px; -fx-text-fill: #0b3d61; -fx-font-weight: bold; -fx-underline: false; -fx-cursor: hand;");
-        }
-    }
-
 
 }

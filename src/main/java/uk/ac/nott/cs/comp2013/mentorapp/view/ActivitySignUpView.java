@@ -1,4 +1,3 @@
-
 package uk.ac.nott.cs.comp2013.mentorapp.view;
 
 import javafx.collections.FXCollections;
@@ -12,7 +11,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import uk.ac.nott.cs.comp2013.mentorapp.controller.MenteeController;
 import uk.ac.nott.cs.comp2013.mentorapp.model.session.SupportType;
-
 import java.net.URL;
 
 public class ActivitySignUpView extends VBox {
@@ -49,15 +47,12 @@ public class ActivitySignUpView extends VBox {
         Label viewMentorLabel = new Label("View Assigned Mentor");
         Label menteeHomeLabel = new Label("Home");
 
-        updateStyles(signingLabel, menteeHomeLabel, viewMentorLabel);
-
         menteeHomeLabel.setStyle(getInactiveStyle());
         signingLabel.setStyle(getActiveStyle());
         viewMentorLabel.setStyle(getInactiveStyle());
 
-        menteeHomeLabel.setOnMouseClicked(e -> switchToMenteeHome(menteeHomeLabel, signingLabel, viewMentorLabel));
-        signingLabel.setOnMouseClicked(e -> switchToSigningView(menteeHomeLabel, signingLabel, viewMentorLabel));
-        viewMentorLabel.setOnMouseClicked(e -> openReportWindow(menteeHomeLabel, signingLabel, viewMentorLabel));
+        menteeHomeLabel.setOnMouseClicked(e -> getScene().setRoot(new MenteeView(menteeController)));
+        viewMentorLabel.setOnMouseClicked(e -> getScene().setRoot(new AssignedMentorView(menteeController)));
 
         // Navigation bar
         HBox labelContainer = new HBox(20, menteeHomeLabel, signingLabel, viewMentorLabel);
@@ -73,7 +68,6 @@ public class ActivitySignUpView extends VBox {
         titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;");
 
         HBox filterBox = createFilterBox();
-
         searchField.setPromptText("Search Activities...");
         searchField.textProperty().addListener((observable, oldValue, newValue) -> filterActivities(newValue));
         searchField.setStyle("-fx-padding: 10px; -fx-border-radius: 5px; -fx-background-radius: 5px;");
@@ -191,27 +185,6 @@ public class ActivitySignUpView extends VBox {
         alert.showAndWait();
     }
 
-    private void switchToMenteeHome(Label menteeHomeLabel, Label signingLabel, Label viewMentorLabel) {
-        updateStyles(menteeHomeLabel, signingLabel, viewMentorLabel);
-        getScene().setRoot(new MenteeView(menteeController));
-    }
-
-    private void switchToSigningView(Label menteeHomeLabel, Label signingLabel, Label viewMentorLabel) {
-        updateStyles(signingLabel, menteeHomeLabel, viewMentorLabel);
-    }
-
-    private void openReportWindow(Label menteeHomeLabel, Label signingLabel, Label viewMentorLabel) {
-        updateStyles(viewMentorLabel, menteeHomeLabel, signingLabel);
-        getScene().setRoot(new AssignedMentorView(menteeController));
-    }
-
-    private void updateStyles(Label activeLabel, Label... otherLabels) {
-        activeLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #ff5722; -fx-font-weight: bold; -fx-underline: true;");
-        for (Label label : otherLabels) {
-            label.setStyle("-fx-font-size: 16px; -fx-text-fill: #0b3d61; -fx-font-weight: bold; -fx-underline: false;");
-        }
-    }
-
     private String getActiveStyle() {
         return "-fx-font-size: 16px; -fx-text-fill: #ff5722; -fx-font-weight: bold; -fx-underline: true; -fx-cursor: hand;";
     }
@@ -221,242 +194,3 @@ public class ActivitySignUpView extends VBox {
     }
 
 }
-
-/*package uk.ac.nott.cs.comp2013.mentorapp.view;
-
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
-import uk.ac.nott.cs.comp2013.mentorapp.controller.MenteeController;
-import uk.ac.nott.cs.comp2013.mentorapp.model.session.SupportType;
-import java.net.URL;
-
-public class ActivitySignUpView extends VBox {
-    private final MenteeController menteeController;
-    private final ObservableList<SupportType> activityList;
-    private final ListView<SupportType> listView;
-    private final TextField searchField;
-
-    public ActivitySignUpView(MenteeController controller, Stage stage) {
-        this.menteeController = controller;
-        this.activityList = FXCollections.observableArrayList(SupportType.values());
-        this.listView = new ListView<>(activityList);
-        this.searchField = new TextField();
-        buildView(stage);
-    }
-
-    private void buildView(Stage stage) {
-        URL imageUrl = getClass().getResource("/pairing_image.png");
-        if (imageUrl == null) {
-            throw new IllegalArgumentException("Image resource not found: /pairing_image.png");
-        }
-        Image image = new Image(imageUrl.toExternalForm());
-        ImageView imageView = new ImageView(image);
-        imageView.setFitWidth(170);
-        imageView.setFitHeight(170);
-        imageView.setPreserveRatio(true);
-
-        VBox imageContainer = new VBox(imageView);
-        imageContainer.setAlignment(Pos.TOP_LEFT);
-        imageContainer.setPadding(new Insets(10));
-
-        Label signingLabel = new Label("Signing up for Activities");
-        Label viewMentorLabel = new Label("View Assigned Mentor");
-        Label menteeHomeLabel = new Label("Home");
-
-        // Set styles for labels
-        menteeHomeLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #0b3d61; -fx-font-weight: bold; -fx-underline: false; -fx-cursor: hand;");
-        menteeHomeLabel.setOnMouseClicked(e -> switchToMenteeHome(menteeHomeLabel,signingLabel, viewMentorLabel));
-
-        // Set styles and actions for labels
-        signingLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #ff5722; -fx-font-weight: bold; -fx-underline: true; -fx-cursor: hand;");
-        signingLabel.setOnMouseClicked(e -> switchToSigningView(menteeHomeLabel,signingLabel, viewMentorLabel));
-
-        viewMentorLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #0b3d61; -fx-font-weight: bold; -fx-underline: false; -fx-cursor: hand;");
-        viewMentorLabel.setOnMouseClicked(e -> openReportWindow(menteeHomeLabel,signingLabel, viewMentorLabel));
-
-        // Label container
-        HBox labelContainer = new HBox(20,  menteeHomeLabel,signingLabel,viewMentorLabel);
-        labelContainer.setAlignment(Pos.CENTER_LEFT);
-
-        HBox topContainer = new HBox(20, imageContainer, labelContainer);
-        topContainer.setAlignment(Pos.CENTER_LEFT);
-        topContainer.setPadding(new Insets(10, 10, 5, 10));
-        setStyle("-fx-background-color: white;");
-
-        Label titleLabel = new Label("Sign up for Activities");
-        titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;");
-
-        HBox filterBox = createFilterBox();
-
-        searchField.setPromptText("Search Activities...");
-        searchField.textProperty().addListener((observable, oldValue, newValue) -> filterActivities(newValue));
-        searchField.setStyle("-fx-padding: 10px; -fx-border-radius: 5px; -fx-background-radius: 5px;");
-
-        VBox headerBox = new VBox(15, titleLabel, filterBox, searchField);
-        headerBox.setStyle("-fx-background-color:#0278a4; -fx-padding: 20;");
-        headerBox.setAlignment(Pos.TOP_LEFT);
-
-        configureListView();
-
-        Button submitButton = createSubmitButton();
-
-        setSpacing(10);
-        setPadding(new Insets(20));
-        setAlignment(Pos.TOP_CENTER);
-        getChildren().addAll(topContainer,headerBox, listView, submitButton);
-    }
-
-    private HBox createFilterBox() {
-        Label mentorLabel = new Label("Mentor");
-        mentorLabel.setStyle("-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;");
-
-        ComboBox<String> adviserComboBox = new ComboBox<>();
-        adviserComboBox.getItems().addAll("Any", "Adviser A", "Adviser B", "Adviser C");
-        adviserComboBox.setValue("Any");
-        adviserComboBox.setStyle("-fx-background-color: white;");
-        adviserComboBox.setPrefWidth(200);
-
-        VBox mentorBox = new VBox(5, mentorLabel, adviserComboBox);
-        mentorBox.setAlignment(Pos.CENTER_LEFT);
-
-        Label campusLabel = new Label("Campus");
-        campusLabel.setStyle("-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;");
-
-        ComboBox<String> campusComboBox = new ComboBox<>();
-        campusComboBox.getItems().addAll("Any", "Jubilee", "University Park");
-        campusComboBox.setValue("Any");
-        campusComboBox.setStyle("-fx-background-color: white;");
-        campusComboBox.setPrefWidth(200);
-
-        VBox campusBox = new VBox(5, campusLabel, campusComboBox);
-        campusBox.setAlignment(Pos.CENTER_LEFT);
-
-        HBox filterBox = new HBox(40, mentorBox, campusBox);
-        filterBox.setAlignment(Pos.CENTER_LEFT);
-        return filterBox;
-    }
-
-    private void configureListView() {
-        listView.setCellFactory(param -> new ListCell<>() {
-            @Override
-            protected void updateItem(SupportType activity, boolean empty) {
-                super.updateItem(activity, empty);
-                if (empty || activity == null) {
-                    setText(null);
-                    setGraphic(null);
-                    setStyle("");
-                } else {
-                    Label activityTitle = new Label(activity.getDisplayName());
-                    activityTitle.setStyle("-fx-font-size: 14px; -fx-text-fill: black;");
-
-                    Label activityDescription = new Label(activity.getDescription());
-                    activityDescription.setStyle("-fx-font-size: 12px; -fx-text-fill: #555555;");
-
-                    VBox contentBox = new VBox(5, activityTitle, activityDescription);
-                    contentBox.setPadding(new Insets(10, 10, 10, 10));
-                    contentBox.setStyle("-fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;");
-
-                    if (isSelected()) {
-                        setStyle("-fx-background-color: #d6eaf8;");
-                    } else {
-                        setStyle("-fx-background-color: white;");
-                    }
-                    this.setOnMouseEntered(event -> {
-                        if (!isSelected()) {
-                            setStyle("-fx-background-color: #f2f2f2;");
-                        }
-                    });
-                    this.setOnMouseExited(event -> {
-                        if (!isSelected()) {
-                            setStyle("-fx-background-color: white;");
-                        }
-                    });
-                    setGraphic(contentBox);
-                }
-            }
-        });
-        listView.setStyle("-fx-background-color: white; -fx-border-color: #dcdcdc; -fx-border-width: 1px;");
-        listView.setMinWidth(400);
-        listView.setPrefHeight(550);
-    }
-    private void switchToMenteeHome(Label menteeHomeLabel, Label signingLabel, Label viewMentorLabel) {
-        // Update styles
-        menteeHomeLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #ff5722; -fx-font-weight: bold; -fx-underline: true; -fx-cursor: hand;");
-        signingLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #0b3d61; -fx-font-weight: bold; -fx-underline: false; -fx-cursor: hand;");
-        viewMentorLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #0b3d61; -fx-font-weight: bold; -fx-underline: false; -fx-cursor: hand;");
-
-        System.out.println("Navigating to Admin Home...");
-        getScene().setRoot(new MenteeView(menteeController));
-    }
-
-    private void switchToSigningView(Label menteeHomeLabel, Label signingLabel, Label viewMentorLabel) {
-        // Update styles
-        menteeHomeLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #0b3d61; -fx-font-weight: bold; -fx-underline: false; -fx-cursor: hand;");
-        signingLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #ff5722; -fx-font-weight: bold; -fx-underline: true; -fx-cursor: hand;");
-        viewMentorLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #0b3d61; -fx-font-weight: bold; -fx-underline: false; -fx-cursor: hand;");
-
-        // Logic to refresh or focus on the pairing view
-        System.out.println("Switched to Signing up Interface");
-    }
-
-    private void openReportWindow(Label adminHomeLabel, Label pairingLabel, Label viewReportLabel) {
-        // Update styles
-        adminHomeLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #0b3d61; -fx-font-weight: bold; -fx-underline: false; -fx-cursor: hand;");
-        pairingLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #0b3d61; -fx-font-weight: bold; -fx-underline: false; -fx-cursor: hand;");
-        viewReportLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #ff5722; -fx-font-weight: bold; -fx-underline: true; -fx-cursor: hand;");
-
-        getScene().setRoot(new AssignedMentorView(menteeController));
-    }
-
-    private Button createSubmitButton() {
-        Button submitButton = new Button("Submit");
-        submitButton.setStyle("-fx-background-color: #0b3d61; -fx-text-fill: white; -fx-font-weight: bold;" +
-                "-fx-font-size: 14px; -fx-padding: 10px 20px; -fx-border-radius: 5px; -fx-background-radius: 5px;");
-        submitButton.setOnMouseEntered(e -> submitButton.setStyle(
-                "-fx-background-color: #04253d; -fx-text-fill: white; -fx-font-weight: bold;" +
-                        "-fx-font-size: 14px; -fx-padding: 10px 20px; -fx-border-radius: 5px; -fx-background-radius: 5px;"));
-        submitButton.setOnMouseExited(e -> submitButton.setStyle(
-                "-fx-background-color: #0b3d61; -fx-text-fill: white; -fx-font-weight: bold;" +
-                        "-fx-font-size: 14px; -fx-padding: 10px 20px; -fx-border-radius: 5px; -fx-background-radius: 5px;"));
-        submitButton.setOnAction(e -> {
-            SupportType selectedType = listView.getSelectionModel().getSelectedItem();
-            if (selectedType != null) {
-                menteeController.requestSupport(selectedType);
-                showAlert("Activity Sign-up", "You have successfully signed up for: " + selectedType.getDisplayName());
-            } else {
-                showAlert("Error", "Please select an activity before submitting.");
-            }
-        });
-        return submitButton;
-    }
-
-    private void filterActivities(String filter) {
-        if (filter == null || filter.isEmpty()) {
-            listView.setItems(activityList);
-        } else {
-            ObservableList<SupportType> filteredList = FXCollections.observableArrayList();
-            for (SupportType activity : activityList) {
-                if (activity.getDisplayName().toLowerCase().contains(filter.toLowerCase())) {
-                    filteredList.add(activity);
-                }
-            }
-            listView.setItems(filteredList);
-        }
-    }
-
-    private void showAlert(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
-    }
-}*/

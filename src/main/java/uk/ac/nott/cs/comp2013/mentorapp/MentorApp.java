@@ -11,6 +11,7 @@ import java.util.List;
 import uk.ac.nott.cs.comp2013.mentorapp.controller.AdminController;
 import uk.ac.nott.cs.comp2013.mentorapp.controller.LoginController;
 import uk.ac.nott.cs.comp2013.mentorapp.controller.MenteeController;
+import uk.ac.nott.cs.comp2013.mentorapp.controller.MentorController;
 import uk.ac.nott.cs.comp2013.mentorapp.model.HashMapRepository;
 import uk.ac.nott.cs.comp2013.mentorapp.model.session.SupportType;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.Administrator;
@@ -106,7 +107,6 @@ public class MentorApp extends Application {
         ViewManager sm = new ViewManager(stage);
         sm.addView(ViewManager.LOGIN, createLoginView());
 
-        // Dynamically select the first available Mentee
         Mentee mentee = repo.selectAll()
                 .stream()
                 .filter(user -> user instanceof Mentee)
@@ -119,7 +119,14 @@ public class MentorApp extends Application {
         MenteeView menteeView = new MenteeView(menteeController);
         sm.addView(ViewManager.MENTEE, menteeView);
 
-        sm.addView(ViewManager.MENTOR, new MentorView());
+        Mentor mentor = repo.selectAll()
+                .stream()
+                .filter(user -> user instanceof Mentor)
+                .map(user -> (Mentor) user)
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("No Mentee found in the repository."));
+        MentorController mentorController = new MentorController(mentor);
+        sm.addView(ViewManager.MENTOR, new MentorView(mentorController));
 
         AdminController adminController = new AdminController(repo);
         sm.addView(ViewManager.ADMIN, new AdminView(adminController));

@@ -1,17 +1,23 @@
 package uk.ac.nott.cs.comp2013.mentorapp.model.user;
 
+import uk.ac.nott.cs.comp2013.mentorapp.model.session.SupportSession;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Mentor implements User, HasAvailability {
   private UserRole role = UserRole.MENTOR;
   private String username, password;
   private LocalDateTime startAvailability, endAvailability;
   private Mentee assignedMentee;
+  private List<SupportSession> assignedSessions;
   private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
   public Mentor(String username, String password) {
     this(username, password, null, null);
+    this.assignedSessions = new ArrayList<>();
   }
 
   public Mentor(String username, String password, LocalDateTime startAvailability,
@@ -129,6 +135,15 @@ public class Mentor implements User, HasAvailability {
       availability = startAvailability.format(formatter) + " - " + endAvailability.format(formatter);
     }
     return username + "       " + availability;
+  }
+
+  public void addSession(SupportSession session) {
+    assignedSessions.add(session);
+  }
+
+  // Get all sessions
+  public List<SupportSession> getAssignedSessions() {
+    return new ArrayList<>(assignedSessions);
   }
 
 
