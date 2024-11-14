@@ -29,13 +29,10 @@ public class AssignedReportView extends VBox {
             throw new IllegalArgumentException("Image resource not found: /pairing_image.png");
         }
         Image image = new Image(imageUrl.toExternalForm());
-
         ImageView imageView = new ImageView(image);
-
         imageView.setFitWidth(170);
         imageView.setFitHeight(170);
         imageView.setPreserveRatio(true);
-
         VBox imageContainer = new VBox(imageView);
         imageContainer.setAlignment(Pos.TOP_LEFT);
         imageContainer.setPadding(new Insets(10));
@@ -43,21 +40,14 @@ public class AssignedReportView extends VBox {
         Label pairingLabel = new Label("Pairing Mentors");
         Label viewReportLabel = new Label("View Assigned Report");
         Label adminHomeLabel = new Label("Home");
+        pairingLabel.setStyle(getInactiveStyle());
+        viewReportLabel.setStyle(getActiveStyle());
+        adminHomeLabel.setStyle(getInactiveStyle());
+        adminHomeLabel.setOnMouseClicked(e -> getScene().setRoot(new AdminView(adminController)));
+        pairingLabel.setOnMouseClicked(e -> getScene().setRoot(new AdminPairingView(adminController)));
 
-        // Set styles for labels
-        adminHomeLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #0b3d61; -fx-font-weight: bold; -fx-underline: false; -fx-cursor: hand;");
-        adminHomeLabel.setOnMouseClicked(e -> switchToAdminHome(adminHomeLabel, pairingLabel, viewReportLabel));
-
-        // Set styles and actions for labels
-        pairingLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #ff5722; -fx-font-weight: bold; -fx-underline: true; -fx-cursor: hand;");
-        pairingLabel.setOnMouseClicked(e -> switchToPairingView(adminHomeLabel, pairingLabel, viewReportLabel));
-
-        viewReportLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #0b3d61; -fx-font-weight: bold; -fx-underline: false; -fx-cursor: hand;");
-
-        // Label container
         HBox labelContainer = new HBox(20, adminHomeLabel,pairingLabel, viewReportLabel);
         labelContainer.setAlignment(Pos.CENTER_LEFT);
-        updateStyles(viewReportLabel, adminHomeLabel, pairingLabel);
 
         HBox topContainer = new HBox(20, imageContainer, labelContainer);
         topContainer.setAlignment(Pos.CENTER_LEFT);
@@ -74,37 +64,6 @@ public class AssignedReportView extends VBox {
         layout.setSpacing(20);
 
         getChildren().addAll(topContainer, reportTableView);
-
-    }
-
-    private void updateStyles(Label activeLabel, Label... otherLabels) {
-        activeLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #ff5722; -fx-font-weight: bold; -fx-underline: true; -fx-cursor: hand;");
-
-        for (Label label : otherLabels) {
-            label.setStyle("-fx-font-size: 16px; -fx-text-fill: #0b3d61; -fx-font-weight: bold; -fx-underline: false; -fx-cursor: hand;");
-        }
-    }
-
-    private void switchToPairingView(Label adminHomeLabel, Label pairingLabel, Label viewReportLabel) {
-        // Update styles
-        adminHomeLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #0b3d61; -fx-font-weight: bold; -fx-underline: false; -fx-cursor: hand;");
-        pairingLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #ff5722; -fx-font-weight: bold; -fx-underline: true; -fx-cursor: hand;");
-        viewReportLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #0b3d61; -fx-font-weight: bold; -fx-underline: false; -fx-cursor: hand;");
-
-        // Logic to refresh or focus on the pairing view
-        System.out.println("Switched to Pairing Interface");
-    }
-
-    private void switchToAdminHome(Label adminHomeLabel, Label pairingLabel, Label viewReportLabel) {
-        // Update styles
-        adminHomeLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #ff5722; -fx-font-weight: bold; -fx-underline: true; -fx-cursor: hand;");
-        pairingLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #0b3d61; -fx-font-weight: bold; -fx-underline: false; -fx-cursor: hand;");
-        viewReportLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #0b3d61; -fx-font-weight: bold; -fx-underline: false; -fx-cursor: hand;");
-
-        // Logic to navigate to AdminView
-        System.out.println("Navigating to Admin Home...");
-        // Notify the main controller or parent layout to switch views
-        getScene().setRoot(new AdminView(adminController)); // Replace the current view with AdminView
     }
 
     private void setupTableView() {
@@ -144,7 +103,7 @@ public class AssignedReportView extends VBox {
                     Pair currentPair = getTableRow().getItem();
 
                     if (currentPair != null && currentPair.equals(selectedPair)) {
-                        setStyle("-fx-font-weight: bold; -fx-text-fill: black;");
+                        setStyle("-fx-font-weight: bold; -fx-text-fill: white;");
                     } else {
                         setStyle("-fx-font-weight: normal; -fx-text-fill: black;");
                     }
@@ -182,5 +141,13 @@ public class AssignedReportView extends VBox {
         public String getMenteeName() {
             return menteeName;
         }
+    }
+
+    private String getActiveStyle() {
+        return "-fx-font-size: 16px; -fx-text-fill: #ff5722; -fx-font-weight: bold; -fx-underline: true; -fx-cursor: hand;";
+    }
+
+    private String getInactiveStyle() {
+        return "-fx-font-size: 16px; -fx-text-fill: #0b3d61; -fx-font-weight: bold; -fx-underline: false; -fx-cursor: hand;";
     }
 }

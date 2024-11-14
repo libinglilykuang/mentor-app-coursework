@@ -30,28 +30,34 @@ public class MentorView extends VBox {
         logoImageView.setFitHeight(350);
         logoImageView.setPreserveRatio(true);
 
-        Label welcomeLabel = new Label("Welcome, Mentor!");
+        Label welcomeLabel = new Label("Welcome, " + controller.getMentor().getUsername() + "!");
         welcomeLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
         getChildren().add(welcomeLabel);
 
-        Mentor mentor = new Mentor("mentor123", "password123");
-        // Create buttons for Mentor actions
         Button btnSetAvailability = createStyledButton("Set Availability", "#0b3d61", "#04253d");
         btnSetAvailability.setOnAction(e -> {
             Stage stage = (Stage) getScene().getWindow();
-            stage.setScene(new Scene(new MentorAvailabilityView(mentor), 400, 300));
+            stage.setScene(new Scene(new MentorAvailabilityView(controller.getMentor()), 400, 300));
         });
         btnSetAvailability.setPrefWidth(350);
 
         Button btnAssignedSessions = createStyledButton("View Assigned Sessions", "#0b3d61", "#04253d");
         btnAssignedSessions.setOnAction(e -> {
             Stage stage = (Stage) getScene().getWindow();
-            stage.setScene(new Scene(new AssignedMenteeView(mentor), 800, 600));
+            stage.setScene(new Scene(new AssignedMenteeView(controller.getMentor()), 800, 600));
         });
         btnAssignedSessions.setPrefWidth(350);
 
+        Button btnEditProfile = createStyledButton("Edit Profile", "#0b3d61", "#04253d");
+        btnEditProfile.setOnAction(e -> {
+            Stage stage = (Stage) getScene().getWindow();
+            Scene currentScene = stage.getScene();
+            stage.setScene(new Scene(new EditProfileView(controller, currentScene), 800, 600));
+        });
+        btnEditProfile.setPrefWidth(350);
+
         // Add all components to the content box
-        contentBox.getChildren().addAll(logoImageView, welcomeLabel, btnSetAvailability, btnAssignedSessions);
+        contentBox.getChildren().addAll(logoImageView, welcomeLabel, btnSetAvailability, btnAssignedSessions,btnEditProfile);
 
         // Style the content box
         contentBox.setMaxWidth(400);

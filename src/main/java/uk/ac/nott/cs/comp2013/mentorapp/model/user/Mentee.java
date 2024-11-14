@@ -8,16 +8,42 @@ public class Mentee implements User, HasCv {
   private String username, password, cvText;
   private Mentor assignedMentor;
   private SupportType supportRequest;
+  private MentorType preferredMentorType;
+  private String realName;
 
   public Mentee(String username, String password) {
-    this(username, password, "");
+    this.username = username;
+    this.password = password;
   }
 
-  public Mentee(String username, String password, String cvText) {
+  public Mentee(String username, String password, String realName) {
+    this.username = username;
+    this.password = password;
+    this.realName = realName;
+  }
+
+  /*public Mentee(String username, String password, String cvText) {
     this.username = username;
     this.password = password;
     this.cvText = cvText;
+  }*/
+
+  public Mentee(String username, String password, String cvText,SupportType supportType) {
+    this.username = username;
+    this.password = password;
+    this.cvText = cvText;
+    this.supportRequest=supportType;
   }
+
+
+  public Mentee(String username, String password, String cvText,SupportType supportType,MentorType preferredMentorType) {
+    this.username = username;
+    this.password = password;
+    this.cvText = cvText;
+    this.supportRequest=supportType;
+    this.preferredMentorType = preferredMentorType;
+  }
+
   @Override
   public String getCvText() {
     return cvText;
@@ -87,12 +113,27 @@ public class Mentee implements User, HasCv {
     this.supportRequest = supportRequest;
   }
 
-  public boolean hasRequestedSupport() {
-    return supportRequest != null;
+  public MentorType getPreferredMentorType() {
+    return preferredMentorType;
+  }
+
+  public void setPreferredMentorType(MentorType preferredMentorType) {
+    this.preferredMentorType = preferredMentorType;
+  }
+
+  public String getRealName() {
+    return realName;
+  }
+
+  public void setRealName(String realName) {
+    this.realName = realName;
   }
 
   @Override
   public String toString() {
-    return username;
+    return "Mentee{" +
+            "username='" + getUsername() + '\'' +
+            ", realName='" + (realName != null ? realName : "Not Set") + '\'' +
+            '}';
   }
 }

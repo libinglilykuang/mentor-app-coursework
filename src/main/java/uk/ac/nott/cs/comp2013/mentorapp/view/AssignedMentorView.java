@@ -2,11 +2,14 @@ package uk.ac.nott.cs.comp2013.mentorapp.view;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import uk.ac.nott.cs.comp2013.mentorapp.controller.MenteeController;
 import java.net.URL;
 
@@ -46,22 +49,67 @@ public class AssignedMentorView extends VBox {
         HBox labelContainer = new HBox(20,  menteeHomeLabel,signingLabel,viewMentorLabel);
         labelContainer.setAlignment(Pos.CENTER_LEFT);
 
-        HBox topContainer = new HBox(20, imageContainer, labelContainer);
+        // Add profile button
+        HBox profileButton = createUserProfileButton();
+
+        HBox topContainer = new HBox(20, imageContainer, labelContainer,profileButton);
         topContainer.setAlignment(Pos.CENTER_LEFT);
+        HBox.setHgrow(profileButton, Priority.ALWAYS);
         topContainer.setPadding(new Insets(10, 10, 5, 10));
         setStyle("-fx-background-color: white;");
 
         Label titleLabel = new Label("Assigned Mentors");
         titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
 
-        HBox titleBox = createTitleBox("Past Activities");
+        VBox pastActivitiesBox = new VBox(20,
+                createTitleBox("Past Activities"),
+                createActivityCard("CV Review", "Mentor1", "Mon - Fri, 10:00 AM - 4:00 PM")
+        );
+        pastActivitiesBox.setPadding(new Insets(20));
+        pastActivitiesBox.setSpacing(10);
 
-        VBox activityCard = createActivityCard("CV Review", "Mentor123", "Mon - Fri, 10:00 AM - 4:00 PM");
+        VBox futureActivitiesBox = new VBox(20,
+                createTitleBox("Future Activities"),
+                createActivityCard("Career Choice: How to enter a specific career field", "Mentor2", "Mon - Wed, 2:00 PM - 5:00 PM")
+        );
+        futureActivitiesBox.setPadding(new Insets(20));
+        futureActivitiesBox.setSpacing(10);
+
+        VBox mainContainer = new VBox(30, pastActivitiesBox, futureActivitiesBox);
+        mainContainer.setPadding(new Insets(30));
+        mainContainer.setAlignment(Pos.TOP_CENTER);
 
         setSpacing(20);
         setPadding(new Insets(20));
         setAlignment(Pos.TOP_CENTER);
-        getChildren().addAll(topContainer,titleLabel, titleBox,activityCard);
+        getChildren().addAll(topContainer,titleLabel, mainContainer);
+    }
+
+    private HBox createUserProfileButton() {
+        // User icon
+        ImageView userIcon = new ImageView(new Image(getClass().getResourceAsStream("/user_icon.png"))); // Replace with your icon path
+        userIcon.setFitWidth(30);
+        userIcon.setPreserveRatio(true);
+
+        // Username label
+        Label usernameLabel = new Label(menteeController.getMentee().getUsername());
+        usernameLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #0b3d61; -fx-font-weight: bold;");
+
+        // Combine user icon and username
+        HBox profileButton = new HBox(8, userIcon, usernameLabel);
+        profileButton.setAlignment(Pos.CENTER_RIGHT);
+        profileButton.setPadding(new Insets(5));
+        profileButton.setStyle("-fx-cursor: hand;");
+
+        // Add click event to navigate to EditProfileView
+        profileButton.setOnMouseClicked(e -> {
+            // Ensure the Scene and Window are accessed during the event
+            Stage stage = (Stage) profileButton.getScene().getWindow();
+            Scene currentScene = stage.getScene(); // Safely get the current scene
+            stage.setScene(new Scene(new EditProfileView(menteeController, currentScene), 800, 600));
+        });
+
+        return profileButton;
     }
 
     private HBox createTitleBox(String title) {

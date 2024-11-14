@@ -4,11 +4,14 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import uk.ac.nott.cs.comp2013.mentorapp.controller.MenteeController;
 import uk.ac.nott.cs.comp2013.mentorapp.model.session.SupportType;
 import java.net.URL;
@@ -58,8 +61,11 @@ public class ActivitySignUpView extends VBox {
         HBox labelContainer = new HBox(20, menteeHomeLabel, signingLabel, viewMentorLabel);
         labelContainer.setAlignment(Pos.CENTER_LEFT);
 
-        HBox topContainer = new HBox(20, imageContainer, labelContainer);
+        HBox profileBox = createUserProfileButton();
+
+        HBox topContainer = new HBox(20, imageContainer, labelContainer, profileBox);
         topContainer.setAlignment(Pos.CENTER_LEFT);
+        HBox.setHgrow(profileBox, Priority.ALWAYS);
         topContainer.setPadding(new Insets(10, 10, 5, 10));
         setStyle("-fx-background-color: white;");
 
@@ -89,33 +95,55 @@ public class ActivitySignUpView extends VBox {
         getChildren().addAll(topContainer, headerBox, listView, submitButton);
     }
 
+    private HBox createUserProfileButton() {
+        // User icon
+        ImageView userIcon = new ImageView(new Image(getClass().getResourceAsStream("/user_icon.png"))); // Replace with your icon path
+        userIcon.setFitWidth(30);
+        userIcon.setPreserveRatio(true);
+
+        // Username label
+        Label usernameLabel = new Label(menteeController.getMentee().getUsername());
+        usernameLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #0b3d61; -fx-font-weight: bold;");
+
+        // Combine user icon and username
+        HBox profileButton = new HBox(8, userIcon, usernameLabel);
+        profileButton.setAlignment(Pos.CENTER_RIGHT);
+        profileButton.setPadding(new Insets(5));
+        profileButton.setStyle("-fx-cursor: hand;");
+
+        // Add click event to navigate to EditProfileView
+        profileButton.setOnMouseClicked(e -> {
+            // Ensure the Scene and Window are accessed during the event
+            Stage stage = (Stage) profileButton.getScene().getWindow();
+            Scene currentScene = stage.getScene(); // Safely get the current scene
+            stage.setScene(new Scene(new EditProfileView(menteeController, currentScene), 800, 600));
+        });
+
+        return profileButton;
+    }
+
     private HBox createFilterBox() {
-        Label mentorLabel = new Label("Mentor");
+        Label mentorLabel = new Label("Mentor:");
         mentorLabel.setStyle("-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;");
 
         ComboBox<String> adviserComboBox = new ComboBox<>();
-        adviserComboBox.getItems().addAll("Any", "Adviser A", "Adviser B", "Adviser C");
+        adviserComboBox.getItems().addAll(
+                "Any",
+                "Alumni from the department",
+                "Tech Industry Professional",
+                "Second Year Student",
+                "Third Year Student"
+        );
         adviserComboBox.setValue("Any");
         adviserComboBox.setStyle("-fx-background-color: white;");
         adviserComboBox.setPrefWidth(200);
 
-        VBox mentorBox = new VBox(5, mentorLabel, adviserComboBox);
+        HBox mentorBox = new HBox(10, mentorLabel, adviserComboBox);
         mentorBox.setAlignment(Pos.CENTER_LEFT);
 
-        Label campusLabel = new Label("Campus");
-        campusLabel.setStyle("-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;");
-
-        ComboBox<String> campusComboBox = new ComboBox<>();
-        campusComboBox.getItems().addAll("Any", "Jubilee", "University Park");
-        campusComboBox.setValue("Any");
-        campusComboBox.setStyle("-fx-background-color: white;");
-        campusComboBox.setPrefWidth(200);
-
-        VBox campusBox = new VBox(5, campusLabel, campusComboBox);
-        campusBox.setAlignment(Pos.CENTER_LEFT);
-
-        HBox filterBox = new HBox(40, mentorBox, campusBox);
+        HBox filterBox = new HBox(40, mentorBox);
         filterBox.setAlignment(Pos.CENTER_LEFT);
+
         return filterBox;
     }
 
@@ -143,7 +171,7 @@ public class ActivitySignUpView extends VBox {
                 }
             }
         });
-        listView.setStyle("-fx-background-color: white; -fx-border-color: #dcdcdc; -fx-border-width: 1px;");
+        listView.setStyle("-fx-background-color: white; -fx-font-size: 14px;-fx-border-color: #dcdcdc; -fx-border-width: 1px;");
         listView.setMinWidth(400);
         listView.setPrefHeight(550);
     }

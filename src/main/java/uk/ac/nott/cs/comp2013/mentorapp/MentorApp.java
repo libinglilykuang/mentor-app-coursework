@@ -1,7 +1,6 @@
 package uk.ac.nott.cs.comp2013.mentorapp;
 
 import javafx.application.Application;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
 import java.io.FileReader;
 import java.time.Instant;
@@ -13,6 +12,7 @@ import uk.ac.nott.cs.comp2013.mentorapp.controller.LoginController;
 import uk.ac.nott.cs.comp2013.mentorapp.controller.MenteeController;
 import uk.ac.nott.cs.comp2013.mentorapp.controller.MentorController;
 import uk.ac.nott.cs.comp2013.mentorapp.model.HashMapRepository;
+import uk.ac.nott.cs.comp2013.mentorapp.model.user.MentorType;
 import uk.ac.nott.cs.comp2013.mentorapp.model.session.SupportType;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.Administrator;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentee;
@@ -44,22 +44,66 @@ public class MentorApp extends Application {
                 String extraInfo = record.length > 3 ? record[3] : "";
                 String startDate = record.length > 4 ? record[4] : null;
                 String endDate = record.length > 5 ? record[5] : null;
+                String activityType = record.length > 6 ? record[6] : "";
+                String mentorType = record.length > 7 ? record[7] : "";
 
                 // Skip header rows
                 if ("ROLE".equalsIgnoreCase(role) || role.isEmpty()) {
                     continue;
                 }
+
+                SupportType supportType = parseSupportType(activityType);
+                MentorType mentorType1=parseMentorType(mentorType);
+
                 switch (role) {
-                    case "MENTEE" -> repo.insert(new Mentee(username, password, extraInfo));
+                    case "MENTEE" ->{
+                        if (supportType != null) {
+                            if(mentorType!=null){
+                                repo.insert(new Mentee(username, password, extraInfo, supportType,mentorType1));
+                            }
+                            repo.insert(new Mentee(username, password, extraInfo, supportType));
+                        } else {
+                            repo.insert(new Mentee(username, password, extraInfo));
+                        }
+                    }
                     case "MENTOR" -> {
                         LocalDateTime start = parseDateSafely(startDate);
                         LocalDateTime end = parseDateSafely(endDate);
-                        repo.insert(new Mentor(username, password, start, end));
+                        MentorType type = parseMentorType(mentorType);
+                        repo.insert(new Mentor(username, password, start, end,type));
                     }
                     case "ADMIN" -> repo.insert(new Administrator(username, password));
                 }
             }
         } catch (Exception e) {}
+    }
+
+    /**
+     * Parses the activity type from CSV into the SupportType enum.
+     *
+     * @param activityType The activity type as a string.
+     * @return The corresponding SupportType, or null if no match is found.
+     */
+    private SupportType parseSupportType(String activityType) {
+        for (SupportType type : SupportType.values()) {
+            if (type.getDisplayName().equalsIgnoreCase(activityType)) {
+                return type;
+            }
+        }
+        return null;
+    }
+
+    private MentorType parseMentorType(String mentorType) {
+        if (mentorType == null || mentorType.trim().isEmpty()) {
+            return null;
+        }
+        for (MentorType type : MentorType.values()) {
+            if (type.getDescription().equalsIgnoreCase(mentorType) || type.name().equalsIgnoreCase(mentorType)) {
+                return type;
+            }
+        }
+        System.err.println("Unknown mentor type: " + mentorType);
+        return null;
     }
 
     // Utility method to parse dates safely without throwing exceptions
@@ -115,7 +159,10 @@ public class MentorApp extends Application {
                 .orElseThrow(() -> new IllegalStateException("No Mentee found in the repository."));
 
         MenteeController menteeController = new MenteeController(mentee);
-        menteeController.requestSupport(SupportType.CV_REVIEW);
+
+        if (mentee.getSupportRequest() == null) {
+            menteeController.requestSupport(SupportType.CV_REVIEW);
+        }
         MenteeView menteeView = new MenteeView(menteeController);
         sm.addView(ViewManager.MENTEE, menteeView);
 

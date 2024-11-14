@@ -1,7 +1,6 @@
 package uk.ac.nott.cs.comp2013.mentorapp.model.user;
 
 import uk.ac.nott.cs.comp2013.mentorapp.model.session.SupportSession;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -13,19 +12,30 @@ public class Mentor implements User, HasAvailability {
   private LocalDateTime startAvailability, endAvailability;
   private Mentee assignedMentee;
   private List<SupportSession> assignedSessions;
+  private MentorType mentorType;
+  private String realName;
   private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
   public Mentor(String username, String password) {
-    this(username, password, null, null);
+    this.username = username;
+    this.password = password;
     this.assignedSessions = new ArrayList<>();
   }
 
+  public Mentor(String username, String password, String realName) {
+    this.username = username;
+    this.password = password;
+    this.assignedSessions = new ArrayList<>();
+    this.realName = realName;
+  }
+
   public Mentor(String username, String password, LocalDateTime startAvailability,
-      LocalDateTime endAvailability) {
+      LocalDateTime endAvailability,MentorType mentorType) {
     this.username = username;
     this.password = password;
     this.startAvailability = startAvailability;
     this.endAvailability = endAvailability;
+    this.mentorType = mentorType;
   }
 
   @Override
@@ -128,6 +138,21 @@ public class Mentor implements User, HasAvailability {
     return true;
   }
 
+  public String getRealName() {
+    return realName;
+  }
+
+  public void setRealName(String realName) {
+    this.realName = realName;
+  }
+  public MentorType getMentorType() {
+    return mentorType;
+  }
+
+  public void setMentorType(MentorType mentorType) {
+    this.mentorType = mentorType;
+  }
+
   @Override
   public String toString() {
     String availability = "Unavailable";
@@ -141,10 +166,8 @@ public class Mentor implements User, HasAvailability {
     assignedSessions.add(session);
   }
 
-  // Get all sessions
   public List<SupportSession> getAssignedSessions() {
-    return new ArrayList<>(assignedSessions);
+    return assignedSessions != null ? new ArrayList<>(assignedSessions) : new ArrayList<>();
   }
-
 
 }

@@ -5,6 +5,7 @@ import javafx.stage.Stage;
 import javafx.util.Pair;
 import uk.ac.nott.cs.comp2013.mentorapp.model.Repository;
 import uk.ac.nott.cs.comp2013.mentorapp.model.session.SupportSession;
+import uk.ac.nott.cs.comp2013.mentorapp.model.user.Administrator;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentee;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentor;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.User;
@@ -18,9 +19,22 @@ import java.util.stream.Collectors;
 public class AdminController {
     private Repository<User, String> userRepository;
     private List<SupportSession> sessions = new ArrayList<>();
+    private Administrator currentAdmin;
 
     public AdminController(Repository<User, String> userRepository) {
         this.userRepository = userRepository;
+    }
+
+    public void setCurrentAdmin(Administrator admin) {
+        this.currentAdmin = admin;
+    }
+
+    public Administrator getAdmin() {
+        if (currentAdmin != null) {
+            return currentAdmin;
+        } else {
+            throw new IllegalStateException("No admin is currently logged in.");
+        }
     }
 
     public boolean pairMenteeWithMentor(String menteeId, String mentorId) {
@@ -31,19 +45,19 @@ public class AdminController {
                 && menteeOpt.get() instanceof Mentee mentee
                 && mentorOpt.get() instanceof Mentor mentor) {
 
-            if (mentor.isAvailable()) {
-                if (mentor.assignMentee(mentee)) {
-                    mentee.assignMentor(mentor);
-                    createSupportSession(mentor, mentee);
-                    System.out.println("Mentee " + menteeId + " successfully paired with Mentor " + mentorId);
-                    return true;
-                }
-            } else {
-                System.out.println("This mentor is already assigned to a mentee for the current period.");
+            if (!mentor.isAvailable()) {
+                System.out.println("This mentor is already assigned.");
+                return false;
             }
-        } else {
-            System.out.println("Mentee or Mentor not found or invalid type");
+
+            if (mentor.assignMentee(mentee)) {
+                mentee.assignMentor(mentor);
+                createSupportSession(mentor, mentee);
+                System.out.println("Mentee " + menteeId + " successfully paired with Mentor " + mentorId);
+                return true;
+            }
         }
+        System.out.println("Mentee or Mentor not found or invalid type.");
         return false;
     }
 
@@ -74,14 +88,14 @@ public class AdminController {
     }
 
     public List<Pair<Mentor, Mentee>> getAssignedPairs() {
-        List<Pair<Mentor, Mentee>> assignedPairs = new ArrayList<>();
-        for (SupportSession session : sessions) {
-            if (session.isSessionActive()) {
-                assignedPairs.add(new Pair<>(session.getMentor(), session.getMentee()));
-            }
-        }
-        return assignedPairs;
+        return userRepository.selectAll().stream()
+                .filter(user -> user instanceof Mentee)
+                .map(user -> (Mentee) user)
+                .filter(mentee -> mentee.getAssignedMentor() != null)
+                .map(mentee -> new Pair<>(mentee.getAssignedMentor(), mentee))
+                .collect(Collectors.toList());
     }
+
 
 }
 

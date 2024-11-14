@@ -58,11 +58,6 @@ public class SupportSession {
         return today.isAfter(startDate) && today.isBefore(endDate);
     }
 
-    public long getRemainingMonths() {
-        long months = ChronoUnit.MONTHS.between(LocalDate.now(), endDate);
-        return Math.max(months, 0); // 确保不返回负值
-    }
-
     public SessionStatus getSessionStatus() {
         LocalDate today = LocalDate.now();
         if (today.isBefore(startDate)) {

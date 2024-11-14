@@ -8,6 +8,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import uk.ac.nott.cs.comp2013.mentorapp.controller.MentorController;
@@ -24,7 +25,6 @@ public class MentorAvailabilityView extends VBox {
     private final DatePicker endDatePicker = new DatePicker();
     private final ComboBox<String> endTimePicker = new ComboBox<>();
     private final Label availabilityLabel = new Label("You have not set any available time yet.");
-    private final VBox availabilityBox = new VBox(10);
 
     public MentorAvailabilityView(Mentor mentor) {
         this.mentor = mentor;
@@ -61,8 +61,10 @@ public class MentorAvailabilityView extends VBox {
         HBox labelContainer = new HBox(20, mentorHomeLabel, signingLabel, viewMentorLabel);
         labelContainer.setAlignment(Pos.CENTER_LEFT);
 
-        HBox topContainer = new HBox(20, imageContainer, labelContainer);
+        HBox profileBox = createUserProfileButton();
+        HBox topContainer = new HBox(20, imageContainer, labelContainer, profileBox);
         topContainer.setAlignment(Pos.CENTER_LEFT);
+        HBox.setHgrow(profileBox, Priority.ALWAYS);
         topContainer.setPadding(new Insets(10, 10, 5, 10));
         setStyle("-fx-background-color: white;");
 
@@ -119,6 +121,33 @@ public class MentorAvailabilityView extends VBox {
         availabilityBox.setPadding(new Insets(5));
 
         getChildren().addAll(topContainer,headerBox, gridPane, buttonBox,belowBox,availabilityBox);
+    }
+
+    private HBox createUserProfileButton() {
+        // User icon
+        ImageView userIcon = new ImageView(new Image(getClass().getResourceAsStream("/user_icon.png"))); // Replace with your icon path
+        userIcon.setFitWidth(30);
+        userIcon.setPreserveRatio(true);
+
+        // Username label
+        Label usernameLabel = new Label(mentor.getUsername());
+        usernameLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #0b3d61; -fx-font-weight: bold;");
+
+        // Combine user icon and username
+        HBox profileButton = new HBox(8, userIcon, usernameLabel);
+        profileButton.setAlignment(Pos.CENTER_RIGHT);
+        profileButton.setPadding(new Insets(5));
+        profileButton.setStyle("-fx-cursor: hand;");
+
+        // Add click event to navigate to EditProfileView
+        profileButton.setOnMouseClicked(e -> {
+            // Ensure the Scene and Window are accessed during the event
+            Stage stage = (Stage) profileButton.getScene().getWindow();
+            Scene currentScene = stage.getScene(); // Safely get the current scene
+            stage.setScene(new Scene(new EditProfileView(new MentorController(mentor), currentScene), 800, 600));
+        });
+
+        return profileButton;
     }
 
     private void saveAvailability() {

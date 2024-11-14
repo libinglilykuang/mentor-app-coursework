@@ -8,6 +8,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import uk.ac.nott.cs.comp2013.mentorapp.controller.AdminController;
+import uk.ac.nott.cs.comp2013.mentorapp.model.user.MentorType;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentee;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentor;
 import javafx.scene.control.Alert.AlertType;
@@ -179,17 +180,33 @@ public class AdminPairingView extends VBox {
     }
 
     private void setupListViewSelection() {
-        // Mentee TableView setup
         TableColumn<Mentee, String> usernameColumn = new TableColumn<>("Mentee Name");
         usernameColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getUsername()));
 
         TableColumn<Mentee, String> requestTypeColumn = new TableColumn<>("Request Type");
-        requestTypeColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getSupportRequest().toString())); // Convert SupportType to String
+        requestTypeColumn.setCellValueFactory(cellData -> {
+            Mentee mentee = cellData.getValue();
+            String activityType = mentee.getSupportRequest() != null
+                    ? mentee.getSupportRequest().getDisplayName()
+                    : "No Request";
+            return new SimpleStringProperty(activityType);
+        });
+
+        TableColumn<Mentee, String> preferredMentorTypeColumn = new TableColumn<>("Preferred Mentor Type");
+        preferredMentorTypeColumn.setCellValueFactory(cellData -> {
+            Mentee mentee = cellData.getValue();
+            MentorType preferredType = mentee.getPreferredMentorType();
+            return new SimpleStringProperty(preferredType != null ? preferredType.getDescription() : "Not Set");
+        });
+        preferredMentorTypeColumn.setPrefWidth(200);
+
 
         // Add columns to menteeListView
         menteeListView.getColumns().clear();
         menteeListView.getColumns().add(usernameColumn);
         menteeListView.getColumns().add(requestTypeColumn);
+        menteeListView.getColumns().add(preferredMentorTypeColumn);
+
 
         // RowFactory for Mentee TableView to alternate row colors
         menteeListView.setRowFactory(tv -> new TableRow<>() {
@@ -237,9 +254,18 @@ public class AdminPairingView extends VBox {
             return new SimpleStringProperty(availability);
         });
 
+        TableColumn<Mentor, String> mentorTypeColumn = new TableColumn<>("Mentor Type");
+        mentorTypeColumn.setCellValueFactory(cellData -> {
+            Mentor mentor = cellData.getValue();
+            MentorType mentorType = mentor.getMentorType();
+            return new SimpleStringProperty(mentorType != null ? mentorType.getDescription() : "Not Set");
+        });
+        mentorTypeColumn.setPrefWidth(200);
+
         mentorListView.getColumns().clear();
         mentorListView.getColumns().add(nameColumn);
         mentorListView.getColumns().add(availabilityColumn);
+        mentorListView.getColumns().add(mentorTypeColumn);
 
         // RowFactory for Mentor TableView
         mentorListView.setRowFactory(tv -> new TableRow<>() {

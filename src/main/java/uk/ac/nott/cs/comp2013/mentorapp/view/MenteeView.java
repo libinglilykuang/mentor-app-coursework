@@ -46,9 +46,17 @@ public class MenteeView extends VBox {
         });
         btnAssignedSessions.setPrefWidth(350);
 
+        Button btnEditProfile = createStyledButton("Edit Profile", "#0b3d61", "#04253d");
+        btnEditProfile.setOnAction(e -> {
+            Stage stage = (Stage) getScene().getWindow();
+            Scene currentScene = stage.getScene();
+            stage.setScene(new Scene(new EditProfileView(controller, currentScene), 800, 600));
+        });
+        btnEditProfile.setPrefWidth(350);
+
         setSpacing(20);
         setAlignment(Pos.CENTER);
-        contentBox.getChildren().addAll(logoImageView,welcomeLabel, btnViewActivities, btnAssignedSessions);
+        contentBox.getChildren().addAll(logoImageView,welcomeLabel, btnViewActivities, btnAssignedSessions, btnEditProfile);
 
         contentBox.setMaxWidth(400);
         contentBox.setStyle(
