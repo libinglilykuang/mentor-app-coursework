@@ -15,13 +15,6 @@ public class LoginController {
 
   public boolean onLoginClick(String username, String password) {
     Optional<User> user = repo.selectById(username);
-    /*if (user.isEmpty()) {
-      return false;
-    }
-
-    User u = user.get();
-    return u.getUsername().equals(username) && u.getPassword().equals(password);
-  }*/
     if (user.isPresent()) {
       User u = user.get();
       if (u.getPassword().equals(password)) {

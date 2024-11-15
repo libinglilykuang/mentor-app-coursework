@@ -50,7 +50,7 @@ public class MenteeView extends VBox {
         btnEditProfile.setOnAction(e -> {
             Stage stage = (Stage) getScene().getWindow();
             Scene currentScene = stage.getScene();
-            stage.setScene(new Scene(new EditProfileView(controller, currentScene), 800, 600));
+            stage.setScene(new Scene(new EditProfileView(controller, currentScene,false), 800, 600));
         });
         btnEditProfile.setPrefWidth(350);
 

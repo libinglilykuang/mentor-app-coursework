@@ -5,6 +5,17 @@ import java.util.Map;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import uk.ac.nott.cs.comp2013.mentorapp.controller.AdminController;
+import uk.ac.nott.cs.comp2013.mentorapp.controller.LoginController;
+import uk.ac.nott.cs.comp2013.mentorapp.controller.MenteeController;
+import uk.ac.nott.cs.comp2013.mentorapp.controller.MentorController;
+import uk.ac.nott.cs.comp2013.mentorapp.model.HashMapRepository;
+import uk.ac.nott.cs.comp2013.mentorapp.model.Repository;
+import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentee;
+import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentor;
+import uk.ac.nott.cs.comp2013.mentorapp.model.user.User;
+import javafx.scene.layout.Pane;
+
 
 /**
  * Manages the scenes available in the application and controls which scene is current presented in
@@ -17,6 +28,7 @@ public class ViewManager {
   public static final String MENTEE = "mentee_view";
   public static final String MENTOR = "mentor_view";
   public static final String ADMIN = "admin_view";
+  public static final String IDENTITY_SELECTION = "identity_selection";
 
   private final Stage stage;
   private final Map<String, Parent> scenes = new HashMap<>();
@@ -28,6 +40,18 @@ public class ViewManager {
    */
   public ViewManager(Stage stage) {
     this.stage = stage;
+
+    // Initialize repositories
+    Repository<User, String> menteeRepository = new HashMapRepository<>();
+    Repository<User, String> mentorRepository = new HashMapRepository<>();
+    Repository<User, String> userRepository = new HashMapRepository<>();
+    LoginController loginController = new LoginController(userRepository);
+
+    addView(IDENTITY_SELECTION, new IdentitySelectionView(this::handleIdentitySelection));
+    addView(LOGIN, new LoginView(loginController));
+    addView(MENTEE, new MenteeView(new MenteeController(menteeRepository, null)));
+    addView(MENTOR, new MentorView(new MentorController(mentorRepository, null)));
+    addView(ADMIN, new AdminView(new AdminController(userRepository)));
   }
 
   /**
@@ -55,9 +79,28 @@ public class ViewManager {
       return;
     }
 
-    Scene s = new Scene(scenes.get(key));
-    stage.setScene(s);
+    Parent view = scenes.get(key);
+    if (view.getScene() != null) {
+      view.getScene().setRoot(new Pane());
+    }
+    Scene currentScene = stage.getScene();
+    if (currentScene == null) {
+      currentScene = new Scene(view, stage.getWidth(), stage.getHeight());
+      stage.setScene(currentScene);
+    } else {
+      currentScene.setRoot(view);
+    }
+    stage.setMaximized(true);
     System.out.println("Switched to view: " + key);
+  }
+
+  private void handleIdentitySelection(String userType) {
+    switch (userType) {
+      case "MENTEE" -> setStageView(MENTEE);
+      case "MENTOR" -> setStageView(MENTOR);
+      case "ADMIN" -> setStageView(ADMIN);
+      default -> System.err.println("Invalid user type selected: " + userType);
+    }
   }
 
 }

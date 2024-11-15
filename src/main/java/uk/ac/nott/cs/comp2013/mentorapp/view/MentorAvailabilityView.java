@@ -144,7 +144,7 @@ public class MentorAvailabilityView extends VBox {
             // Ensure the Scene and Window are accessed during the event
             Stage stage = (Stage) profileButton.getScene().getWindow();
             Scene currentScene = stage.getScene(); // Safely get the current scene
-            stage.setScene(new Scene(new EditProfileView(new MentorController(mentor), currentScene), 800, 600));
+            stage.setScene(new Scene(new EditProfileView(new MentorController(mentor), currentScene,true), 800, 600));
         });
 
         return profileButton;

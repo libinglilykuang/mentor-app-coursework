@@ -88,17 +88,15 @@ public class AdminView extends VBox {
 
     private void showPairingInterface() {
         getChildren().clear();
-        // Create the pairing view
         AdminPairingView pairingView = new AdminPairingView(adminController);
 
-        // Set desired size for pairing window
         Platform.runLater(() -> {
             Stage stage = (Stage) getScene().getWindow();
-            stage.setWidth(900); // Set pairing window width
-            stage.setHeight(700); // Set pairing window height
-            stage.setMinWidth(800); // Set minimum width
-            stage.setMinHeight(600); // Set minimum height
+            if (!stage.isMaximized()) {
+                stage.setMaximized(true);
+            }
         });
+
         getChildren().add(pairingView);
     }
 

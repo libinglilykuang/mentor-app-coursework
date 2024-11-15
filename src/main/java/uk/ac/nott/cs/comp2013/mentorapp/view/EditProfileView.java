@@ -11,24 +11,29 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import uk.ac.nott.cs.comp2013.mentorapp.controller.MenteeController;
 import uk.ac.nott.cs.comp2013.mentorapp.controller.MentorController;
+import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentee;
+import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentor;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.MentorType;
 
 public class EditProfileView extends VBox {
     private final MenteeController menteeController;
     private final MentorController mentorController;
     private final Scene previousScene;
+    private final boolean isNewUser;
 
-    public EditProfileView(MenteeController menteeController, Scene previousScene) {
+    public EditProfileView(MenteeController menteeController, Scene previousScene, boolean isNewUser) {
         this.menteeController = menteeController;
         this.mentorController = null;
         this.previousScene = previousScene;
+        this.isNewUser = isNewUser;
         buildView();
     }
 
-    public EditProfileView(MentorController mentorController, Scene previousScene) {
+    public EditProfileView(MentorController mentorController, Scene previousScene, boolean isNewUser) {
         this.menteeController = null;
         this.mentorController = mentorController;
         this.previousScene = previousScene;
+        this.isNewUser = isNewUser;
         buildView();
     }
 
@@ -85,26 +90,44 @@ public class EditProfileView extends VBox {
                 return;
             }
 
+            if (!isPasswordValid(password)) {
+                showError("Password must be at least 6 characters long and cannot contain ',', '\\n', '\\r\\n', or spaces.");
+                return;
+            }
+
             if (realName.isEmpty()) {
                 realName = "";
             }
 
             // Update mentee or mentor data
-            if (menteeController != null) {
-                menteeController.getMentee().setUsername(username);
-                menteeController.getMentee().setPassword(password);
-                menteeController.getMentee().setRealName(realName);
-            } else if (mentorController != null) {
-                mentorController.getMentor().setUsername(username);
-                mentorController.getMentor().setPassword(password);
-                mentorController.getMentor().setRealName(realName);
+            if (isNewUser) {
+                if (menteeController != null) {
+                    boolean success = menteeController.getRepository().insert(new Mentee(username, password, realName)) != null;
+                    if (!success) {
+                        showError("A user with this username already exists.");
+                        return;
+                    }
+                } else if (mentorController != null) {
+                    boolean success = mentorController.getRepository().insert(new Mentor(username, password, realName)) != null;
+                    if (!success) {
+                        showError("A user with this username already exists.");
+                        return;
+                    }
+                }
+                showSuccess("New user created successfully!");
             }
-
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Success");
-            alert.setHeaderText(null);
-            alert.setContentText("Your profile has been updated successfully!");
-            alert.showAndWait();
+            else {
+                if (menteeController != null) {
+                    menteeController.getMentee().setUsername(username);
+                    menteeController.getMentee().setPassword(password);
+                    menteeController.getMentee().setRealName(realName);
+                } else if (mentorController != null) {
+                    mentorController.getMentor().setUsername(username);
+                    mentorController.getMentor().setPassword(password);
+                    mentorController.getMentor().setRealName(realName);
+                }
+                showSuccess("Profile updated successfully!");
+            }
 
             Stage stage = (Stage) getScene().getWindow();
             if (previousScene != null) {
@@ -138,6 +161,15 @@ public class EditProfileView extends VBox {
 
         getChildren().add(container);
     }
+
+    private void showSuccess(String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Success");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
 
     private String getUsername() {
         if (menteeController != null) {
@@ -186,6 +218,19 @@ public class EditProfileView extends VBox {
         box.setAlignment(Pos.CENTER);
         return box;
     }
+
+    private boolean isPasswordValid(String password) {
+        if (password.length() < 6) {
+            return false;
+        }
+
+        if (password.contains(",") || password.contains("\n") || password.contains("\r\n") || password.contains(" ")) {
+            return false;
+        }
+
+        return true;
+    }
+
 
     private void showError(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
