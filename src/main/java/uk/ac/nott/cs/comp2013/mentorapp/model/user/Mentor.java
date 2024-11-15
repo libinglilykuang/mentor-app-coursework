@@ -30,6 +30,14 @@ public class Mentor implements User, HasAvailability {
   }
 
   public Mentor(String username, String password, LocalDateTime startAvailability,
+                LocalDateTime endAvailability) {
+    this.username = username;
+    this.password = password;
+    this.startAvailability = startAvailability;
+    this.endAvailability = endAvailability;
+  }
+
+  public Mentor(String username, String password, LocalDateTime startAvailability,
       LocalDateTime endAvailability,MentorType mentorType) {
     this.username = username;
     this.password = password;
