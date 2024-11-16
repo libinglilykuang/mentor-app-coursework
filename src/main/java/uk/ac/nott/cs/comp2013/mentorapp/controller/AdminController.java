@@ -11,6 +11,7 @@ import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentor;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.User;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -96,6 +97,34 @@ public class AdminController {
                 .collect(Collectors.toList());
     }
 
+    public String getMentorTypeByName(String mentorName) {
+        Optional<User> mentorOpt = userRepository.selectById(mentorName);
+        if (mentorOpt.isPresent() && mentorOpt.get() instanceof Mentor mentor) {
+            return mentor.getMentorType() != null ? mentor.getMentorType().getDescription() : "";
+        }
+        return "";
+    }
+
+    public String getMentorAvailabilityByName(String mentorName) {
+        Optional<User> mentorOpt = userRepository.selectById(mentorName);
+        if (mentorOpt.isPresent() && mentorOpt.get() instanceof Mentor mentor) {
+            if (mentor.getStartAvailability() != null && mentor.getEndAvailability() != null) {
+                return mentor.getStartAvailability().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) + " - " +
+                        mentor.getEndAvailability().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+            }
+            return "Not available";
+        }
+        return "Not find";
+    }
+
+    public String getMenteeCVByName(String menteeName) {
+        Optional<User> menteeOpt = userRepository.selectById(menteeName);
+        if (menteeOpt.isPresent() && menteeOpt.get() instanceof Mentee) {
+            Mentee mentee = (Mentee) menteeOpt.get();
+            return mentee.getCvText();
+        }
+        return null;
+    }
 
 }
 

@@ -1,23 +1,25 @@
 package uk.ac.nott.cs.comp2013.mentorapp.view;
 
+import javafx.animation.PauseTransition;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import uk.ac.nott.cs.comp2013.mentorapp.controller.AdminController;
-import uk.ac.nott.cs.comp2013.mentorapp.model.user.MentorType;
-import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentee;
-import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentor;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+
+import uk.ac.nott.cs.comp2013.mentorapp.controller.AdminController;
+import uk.ac.nott.cs.comp2013.mentorapp.model.user.MentorType;
+import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentee;
+import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentor;
 
 public class AdminPairingView extends VBox {
     private final AdminController adminController;
@@ -27,6 +29,7 @@ public class AdminPairingView extends VBox {
     private final ObservableList<Mentor> mentorItems = FXCollections.observableArrayList();
     private Mentee lastSelectedMentee = null;
     private Mentor lastSelectedMentor = null;
+    private Label snackbarLabel;
 
     public AdminPairingView(AdminController adminController) {
         this.adminController = adminController;
@@ -74,6 +77,12 @@ public class AdminPairingView extends VBox {
         topContainer.setPadding(new Insets(10));
         setStyle("-fx-background-color: white;");
 
+        Separator separator = new Separator();
+        separator.setPrefHeight(1);
+        separator.setStyle("-fx-background-color: #cccccc;");
+        VBox topContainerWithSeparator = new VBox(topContainer, separator);
+        topContainerWithSeparator.setSpacing(0);
+
         Button pairButton = new Button("Pair Mentor and Mentee");
         pairButton.setStyle("-fx-background-color: #0b3d61; -fx-text-fill: white; -fx-font-weight: bold;" +
                 "-fx-font-size: 14px; -fx-padding: 10px 20px; -fx-border-radius: 5px; -fx-background-radius: 5px;");
@@ -116,7 +125,7 @@ public class AdminPairingView extends VBox {
         Label menteeLabel = new Label("Unpaired Mentees");
         menteeLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #0b3d61;");
 
-        Label mentorLabel = new Label("Available Mentors");
+        Label mentorLabel = new Label("All Mentors");
         mentorLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #0b3d61;");
 
         VBox menteeContainer = new VBox(10, menteeLabel, menteeListView);
@@ -143,8 +152,8 @@ public class AdminPairingView extends VBox {
         buttonContainer.setAlignment(Pos.CENTER);
         buttonContainer.setPrefHeight(80);
 
-        getChildren().addAll(topContainer, listsContainer, buttonContainer);
-        setSpacing(20);
+        getChildren().addAll(topContainerWithSeparator, listsContainer, buttonContainer);
+        setSpacing(5);
         setAlignment(Pos.TOP_CENTER);
     }
 
@@ -164,8 +173,6 @@ public class AdminPairingView extends VBox {
         pairingLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #0b3d61; -fx-font-weight: bold; -fx-underline: false; -fx-cursor: hand;");
         viewReportLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #0b3d61; -fx-font-weight: bold; -fx-underline: false; -fx-cursor: hand;");
 
-        // Logic to navigate to AdminView
-        System.out.println("Navigating to Admin Home...");
         // Notify the main controller or parent layout to switch views
         getScene().setRoot(new AdminView(adminController)); // Replace the current view with AdminView
     }
@@ -198,15 +205,46 @@ public class AdminPairingView extends VBox {
             MentorType preferredType = mentee.getPreferredMentorType();
             return new SimpleStringProperty(preferredType != null ? preferredType.getDescription() : "Not Set");
         });
-        preferredMentorTypeColumn.setPrefWidth(200);
+        preferredMentorTypeColumn.setPrefWidth(180);
 
+        TableColumn<Mentee, String> cvTextColumn = new TableColumn<>("CV Summary");
+        cvTextColumn.setCellValueFactory(cellData -> {
+            String fullCvText = cellData.getValue().getCvText();
+            return new SimpleStringProperty(fullCvText);
+        });
+        cvTextColumn.setCellFactory(column -> new TableCell<>() {
+            private Tooltip tooltip;
+            @Override
+            protected void updateItem(String fullCvText, boolean empty) {
+                super.updateItem(fullCvText, empty);
+                if (empty || fullCvText == null) {
+                    setText(null);
+                    setTooltip(null);
+                } else {
+                    String summary = fullCvText.length() > 30 ? fullCvText.substring(0, 30) + "..." : fullCvText;
+                    setText(summary);
+
+                    tooltip = new Tooltip(fullCvText);
+                    tooltip.setWrapText(true);
+                    tooltip.setMaxWidth(400);
+                    tooltip.setStyle("-fx-font-size: 14px;");
+
+                    tooltip.setShowDelay(javafx.util.Duration.ZERO);
+                    tooltip.setHideDelay(javafx.util.Duration.INDEFINITE);
+                    tooltip.setShowDuration(javafx.util.Duration.INDEFINITE);
+
+                    setOnMouseEntered(event -> setTooltip(tooltip));
+                    setOnMouseExited(event -> setTooltip(null));
+                }
+            }
+        });
 
         // Add columns to menteeListView
         menteeListView.getColumns().clear();
         menteeListView.getColumns().add(usernameColumn);
         menteeListView.getColumns().add(requestTypeColumn);
         menteeListView.getColumns().add(preferredMentorTypeColumn);
-
+        menteeListView.getColumns().add(cvTextColumn);
 
         // RowFactory for Mentee TableView to alternate row colors
         menteeListView.setRowFactory(tv -> new TableRow<>() {
@@ -262,10 +300,65 @@ public class AdminPairingView extends VBox {
         });
         mentorTypeColumn.setPrefWidth(200);
 
+        TableColumn<Mentor, String> statusColumn = new TableColumn<>("Status");
+        statusColumn.setCellValueFactory(cellData -> {
+            Mentor mentor = cellData.getValue();
+            String status;
+            if (mentor.getEndAvailability() != null && mentor.getEndAvailability().isBefore(LocalDateTime.now())) {
+                status = "Expired";
+            } else if (!mentor.isAvailable()) {
+                status = "Paired";
+            } else {
+                status = "Available";
+            }
+            return new SimpleStringProperty(status);
+        });
+
+        statusColumn.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(String status, boolean empty) {
+                super.updateItem(status, empty);
+                if (empty || status == null) {
+                    setGraphic(null);
+                    return;
+                }
+
+                Label statusLabel = new Label(status);
+                statusLabel.setStyle("-fx-text-fill: black; -fx-font-weight: bold;");
+
+                String backgroundColor;
+                switch (status) {
+                    case "Available":
+                        backgroundColor = "#d4edda";
+                        break;
+                    case "Paired":
+                        backgroundColor = "#f5c6cb";
+                        break;
+                    case "Expired":
+                        backgroundColor = "#fff3cd";
+                        break;
+                    default:
+                        backgroundColor = "#ffffff";
+                        break;
+                }
+
+                HBox statusBox = new HBox(statusLabel);
+                statusBox.setAlignment(Pos.CENTER);
+                statusBox.setStyle("-fx-background-color: " + backgroundColor + "; " +
+                        "-fx-background-radius: 5px; " +
+                        "-fx-padding: 5px;");
+
+                setGraphic(statusBox);
+            }
+        });
+        statusColumn.setPrefWidth(100);
+
         mentorListView.getColumns().clear();
         mentorListView.getColumns().add(nameColumn);
         mentorListView.getColumns().add(availabilityColumn);
         mentorListView.getColumns().add(mentorTypeColumn);
+        mentorListView.getColumns().add(statusColumn);
+
 
         // RowFactory for Mentor TableView
         mentorListView.setRowFactory(tv -> new TableRow<>() {
@@ -304,39 +397,47 @@ public class AdminPairingView extends VBox {
     }
 
     private void pairSelectedMenteeAndMentor() {
-        // Get selected mentee
         Mentee selectedMentee = menteeListView.getSelectionModel().getSelectedItem();
-
-        // Get selected mentor
         Mentor selectedMentor = mentorListView.getSelectionModel().getSelectedItem();
 
-        // Check if both a mentee and mentor are selected
         if (selectedMentee != null && selectedMentor != null) {
-            // Perform the pairing operation
             boolean success = adminController.pairMenteeWithMentor(selectedMentee.getUsername(), selectedMentor.getUsername());
-            Alert alert = new Alert(AlertType.INFORMATION);
-
             if (success) {
-                alert.setTitle("Pairing Successful");
-                alert.setHeaderText("Pairing Completed");
-                alert.setContentText("Mentee " + selectedMentee.getUsername() + " has been paired with Mentor " + selectedMentor.getUsername() + ".");
-
-                // Update the lists after successful pairing
+                showSnackbar("Successfully paired!",true);
                 refreshLists();
             } else {
-                alert.setTitle("Pairing Failed");
-                alert.setHeaderText("Pairing Unsuccessful");
-                alert.setContentText("Unable to pair. Mentor " + selectedMentor.getUsername() + " is already assigned.");
+                showSnackbar("Pairing failed: Mentor \"" + selectedMentor.getUsername() + "\" is unavailable.", false);
             }
-            alert.showAndWait();
+
         } else {
-            // Show an error alert if either mentee or mentor is not selected
-            Alert alert = new Alert(AlertType.WARNING);
-            alert.setTitle("Selection Error");
-            alert.setHeaderText("Selection Error");
-            alert.setContentText("Please select both a mentee and a mentor to proceed with pairing.");
-            alert.showAndWait();
+            showSnackbar("Please select both a mentee and a mentor to proceed.", false);
         }
+    }
+
+    private void showSnackbar(String message, boolean success) {
+        Label messageLabel = new Label(message);
+        messageLabel.setStyle((success
+                ? "-fx-background-color: #d4edda; -fx-text-fill: #155724;"
+                : "-fx-background-color: #f8d7da; -fx-text-fill: #721c24;"
+        ) +
+                "-fx-font-size: 16px; " +
+                "-fx-padding: 10px 20px; " +
+                "-fx-background-radius: 5px; " +
+                "-fx-border-radius: 5px; " +
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 10, 0.3, 0, 2);");
+
+        Scene scene = this.getScene();
+        if (scene == null) return;
+
+        Pane root = (Pane) scene.getRoot();
+        StackPane snackbarPane = new StackPane(messageLabel);
+        snackbarPane.setAlignment(Pos.CENTER);
+
+        root.getChildren().add(snackbarPane);
+
+        PauseTransition delay = new PauseTransition(javafx.util.Duration.seconds(3));
+        delay.setOnFinished(event -> root.getChildren().remove(snackbarPane));
+        delay.play();
     }
 
     private void refreshLists() {

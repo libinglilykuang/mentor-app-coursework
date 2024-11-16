@@ -1,17 +1,14 @@
 package uk.ac.nott.cs.comp2013.mentorapp;
 
 import javafx.application.Application;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
 import uk.ac.nott.cs.comp2013.mentorapp.controller.AdminController;
 import uk.ac.nott.cs.comp2013.mentorapp.controller.LoginController;
 import uk.ac.nott.cs.comp2013.mentorapp.controller.MenteeController;
 import uk.ac.nott.cs.comp2013.mentorapp.controller.MentorController;
 import uk.ac.nott.cs.comp2013.mentorapp.model.HashMapRepository;
-import uk.ac.nott.cs.comp2013.mentorapp.model.Repository;
 import uk.ac.nott.cs.comp2013.mentorapp.model.RepositoryFactory;
 import uk.ac.nott.cs.comp2013.mentorapp.model.session.SupportType;
-import uk.ac.nott.cs.comp2013.mentorapp.model.user.Administrator;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentee;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentor;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.User;
@@ -66,90 +63,44 @@ public class MentorApp extends Application {
         return loginView;
     }
 
-    /*@Override
-    public void start(Stage stage) {
-        try {
-            createRepository();
-
-            if (repo == null || repo.selectAll().isEmpty()) {
-                throw new IllegalStateException("Repository is not properly initialized or contains no users.");
-            }
-
-            ViewManager sm = new ViewManager(stage);
-            sm.addView(ViewManager.LOGIN, createLoginView());
-
-            // Add mentee view
-            Mentee mentee = repo.selectAll()
-                    .stream()
-                    .filter(user -> user instanceof Mentee)
-                    .map(user -> (Mentee) user)
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalStateException("No Mentee found in the repository."));
-            MenteeController menteeController = new MenteeController(mentee);
-            if (mentee.getSupportRequest() == null) {
-                menteeController.requestSupport(SupportType.CV_REVIEW);
-            }
-            MenteeView menteeView = new MenteeView(menteeController);
-            sm.addView(ViewManager.MENTEE, menteeView);
-
-            // Add mentor view
-            Mentor mentor = repo.selectAll()
-                    .stream()
-                    .filter(user -> user instanceof Mentor)
-                    .map(user -> (Mentor) user)
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalStateException("No Mentor found in the repository."));
-            MentorController mentorController = new MentorController(mentor);
-            sm.addView(ViewManager.MENTOR, new MentorView(mentorController));
-
-            // Add admin view
-            AdminController adminController = new AdminController(repo);
-            sm.addView(ViewManager.ADMIN, new AdminView(adminController));
-
-            // Set initial view
-            sm.setStageView(ViewManager.LOGIN);
-            stage.setTitle("Mentor App");
-            stage.show();
-        } catch (Exception e) {
-            System.err.println("Error during application start:");
-            e.printStackTrace();
-        }
-    }*/
     @Override
     public void start(Stage stage) {
-        try {
-            createRepository();
-            if (repo == null || repo.selectAll().isEmpty()) {
-                throw new IllegalStateException("Repository is not properly initialized or contains no users.");
+            try {
+                createRepository();
+                if (repo == null || repo.selectAll().isEmpty()) {
+                    throw new IllegalStateException("Repository is not properly initialized or contains no users.");
+                }
+
+                ViewManager sm = new ViewManager(stage);
+
+                // Create homepage
+                HomepageView homepageView = new HomepageView(() -> {
+                    // Action after clicking "Verify Identity"
+                    IdentitySelectionView identitySelectionView = new IdentitySelectionView(userType -> {
+                        LoginController loginController = new LoginController(repo);
+                        LoginView loginView = new LoginView(loginController);
+                        sm.addView(ViewManager.LOGIN, loginView);
+                        addViews(sm);
+                        sm.setStageView(ViewManager.LOGIN);
+                    });
+                    sm.addView(ViewManager.IDENTITY_SELECTION, identitySelectionView);
+                    sm.setStageView(ViewManager.IDENTITY_SELECTION);
+                });
+
+                // Add homepage to ViewManager
+                sm.addView("HOMEPAGE", homepageView);
+                sm.setStageView("HOMEPAGE");
+
+                stage.setWidth(1024);
+                stage.setHeight(768);
+                stage.setResizable(true);
+                stage.setMaximized(true);
+                stage.setTitle("Mentor App");
+                stage.show();
+            } catch (Exception e) {
+                System.err.println("Error during application start:");
+                e.printStackTrace();
             }
-
-            ViewManager sm = new ViewManager(stage);
-
-            IdentitySelectionView identitySelectionView = new IdentitySelectionView(userType -> {
-                LoginController loginController = new LoginController(repo);
-                LoginView loginView = new LoginView(loginController);
-                sm.addView(ViewManager.LOGIN, loginView);
-                addViews(sm);
-                sm.setStageView(ViewManager.LOGIN);
-
-                setStageViewAndPreserveSize(stage, sm, ViewManager.LOGIN);
-            });
-
-
-            sm.addView(ViewManager.IDENTITY_SELECTION, identitySelectionView);
-            sm.setStageView(ViewManager.IDENTITY_SELECTION);
-
-            stage.setWidth(1024);
-            stage.setHeight(768);
-            stage.setResizable(true);
-            stage.setMaximized(true);
-
-            stage.setTitle("Mentor App");
-            stage.show();
-        } catch (Exception e) {
-            System.err.println("Error during application start:");
-            e.printStackTrace();
-        }
     }
 
     private void addViews(ViewManager sm) {
@@ -184,16 +135,4 @@ public class MentorApp extends Application {
         AdminView adminView = new AdminView(adminController);
         sm.addView(ViewManager.ADMIN, adminView);
     }
-
-    private void setStageViewAndPreserveSize(Stage stage, ViewManager sm, String viewKey) {
-        double currentWidth = stage.getWidth();
-        double currentHeight = stage.getHeight();
-
-        sm.setStageView(viewKey);
-
-        stage.setWidth(currentWidth);
-        stage.setHeight(currentHeight);
-    }
-
-
 }

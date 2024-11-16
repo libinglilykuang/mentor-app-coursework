@@ -9,8 +9,11 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import uk.ac.nott.cs.comp2013.mentorapp.controller.AdminController;
+import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentee;
+
 import java.net.URL;
 
 public class AssignedReportView extends VBox {
@@ -24,6 +27,8 @@ public class AssignedReportView extends VBox {
     }
 
     private void buildView() {
+        setStyle("-fx-background-color: white;");
+
         URL imageUrl = getClass().getResource("/pairing_image.png");
         if (imageUrl == null) {
             throw new IllegalArgumentException("Image resource not found: /pairing_image.png");
@@ -56,8 +61,17 @@ public class AssignedReportView extends VBox {
         setupTableView();
         refreshReport();
 
+        reportTableView.setPrefWidth(Double.MAX_VALUE);
+        VBox.setVgrow(reportTableView, Priority.ALWAYS);
         reportTableView.setPrefWidth(500);
         reportTableView.setPrefHeight(700);
+        reportTableView.setStyle(
+                "-fx-border-color: #0b3d61; " +
+                        "-fx-border-width: 1px; " +
+                        "-fx-border-radius: 5px; " +
+                        "-fx-background-radius: 5px;"
+        );
+
 
         VBox layout = new VBox(20,topContainer, reportTableView);
         layout.setPadding(new javafx.geometry.Insets(10));
@@ -70,17 +84,70 @@ public class AssignedReportView extends VBox {
         // Mentor column
         TableColumn<Pair, String> mentorColumn = new TableColumn<>("Mentor");
         mentorColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getMentorName()));
-        mentorColumn.setPrefWidth(250);
+        mentorColumn.setPrefWidth(200);
 
         // Mentee column
         TableColumn<Pair, String> menteeColumn = new TableColumn<>("Mentee");
         menteeColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getMenteeName()));
-        menteeColumn.setPrefWidth(250);
+        menteeColumn.setPrefWidth(200);
+
+        TableColumn<Pair, String> mentorTypeColumn = new TableColumn<>("Mentor Type");
+        mentorTypeColumn.setCellValueFactory(data -> {
+            String mentorType = adminController.getMentorTypeByName(data.getValue().getMentorName());
+            return new SimpleStringProperty(mentorType != null ? mentorType : "Not Set");
+        });
+        mentorTypeColumn.setPrefWidth(250);
+
+        // Mentor Availability column
+        TableColumn<Pair, String> availabilityColumn = new TableColumn<>("Availability");
+        availabilityColumn.setCellValueFactory(data -> {
+            String availability = adminController.getMentorAvailabilityByName(data.getValue().getMentorName());
+            return new SimpleStringProperty(availability != null ? availability : "Unavailable");
+        });
+        availabilityColumn.setPrefWidth(250);
+
+        TableColumn<Pair, String> cvColumn = new TableColumn<>("CV Summary");
+        cvColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getCvText()));
+        cvColumn.setCellFactory(column -> new TableCell<>() {
+            private Tooltip tooltip;
+
+            @Override
+            protected void updateItem(String fullCvText, boolean empty) {
+                super.updateItem(fullCvText, empty);
+
+                if (empty || fullCvText == null) {
+                    setText(null);
+                    setTooltip(null);
+                } else {
+                    String summary = fullCvText.length() > 100 ? fullCvText.substring(0, 100) + "..." : fullCvText;
+                    setText(summary);
+
+                    tooltip = new Tooltip(fullCvText);
+                    tooltip.setWrapText(true);
+                    tooltip.setMaxWidth(400);
+                    tooltip.setStyle("-fx-font-size: 14px;");
+                    tooltip.setShowDelay(javafx.util.Duration.ZERO);
+                    tooltip.setHideDelay(javafx.util.Duration.INDEFINITE);
+                    tooltip.setShowDuration(javafx.util.Duration.INDEFINITE);
+
+                    setOnMouseEntered(event -> setTooltip(tooltip));
+                    setOnMouseExited(event -> setTooltip(null));
+                }
+            }
+        });
+        cvColumn.setPrefWidth(500);
 
         // Add columns to TableView
         reportTableView.getColumns().add(mentorColumn);
         reportTableView.getColumns().add(menteeColumn);
+        reportTableView.getColumns().add(mentorTypeColumn);
+        reportTableView.getColumns().add(availabilityColumn);
+        reportTableView.getColumns().add(cvColumn);
 
+        reportTableView.setPlaceholder(new Label("No assigned reports to display."));
+
+        // Style for placeholder
+        reportTableView.getPlaceholder().setStyle("-fx-text-fill: gray; -fx-font-size: 16px; -fx-font-weight: bold;");
         reportTableView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             reportTableView.refresh();
         });
@@ -118,20 +185,32 @@ public class AssignedReportView extends VBox {
         adminController.getAssignedPairs().forEach(pair -> {
             String mentor = pair.getKey().getUsername(); // Use getKey() for the Mentor
             String mentee = pair.getValue().getUsername(); // Use getValue() for the Mentee
-            data.add(new Pair(mentor, mentee));
+
+            // Mentor Type and Availability fetched directly via AdminController
+            String mentorType = adminController.getMentorTypeByName(mentor);
+            String availability = adminController.getMentorAvailabilityByName(mentor);
+
+            String cvText = adminController.getMenteeCVByName(mentee);
+            data.add(new Pair(mentor, mentee, mentorType, availability, cvText));
         });
+
 
         reportTableView.setItems(data);
     }
 
-    // Helper class for TableView
     public static class Pair {
         private final String mentorName;
         private final String menteeName;
+        private final String mentorType;
+        private final String availability;
+        private final String cvText; // 添加 CV 字段
 
-        public Pair(String mentorName, String menteeName) {
+        public Pair(String mentorName, String menteeName, String mentorType, String availability, String cvText) {
             this.mentorName = mentorName;
             this.menteeName = menteeName;
+            this.mentorType = mentorType;
+            this.availability = availability;
+            this.cvText = cvText;
         }
 
         public String getMentorName() {
@@ -141,7 +220,20 @@ public class AssignedReportView extends VBox {
         public String getMenteeName() {
             return menteeName;
         }
+
+        public String getMentorType() {
+            return mentorType;
+        }
+
+        public String getAvailability() {
+            return availability;
+        }
+
+        public String getCvText() {
+            return cvText;
+        }
     }
+
 
     private String getActiveStyle() {
         return "-fx-font-size: 16px; -fx-text-fill: #ff5722; -fx-font-weight: bold; -fx-underline: true; -fx-cursor: hand;";
