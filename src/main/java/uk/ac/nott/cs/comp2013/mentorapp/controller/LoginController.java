@@ -33,6 +33,8 @@ public class LoginController {
   }
 
   public User getCurrentUser() {
+    //System.out.println("Current User: " + currentUser.getUsername());
+
     return currentUser;
   }
 }

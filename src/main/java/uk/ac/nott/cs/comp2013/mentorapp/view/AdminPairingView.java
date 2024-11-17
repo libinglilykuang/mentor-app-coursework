@@ -17,6 +17,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import uk.ac.nott.cs.comp2013.mentorapp.controller.AdminController;
+import uk.ac.nott.cs.comp2013.mentorapp.model.user.MenteeType;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.MentorType;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentee;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentor;
@@ -29,7 +30,6 @@ public class AdminPairingView extends VBox {
     private final ObservableList<Mentor> mentorItems = FXCollections.observableArrayList();
     private Mentee lastSelectedMentee = null;
     private Mentor lastSelectedMentor = null;
-    private Label snackbarLabel;
 
     public AdminPairingView(AdminController adminController) {
         this.adminController = adminController;
@@ -42,9 +42,7 @@ public class AdminPairingView extends VBox {
             throw new IllegalArgumentException("Image resource not found: /pairing_image.png");
         }
         Image image = new Image(imageUrl.toExternalForm());
-
         ImageView imageView = new ImageView(image);
-
         imageView.setFitWidth(170);
         imageView.setFitHeight(170);
         imageView.setPreserveRatio(true);
@@ -97,15 +95,15 @@ public class AdminPairingView extends VBox {
         pairButton.setOnAction(e -> pairSelectedMenteeAndMentor());
 
         // Adjust the size of menteeListView
-        menteeListView.setMinWidth(300); // Minimum width
+        menteeListView.setMinWidth(400); // Minimum width
         menteeListView.setMinHeight(450); // Minimum height
-        menteeListView.setPrefWidth(350); // Preferred width
+        menteeListView.setPrefWidth(450); // Preferred width
         menteeListView.setPrefHeight(550); // Preferred height
 
         // Adjust the size of mentorListView
-        mentorListView.setMinWidth(300); // Minimum width
+        mentorListView.setMinWidth(200); // Minimum width
         mentorListView.setMinHeight(450); // Minimum height
-        mentorListView.setPrefWidth(350); // Preferred width
+        mentorListView.setPrefWidth(250); // Preferred width
         mentorListView.setPrefHeight(550); // Preferred height
 
         menteeListView.setMaxWidth(Double.MAX_VALUE);
@@ -138,7 +136,7 @@ public class AdminPairingView extends VBox {
 
         menteeContainer.setPadding(new Insets(10, 10, 10, 10));
         mentorContainer.setPadding(new Insets(10, 10, 10, 10));
-        listsContainer.setSpacing(30);
+        listsContainer.setSpacing(5);
 
         HBox.setHgrow(menteeContainer, Priority.ALWAYS);
         HBox.setHgrow(mentorContainer, Priority.ALWAYS);
@@ -189,6 +187,7 @@ public class AdminPairingView extends VBox {
     private void setupListViewSelection() {
         TableColumn<Mentee, String> usernameColumn = new TableColumn<>("Mentee Name");
         usernameColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getUsername()));
+        usernameColumn.setPrefWidth(100);
 
         TableColumn<Mentee, String> requestTypeColumn = new TableColumn<>("Request Type");
         requestTypeColumn.setCellValueFactory(cellData -> {
@@ -198,6 +197,7 @@ public class AdminPairingView extends VBox {
                     : "No Request";
             return new SimpleStringProperty(activityType);
         });
+        requestTypeColumn.setPrefWidth(325);
 
         TableColumn<Mentee, String> preferredMentorTypeColumn = new TableColumn<>("Preferred Mentor Type");
         preferredMentorTypeColumn.setCellValueFactory(cellData -> {
@@ -206,6 +206,16 @@ public class AdminPairingView extends VBox {
             return new SimpleStringProperty(preferredType != null ? preferredType.getDescription() : "Not Set");
         });
         preferredMentorTypeColumn.setPrefWidth(180);
+
+
+        TableColumn<Mentee, String> menteeTypeColumn = new TableColumn<>("Mentee Type");
+        menteeTypeColumn.setCellValueFactory(cellData -> {
+            Mentee mentee = cellData.getValue();
+            MenteeType menteeType = mentee.getMenteeType();
+            return new SimpleStringProperty(menteeType != null ? menteeType.getDescription() : "Not Set");
+        });
+        menteeTypeColumn.setPrefWidth(130);
+
 
         TableColumn<Mentee, String> cvTextColumn = new TableColumn<>("CV Summary");
         cvTextColumn.setCellValueFactory(cellData -> {
@@ -244,6 +254,7 @@ public class AdminPairingView extends VBox {
         menteeListView.getColumns().add(usernameColumn);
         menteeListView.getColumns().add(requestTypeColumn);
         menteeListView.getColumns().add(preferredMentorTypeColumn);
+        menteeListView.getColumns().add(menteeTypeColumn);
         menteeListView.getColumns().add(cvTextColumn);
 
         // RowFactory for Mentee TableView to alternate row colors
@@ -260,9 +271,9 @@ public class AdminPairingView extends VBox {
                     } else {
                         // Apply alternating row colors
                         if (getIndex() % 2 == 0) {
-                            setStyle("-fx-background-color: #e8f4fc; -fx-text-fill: black;");
+                            setStyle("-fx-background-color: #e8f4fc; -fx-text-fill: black; -fx-padding: 5px;");
                         } else {
-                            setStyle("-fx-background-color: white; -fx-text-fill: black;");
+                            setStyle("-fx-background-color: white; -fx-text-fill: black; -fx-padding: 5px;");
                         }
                     }
                 }
@@ -298,7 +309,7 @@ public class AdminPairingView extends VBox {
             MentorType mentorType = mentor.getMentorType();
             return new SimpleStringProperty(mentorType != null ? mentorType.getDescription() : "Not Set");
         });
-        mentorTypeColumn.setPrefWidth(200);
+        mentorTypeColumn.setPrefWidth(180);
 
         TableColumn<Mentor, String> statusColumn = new TableColumn<>("Status");
         statusColumn.setCellValueFactory(cellData -> {

@@ -1,5 +1,6 @@
 package uk.ac.nott.cs.comp2013.mentorapp.view;
 
+import javafx.animation.PauseTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -8,9 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import uk.ac.nott.cs.comp2013.mentorapp.controller.MenteeController;
 import uk.ac.nott.cs.comp2013.mentorapp.model.session.SupportType;
@@ -173,23 +172,55 @@ public class ActivitySignUpView extends VBox {
         });
         listView.setStyle("-fx-background-color: white; -fx-font-size: 14px;-fx-border-color: #dcdcdc; -fx-border-width: 1px;");
         listView.setMinWidth(400);
-        listView.setPrefHeight(550);
+        listView.setPrefHeight(380);
     }
 
     private Button createSubmitButton() {
         Button submitButton = new Button("Submit");
-        submitButton.setStyle("-fx-background-color: #0b3d61; -fx-text-fill: white; -fx-font-weight: bold;");
+        submitButton.setStyle("-fx-background-color: #0b3d61; -fx-font-size: 16px; -fx-text-fill: white; -fx-font-weight: bold;");
+        submitButton.setMinWidth(100); // Minimum button width
+        submitButton.setMinHeight(50);
         submitButton.setOnAction(e -> {
             SupportType selectedType = listView.getSelectionModel().getSelectedItem();
             if (selectedType != null) {
                 menteeController.requestSupport(selectedType);
-                showAlert("Activity Sign-up", "You have successfully signed up for: " + selectedType.getDisplayName());
-            } else {
-                showAlert("Error", "Please select an activity before submitting.");
+                showSnackbar("Successfully signed up for: " + selectedType.getDisplayName(), true);
+            }else {
+                showSnackbar("Error: Please select an activity before submitting.", false);
             }
         });
         return submitButton;
     }
+
+    private void showSnackbar(String message, boolean success) {
+        Label messageLabel = new Label(message);
+        messageLabel.setStyle((success
+                ? "-fx-background-color: #d4edda; -fx-text-fill: #155724;" // Success styling
+                : "-fx-background-color: #f8d7da; -fx-text-fill: #721c24;" // Error styling
+        ) +
+                "-fx-font-size: 14px; " +
+                "-fx-padding: 10px 20px; " +
+                "-fx-background-radius: 5px; " +
+                "-fx-border-radius: 5px; " +
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0.3, 0, 2);");
+
+        // Add snackbar to the scene
+        Scene scene = this.getScene();
+        if (scene == null) return;
+
+        Pane root = (Pane) scene.getRoot();
+        StackPane snackbarPane = new StackPane(messageLabel);
+        snackbarPane.setAlignment(Pos.BOTTOM_CENTER); // Position at the bottom center
+        snackbarPane.setPadding(new Insets(20, 20, 50, 20)); // Adjust padding for better visibility
+
+        root.getChildren().add(snackbarPane);
+
+        // Auto-hide after 3 seconds
+        PauseTransition delay = new PauseTransition(javafx.util.Duration.seconds(3));
+        delay.setOnFinished(event -> root.getChildren().remove(snackbarPane));
+        delay.play();
+    }
+
 
     private void filterActivities(String filter) {
         if (filter == null || filter.isEmpty()) {
@@ -203,14 +234,6 @@ public class ActivitySignUpView extends VBox {
             }
             listView.setItems(filteredList);
         }
-    }
-
-    private void showAlert(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
     }
 
     private String getActiveStyle() {

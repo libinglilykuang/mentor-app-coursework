@@ -6,21 +6,21 @@ import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentee;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.User;
 
 public class MenteeController {
-    private final Mentee mentee;
+    private Mentee mentee;
     private final Repository<User, String> menteeRepository;
 
     public MenteeController(Repository<User, String> menteeRepository, Mentee mentee) {
         this.menteeRepository = menteeRepository;
-        if (mentee == null) {
-            this.mentee = new Mentee("default_mentee", "password", "Default Name");
-        } else {
-            this.mentee = mentee;
-        }
+        this.mentee = mentee;
     }
 
     public void requestSupport(SupportType supportType) {
         mentee.setSupportRequest(supportType);
         menteeRepository.update(mentee);
+    }
+
+    public void setMentee(Mentee mentee) {
+        this.mentee = mentee;
     }
 
     public Mentee getMentee() {

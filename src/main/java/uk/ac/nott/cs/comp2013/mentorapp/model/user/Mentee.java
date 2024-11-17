@@ -10,6 +10,7 @@ public class Mentee implements User, HasCv {
   private SupportType supportRequest;
   private MentorType preferredMentorType;
   private String realName;
+  private MenteeType menteeType;
 
   public Mentee(String username, String password) {
     this.username = username;
@@ -35,13 +36,13 @@ public class Mentee implements User, HasCv {
     this.supportRequest=supportType;
   }
 
-
-  public Mentee(String username, String password, String cvText,SupportType supportType,MentorType preferredMentorType) {
+  public Mentee(String username, String password, String cvText,SupportType supportType,MentorType preferredMentorType,MenteeType menteeType) {
     this.username = username;
     this.password = password;
     this.cvText = cvText;
     this.supportRequest=supportType;
     this.preferredMentorType = preferredMentorType;
+    this.menteeType=menteeType;
   }
 
   @Override
@@ -127,6 +128,14 @@ public class Mentee implements User, HasCv {
 
   public void setRealName(String realName) {
     this.realName = realName;
+  }
+
+  public MenteeType getMenteeType() {
+    return menteeType;
+  }
+
+  public void setMenteeType(MenteeType menteeType) {
+    this.menteeType = menteeType;
   }
 
   @Override

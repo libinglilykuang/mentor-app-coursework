@@ -28,12 +28,5 @@ public class MentorController {
     public Repository<User, String> getRepository() {
         return mentorRepository;
     }
-
-    public boolean addMentor(Mentor newMentor) {
-        if (mentorRepository.selectById(newMentor.getUsername()).isPresent()) {
-            return false;
-        }
-        mentorRepository.insert(newMentor);
-        return true;
-    }
 }
+

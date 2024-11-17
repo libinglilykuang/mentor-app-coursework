@@ -1,15 +1,13 @@
 package uk.ac.nott.cs.comp2013.mentorapp.view;
 
+import javafx.animation.PauseTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import uk.ac.nott.cs.comp2013.mentorapp.controller.MentorController;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentor;
@@ -158,7 +156,7 @@ public class MentorAvailabilityView extends VBox {
 
         if (startDate == null || endDate == null || startTime == null || endTime == null) {
             availabilityLabel.setText("You have not set any available time yet.");
-            showAlert("Error", "Please fill in all fields.");
+            showSnackbar("Please fill in all fields.", false);
             return;
         }
 
@@ -167,7 +165,7 @@ public class MentorAvailabilityView extends VBox {
 
         if (endDateTime.isBefore(startDateTime)) {
             availabilityLabel.setText("You have not set any available time yet.");
-            showAlert("Error", "End time cannot be earlier than start time.");
+            showSnackbar("End time cannot be earlier than start time.", false);
             return;
         }
 
@@ -176,8 +174,35 @@ public class MentorAvailabilityView extends VBox {
         availabilityLabel.setText("From: " + formattedStart + "\n" + "To: " + formattedEnd);
         availabilityLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #0b3d61; -fx-font-weight: bold;");
 
-        showAlert("Success", "Availability set successfully.");
+        showSnackbar("Availability set successfully.", true);
     }
+
+    private void showSnackbar(String message, boolean success) {
+        Label messageLabel = new Label(message);
+        messageLabel.setStyle((success
+                ? "-fx-background-color: #d4edda; -fx-text-fill: #155724;"
+                : "-fx-background-color: #f8d7da; -fx-text-fill: #721c24;")
+                + "-fx-font-size: 14px; "
+                + "-fx-padding: 10px 20px; "
+                + "-fx-background-radius: 10px; "
+                + "-fx-border-radius: 10px; "
+                + "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 5, 0, 0, 1);");
+
+        Scene scene = getScene();
+        if (scene == null) return;
+
+        Pane root = (Pane) scene.getRoot();
+        StackPane snackbarPane = new StackPane(messageLabel);
+        snackbarPane.setAlignment(Pos.BOTTOM_CENTER);
+        snackbarPane.setPadding(new Insets(0, 0, 20, 0));
+
+        root.getChildren().add(snackbarPane);
+
+        PauseTransition delay = new PauseTransition(javafx.util.Duration.seconds(3));
+        delay.setOnFinished(event -> root.getChildren().remove(snackbarPane));
+        delay.play();
+    }
+
 
     private Label createStyledLabel(String text) {
         Label label = new Label(text);
@@ -236,14 +261,6 @@ public class MentorAvailabilityView extends VBox {
         Stage stage = (Stage) getScene().getWindow();
         MentorController mentorController = new MentorController(mentor);
         stage.setScene(new Scene(new MentorView(mentorController), 400, 300));
-    }
-
-    private void showAlert(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
     }
 
     private String getActiveStyle() {

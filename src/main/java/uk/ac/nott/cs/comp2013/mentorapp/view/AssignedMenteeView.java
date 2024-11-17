@@ -74,10 +74,6 @@ public class AssignedMenteeView extends VBox {
         Label titleLabel = new Label("Assigned Mentee Sessions");
         titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #0b3d61;");
 
-        // Mentor Info
-        Label mentorInfoLabel = new Label("Mentor: " + mentor.getUsername());
-        mentorInfoLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #333333;");
-
         // Session List
         Label sessionListLabel = new Label("Your Assigned Sessions:");
         sessionListLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #333333; -fx-font-weight: bold;");
@@ -86,17 +82,13 @@ public class AssignedMenteeView extends VBox {
         sessionListView.setStyle("-fx-border-color: #dddddd; -fx-border-radius: 5px; -fx-padding: 10px;");
         populateSessionList(); // Populate the session list with mentor's sessions
 
-        // Layout
-        VBox mentorInfoBox = new VBox(10, mentorInfoLabel);
         VBox sessionBox = new VBox(10, sessionListLabel, sessionListView);
-
-        mentorInfoBox.setPadding(new Insets(10));
         sessionBox.setPadding(new Insets(10));
 
         setSpacing(20);
         setPadding(new Insets(20));
         setAlignment(Pos.TOP_CENTER);
-        getChildren().addAll(topContainer,titleLabel, mentorInfoBox, sessionBox);
+        getChildren().addAll(topContainer,titleLabel,  sessionBox);
     }
 
     private HBox createUserProfileButton() {
@@ -144,18 +136,6 @@ public class AssignedMenteeView extends VBox {
                     menteeName, startDate, endDate, status);
             sessionListView.getItems().add(sessionInfo);
         }
-    }
-
-    private Label createStyledButton(String text, Runnable onClickAction) {
-        Label button = new Label(text);
-        button.setStyle("-fx-font-size: 14px; -fx-text-fill: #0b3d61; -fx-underline: true; -fx-cursor: hand;");
-        button.setOnMouseClicked(e -> onClickAction.run());
-        return button;
-    }
-
-    private void switchToHomePage() {
-        Stage stage = (Stage) getScene().getWindow();
-        stage.setScene(new Scene(new MentorView(new MentorController(mentor)), 800, 600));
     }
 
     private String getActiveStyle() {

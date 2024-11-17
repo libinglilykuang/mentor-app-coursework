@@ -56,21 +56,23 @@ public class RepositoryFactory {
         String endDate = record.length > 5 ? record[5] : null;
         String activityType = record.length > 6 ? record[6] : "";
         String mentorType = record.length > 7 ? record[7] : "";
+        String menteeType = record.length > 8 ? record[8] : "";
 
         return switch (role.toUpperCase()) {
-            case "MENTEE" -> parseMentee(username, password, extraInfo, activityType, mentorType);
+            case "MENTEE" -> parseMentee(username, password, extraInfo, activityType, mentorType,menteeType);
             case "MENTOR" -> parseMentor(username, password, startDate, endDate, mentorType);
             case "ADMIN" -> new Administrator(username, password);
             default -> null;
         };
     }
 
-    private static Mentee parseMentee(String username, String password, String extraInfo, String activityType, String mentorType) {
+    private static Mentee parseMentee(String username, String password, String extraInfo, String activityType, String mentorType,String menteeType) {
         SupportType supportType = parseSupportType(activityType);
         MentorType mentorTypeEnum = parseMentorType(mentorType);
+        MenteeType menteeTypeEnum=parseMenteeType(menteeType);
 
         if (supportType != null && mentorTypeEnum != null) {
-            return new Mentee(username, password, extraInfo, supportType, mentorTypeEnum);
+            return new Mentee(username, password, extraInfo, supportType, mentorTypeEnum,menteeTypeEnum);
         } else if (supportType != null) {
             return new Mentee(username, password, extraInfo, supportType);
         } else {
@@ -110,6 +112,19 @@ public class RepositoryFactory {
         }
         return null;
     }
+
+    private static MenteeType parseMenteeType(String menteeType) {
+        if (menteeType == null || menteeType.trim().isEmpty()) {
+            return null;
+        }
+        for (MenteeType type : MenteeType.values()) {
+            if (type.getDescription().equalsIgnoreCase(menteeType) || type.name().equalsIgnoreCase(menteeType)) {
+                return type;
+            }
+        }
+        return null;
+    }
+
 
     private static LocalDateTime parseDateSafely(String date) {
         if (date == null || date.isEmpty()) {

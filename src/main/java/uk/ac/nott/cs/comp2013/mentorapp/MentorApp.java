@@ -65,42 +65,42 @@ public class MentorApp extends Application {
 
     @Override
     public void start(Stage stage) {
-            try {
-                createRepository();
-                if (repo == null || repo.selectAll().isEmpty()) {
-                    throw new IllegalStateException("Repository is not properly initialized or contains no users.");
-                }
-
-                ViewManager sm = new ViewManager(stage);
-
-                // Create homepage
-                HomepageView homepageView = new HomepageView(() -> {
-                    // Action after clicking "Verify Identity"
-                    IdentitySelectionView identitySelectionView = new IdentitySelectionView(userType -> {
-                        LoginController loginController = new LoginController(repo);
-                        LoginView loginView = new LoginView(loginController);
-                        sm.addView(ViewManager.LOGIN, loginView);
-                        addViews(sm);
-                        sm.setStageView(ViewManager.LOGIN);
-                    });
-                    sm.addView(ViewManager.IDENTITY_SELECTION, identitySelectionView);
-                    sm.setStageView(ViewManager.IDENTITY_SELECTION);
-                });
-
-                // Add homepage to ViewManager
-                sm.addView("HOMEPAGE", homepageView);
-                sm.setStageView("HOMEPAGE");
-
-                stage.setWidth(1024);
-                stage.setHeight(768);
-                stage.setResizable(true);
-                stage.setMaximized(true);
-                stage.setTitle("Mentor App");
-                stage.show();
-            } catch (Exception e) {
-                System.err.println("Error during application start:");
-                e.printStackTrace();
+        try {
+            createRepository();
+            if (repo == null || repo.selectAll().isEmpty()) {
+                throw new IllegalStateException("Repository is not properly initialized or contains no users.");
             }
+
+            ViewManager sm = new ViewManager(stage);
+
+            // Create homepage
+            HomepageView homepageView = new HomepageView(() -> {
+                // Action after clicking "Verify Identity"
+                IdentitySelectionView identitySelectionView = new IdentitySelectionView(userType -> {
+                    LoginController loginController = new LoginController(repo);
+                    LoginView loginView = new LoginView(loginController);
+                    sm.addView(ViewManager.LOGIN, loginView);
+                    addViews(sm);
+                    sm.setStageView(ViewManager.LOGIN);
+                });
+                sm.addView(ViewManager.IDENTITY_SELECTION, identitySelectionView);
+                sm.setStageView(ViewManager.IDENTITY_SELECTION);
+            });
+
+            // Add homepage to ViewManager
+            sm.addView("HOMEPAGE", homepageView);
+            sm.setStageView("HOMEPAGE");
+
+            stage.setWidth(1024);
+            stage.setHeight(768);
+            stage.setResizable(true);
+            stage.setMaximized(true);
+            stage.setTitle("Mentor App");
+            stage.show();
+        } catch (Exception e) {
+            System.err.println("Error during application start:");
+            e.printStackTrace();
+        }
     }
 
     private void addViews(ViewManager sm) {
