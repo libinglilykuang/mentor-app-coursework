@@ -23,12 +23,6 @@ public class Mentee implements User, HasCv {
     this.realName = realName;
   }
 
-  /*public Mentee(String username, String password, String cvText) {
-    this.username = username;
-    this.password = password;
-    this.cvText = cvText;
-  }*/
-
   public Mentee(String username, String password, String cvText,SupportType supportType) {
     this.username = username;
     this.password = password;
@@ -134,15 +128,4 @@ public class Mentee implements User, HasCv {
     return menteeType;
   }
 
-  public void setMenteeType(MenteeType menteeType) {
-    this.menteeType = menteeType;
-  }
-
-  @Override
-  public String toString() {
-    return "Mentee{" +
-            "username='" + getUsername() + '\'' +
-            ", realName='" + (realName != null ? realName : "Not Set") + '\'' +
-            '}';
-  }
 }

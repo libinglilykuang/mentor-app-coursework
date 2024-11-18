@@ -1,7 +1,5 @@
 package uk.ac.nott.cs.comp2013.mentorapp.controller;
 
-import javafx.scene.Scene;
-import javafx.stage.Stage;
 import javafx.util.Pair;
 import uk.ac.nott.cs.comp2013.mentorapp.model.Repository;
 import uk.ac.nott.cs.comp2013.mentorapp.model.session.SupportSession;
@@ -70,9 +68,11 @@ public class AdminController {
 
     public List<Mentee> getAllUnpairedMentees() {
         return getAllMentees().stream()
-                .filter(mentee -> mentee.getAssignedMentor() == null && mentee.getSupportRequest() != null)
+                .filter(mentee -> mentee.getAssignedMentor() == null)
                 .collect(Collectors.toList());
     }
+
+
 
     public List<Mentor> getAvailableMentors() {
         return userRepository.selectAll().stream()

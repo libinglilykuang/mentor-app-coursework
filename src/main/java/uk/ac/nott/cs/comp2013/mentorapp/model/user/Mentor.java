@@ -127,23 +127,13 @@ public class Mentor implements User, HasAvailability {
 
   public boolean isAvailable() {
     if (assignedMentee != null) {
-      System.out.println("Mentor " + username + " is not available because they already have an assigned mentee.");
       return false;
     }
-
     if (startAvailability == null || endAvailability == null) {
-      System.out.println("Mentor " + username + " is not available because availability times are not set.");
       return false;
     }
-
     LocalDateTime now = LocalDateTime.now();
-
-    boolean withinAvailability = !now.isAfter(endAvailability);
-    if (!withinAvailability) {
-      return false;
-    }
-
-    return true;
+      return !now.isAfter(endAvailability);
   }
 
   public String getRealName() {
@@ -157,25 +147,15 @@ public class Mentor implements User, HasAvailability {
     return mentorType;
   }
 
-  public void setMentorType(MentorType mentorType) {
-    this.mentorType = mentorType;
-  }
-
-  @Override
-  public String toString() {
-    String availability = "Unavailable";
-    if (startAvailability != null && endAvailability != null) {
-      availability = startAvailability.format(formatter) + " - " + endAvailability.format(formatter);
+  public void setAvailability(LocalDateTime start, LocalDateTime end) {
+    if (start.isAfter(end)) {
+      throw new IllegalArgumentException("Start availability cannot be later than end availability.");
     }
-    return username + "       " + availability;
-  }
-
-  public void addSession(SupportSession session) {
-    assignedSessions.add(session);
+    this.startAvailability = start;
+    this.endAvailability = end;
   }
 
   public List<SupportSession> getAssignedSessions() {
     return assignedSessions != null ? new ArrayList<>(assignedSessions) : new ArrayList<>();
   }
-
 }

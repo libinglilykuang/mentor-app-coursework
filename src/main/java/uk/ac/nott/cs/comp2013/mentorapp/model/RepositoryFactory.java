@@ -2,10 +2,8 @@ package uk.ac.nott.cs.comp2013.mentorapp.model;
 
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
-import uk.ac.nott.cs.comp2013.mentorapp.model.HashMapRepository;
 import uk.ac.nott.cs.comp2013.mentorapp.model.session.SupportType;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.*;
-
 import java.io.FileReader;
 import java.io.IOException;
 import java.time.Instant;
@@ -13,23 +11,15 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 
-/**
- * Factory class for creating a repository from a CSV file.
- */
 public class RepositoryFactory {
-
-    /**
-     * Generate a repository using data provided in a cleaned CSV file.
-     *
-     * @param cleanedCsvPath path to the cleaned CSV file
-     * @return the repository
-     * @throws IOException if there was an error reading the file
-     */
-    public static HashMapRepository<User, String> createRepositoryFromCsv(String cleanedCsvPath) throws IOException {
+    public static HashMapRepository<User, String> createRepositoryFromCsv(String csvFilePath) throws IOException {
         HashMapRepository<User, String> repo = new HashMapRepository<>();
 
-        try (CSVReader reader = new CSVReader(new FileReader(cleanedCsvPath))) {
+        try (CSVReader reader = new CSVReader(new FileReader(csvFilePath))) {
             List<String[]> records = reader.readAll();
+            // Skip the header row
+            records.removeFirst();
+
             for (String[] record : records) {
                 User user = parseUser(record);
                 if (user != null) {
@@ -37,7 +27,7 @@ public class RepositoryFactory {
                 }
             }
         } catch (CsvException e) {
-            throw new RuntimeException(e);
+            throw new IOException("Failed to parse CSV file.", e);
         }
 
         return repo;
@@ -45,7 +35,8 @@ public class RepositoryFactory {
 
     private static User parseUser(String[] record) {
         if (record.length < 3) {
-            return null; // Insufficient data
+            System.out.println("Skipping incomplete record: " + String.join(", ", record));
+            return null;
         }
 
         String username = record[0];
@@ -59,20 +50,23 @@ public class RepositoryFactory {
         String menteeType = record.length > 8 ? record[8] : "";
 
         return switch (role.toUpperCase()) {
-            case "MENTEE" -> parseMentee(username, password, extraInfo, activityType, mentorType,menteeType);
+            case "MENTEE" -> parseMentee(username, password, extraInfo, activityType, mentorType, menteeType);
             case "MENTOR" -> parseMentor(username, password, startDate, endDate, mentorType);
             case "ADMIN" -> new Administrator(username, password);
-            default -> null;
+            default -> {
+                System.out.println("Skipping record with invalid role: " + String.join(", ", record));
+                yield null;
+            }
         };
     }
 
-    private static Mentee parseMentee(String username, String password, String extraInfo, String activityType, String mentorType,String menteeType) {
+    private static Mentee parseMentee(String username, String password, String extraInfo, String activityType, String mentorType, String menteeType) {
         SupportType supportType = parseSupportType(activityType);
         MentorType mentorTypeEnum = parseMentorType(mentorType);
-        MenteeType menteeTypeEnum=parseMenteeType(menteeType);
+        MenteeType menteeTypeEnum = parseMenteeType(menteeType);
 
         if (supportType != null && mentorTypeEnum != null) {
-            return new Mentee(username, password, extraInfo, supportType, mentorTypeEnum,menteeTypeEnum);
+            return new Mentee(username, password, extraInfo, supportType, mentorTypeEnum, menteeTypeEnum);
         } else if (supportType != null) {
             return new Mentee(username, password, extraInfo, supportType);
         } else {
@@ -83,13 +77,12 @@ public class RepositoryFactory {
     private static Mentor parseMentor(String username, String password, String startDate, String endDate, String mentorType) {
         LocalDateTime start = parseDateSafely(startDate);
         LocalDateTime end = parseDateSafely(endDate);
-        MentorType type = parseMentorType(mentorType);
-
-        if (start != null && end != null) {
-            return new Mentor(username, password, start, end, type);
-        } else {
-            return new Mentor(username, password, null, null, type);
+        if (start != null && end != null && start.isAfter(end)) {
+            start = null;
+            end = null;
         }
+        MentorType type = parseMentorType(mentorType);
+        return new Mentor(username, password, start, end, type);
     }
 
     private static SupportType parseSupportType(String activityType) {
@@ -125,7 +118,6 @@ public class RepositoryFactory {
         return null;
     }
 
-
     private static LocalDateTime parseDateSafely(String date) {
         if (date == null || date.isEmpty()) {
             return null;
@@ -133,6 +125,7 @@ public class RepositoryFactory {
         try {
             return LocalDateTime.ofInstant(Instant.parse(date), ZoneId.systemDefault());
         } catch (Exception e) {
+            System.out.println("Skipping record with invalid date: " + date);
             return null;
         }
     }

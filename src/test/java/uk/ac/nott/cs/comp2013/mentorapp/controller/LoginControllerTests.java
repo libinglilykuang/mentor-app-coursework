@@ -12,7 +12,6 @@ import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentee;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.User;
 
 public class LoginControllerTests {
-
   private Repository<User, String> model;
   private LoginController controller;
 
@@ -47,4 +46,30 @@ public class LoginControllerTests {
     assertEquals(user, controller.getCurrentUser());
   }
 
+  @Test
+  public void testGetCurrentUserWithoutLogin() {
+    assertNull(controller.getCurrentUser());
+  }
+
+  @Test
+  public void testGetCurrentUserAfterFailedLogin() {
+    when(model.selectById("user")).thenReturn(Optional.empty());
+    controller.onLoginClick("user", "password");
+    assertNull(controller.getCurrentUser());
+  }
+
+  @Test
+  public void testMultipleLogins() {
+    Mentee user1 = new Mentee("user1", "password1");
+    Mentee user2 = new Mentee("user2", "password2");
+
+    when(model.selectById("user1")).thenReturn(Optional.of(user1));
+    when(model.selectById("user2")).thenReturn(Optional.of(user2));
+
+    assertTrue(controller.onLoginClick("user1", "password1"));
+    assertEquals(user1, controller.getCurrentUser());
+
+    assertTrue(controller.onLoginClick("user2", "password2"));
+    assertEquals(user2, controller.getCurrentUser());
+  }
 }

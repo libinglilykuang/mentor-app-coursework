@@ -1,2 +1,5 @@
-username,password,role,cvText,startAvailability,endAvailability
-labarough0,gC9!dK+z!Fq$,MENTEE,"Vivamus metus arcu, adipiscing molestie, hendrerit at, vulputate vitae, nisl. Aenean lectus. Pellentesque eget nunc.",,
+username,password,role,cvText,startAvailability,endAvailability,activityType,mentorType,menteeType
+labarough0,gC9!dK+z!Fq$,MENTEE,"Vivamus metus arcu, adipiscing molestie, hendrerit at, vulputate vitae, nisl. Aenean lectus. Pellentesque eget nunc.",,,,
+mentor1,password2,MENTOR,,"2024-01-01T09:00:00Z","2026-01-01T17:00:00Z",,Tech Industry Professional,
+admin1,adminPassword,ADMIN,,,,,,
+mentor2,password2,MENTOR,,"2024-01-01T09:00:00Z","2023-01-01T17:00:00Z",,Tech Industry Professional

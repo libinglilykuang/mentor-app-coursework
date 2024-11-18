@@ -27,23 +27,7 @@ public class MenteeController {
         return mentee;
     }
 
-    public boolean addNewMentee(Mentee newMentee) {
-        if (menteeRepository.selectById(newMentee.getUsername()).isPresent()) {
-            return false;
-        }
-        menteeRepository.insert(newMentee);
-        return true;
-    }
-
     public Repository<User, String> getRepository() {
         return menteeRepository;
-    }
-
-    public boolean addMentee(Mentee newMentee) {
-        if (menteeRepository.selectById(newMentee.getUsername()).isPresent()) {
-            return false;
-        }
-        menteeRepository.insert(newMentee);
-        return true;
     }
 }

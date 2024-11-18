@@ -4,7 +4,6 @@ public class Administrator implements User {
 
   private UserRole role = UserRole.ADMIN;
   private String username, password;
-  private String realName;
 
   public Administrator(String username, String password) {
     this.username=username;
@@ -40,22 +39,4 @@ public class Administrator implements User {
   public void setPassword(String password) {
     this.password = password;
   }
-
-  public String getRealName() {
-    return realName;
-  }
-
-  public void setRealName(String realName) {
-    this.realName = realName;
-  }
-
-  @Override
-  public String toString() {
-    return "Administrator{" +
-            "username='" + username + '\'' +
-            ", realName='" + (realName != null ? realName : "Not Set") + '\'' +
-            '}';
-  }
-
-
 }

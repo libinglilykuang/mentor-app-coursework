@@ -7,16 +7,16 @@ import uk.ac.nott.cs.comp2013.mentorapp.controller.LoginController;
 import uk.ac.nott.cs.comp2013.mentorapp.controller.MenteeController;
 import uk.ac.nott.cs.comp2013.mentorapp.controller.MentorController;
 import uk.ac.nott.cs.comp2013.mentorapp.model.HashMapRepository;
+import uk.ac.nott.cs.comp2013.mentorapp.model.Repository;
 import uk.ac.nott.cs.comp2013.mentorapp.model.RepositoryFactory;
 import uk.ac.nott.cs.comp2013.mentorapp.model.session.SupportType;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentee;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentor;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.User;
-import uk.ac.nott.cs.comp2013.mentorapp.util.CsvCleaner;
 import uk.ac.nott.cs.comp2013.mentorapp.view.*;
 
 public class MentorApp extends Application {
-    private HashMapRepository<User, String> repo;
+    Repository<User, String> repo;
 
     public static void main(String[] args) {
         Application.launch(args);
@@ -26,14 +26,10 @@ public class MentorApp extends Application {
      * Initializes the user repository by processing the CSV files.
      */
     private void createRepository() {
-        String rawCsvPath = "src/main/resources/MOCK_DATA.csv";
-        String cleanedCsvPath = "src/main/resources/CLEANED_MOCK_DATA.csv";
-        CsvCleaner.cleanCsv(rawCsvPath, cleanedCsvPath);
-
+        String csvPath = "src/main/resources/MOCK_DATA.csv";
         try {
-            repo = RepositoryFactory.createRepositoryFromCsv(cleanedCsvPath);
+            repo = RepositoryFactory.createRepositoryFromCsv(csvPath);
         } catch (Exception e) {
-            System.err.println("Error loading repository from CSV: " + e.getMessage());
             e.printStackTrace();
         }
     }
