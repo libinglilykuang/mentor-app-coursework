@@ -2,9 +2,7 @@ package uk.ac.nott.cs.comp2013.mentorapp.model.session;
 
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentee;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentor;
-
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 
 public class SupportSession {
     private Mentor mentor;
@@ -46,13 +44,6 @@ public class SupportSession {
         return endDate;
     }
 
-    public void extendSession(int months) {
-        if (months <= 0) {
-            throw new IllegalArgumentException("Extension months must be positive.");
-        }
-        this.endDate = this.endDate.plusMonths(months);
-    }
-
     public boolean isSessionActive() {
         LocalDate today = LocalDate.now();
         return today.isAfter(startDate) && today.isBefore(endDate);
@@ -69,17 +60,6 @@ public class SupportSession {
         }
     }
 
-    @Override
-    public String toString() {
-        return String.format(
-                "Session [Mentor: %s, Mentee: %s, Start: %s, End: %s, Status: %s]",
-                mentor.getUsername(),
-                mentee.getUsername(),
-                startDate,
-                endDate,
-                getSessionStatus()
-        );
-    }
 
     public enum SessionStatus {
         NOT_STARTED,

@@ -1,6 +1,9 @@
 package uk.ac.nott.cs.comp2013.mentorapp.view;
 
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -9,7 +12,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import uk.ac.nott.cs.comp2013.mentorapp.controller.MentorController;
-import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentor;
+import java.util.Objects;
 
 public class MentorView extends VBox {
     private final MentorController controller;
@@ -20,46 +23,49 @@ public class MentorView extends VBox {
     }
 
     private void buildView() {
+        VBox contentBox = createContentBox();
+        ImageView logoImageView = createLogoImageView();
+        Label welcomeLabel = createWelcomeLabel(controller.getMentor().getUsername());
+        Button btnSetAvailability = createNavigationButton(
+                "Set Availability",
+                new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent event) {
+                        navigateTo(new MentorAvailabilityView(controller.getMentor()), 400, 300);
+                    }
+                }
+        );
+        Button btnAssignedSessions = createNavigationButton(
+                "View Assigned Sessions",
+                new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent event) {
+                        navigateTo(new AssignedMenteeView(controller.getMentor()), 800, 600);
+                    }
+                }
+        );
+        Button btnEditProfile = createNavigationButton(
+                "Edit Profile",
+                new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent event) {
+                        Stage stage = (Stage) getScene().getWindow();
+                        Scene currentScene = stage.getScene();
+                        stage.setScene(new Scene(new EditProfileView(controller, currentScene, false), 800, 600));
+                    }
+                }
+        );
+
+        contentBox.getChildren().addAll(logoImageView, welcomeLabel, btnSetAvailability, btnAssignedSessions, btnEditProfile);
+        getChildren().clear();
+        setAlignment(Pos.CENTER);
+        getChildren().add(contentBox);
+    }
+
+    private VBox createContentBox() {
         VBox contentBox = new VBox();
         contentBox.setSpacing(20);
         contentBox.setAlignment(Pos.CENTER);
-
-        // Add a logo image at the top
-        ImageView logoImageView = new ImageView(new Image("/university-logo.png"));
-        logoImageView.setFitWidth(350);
-        logoImageView.setFitHeight(350);
-        logoImageView.setPreserveRatio(true);
-
-        Label welcomeLabel = new Label("Welcome, " + controller.getMentor().getUsername() + "!");
-        welcomeLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
-        getChildren().add(welcomeLabel);
-
-        Button btnSetAvailability = createStyledButton("Set Availability", "#0b3d61", "#04253d");
-        btnSetAvailability.setOnAction(e -> {
-            Stage stage = (Stage) getScene().getWindow();
-            stage.setScene(new Scene(new MentorAvailabilityView(controller.getMentor()), 400, 300));
-        });
-        btnSetAvailability.setPrefWidth(350);
-
-        Button btnAssignedSessions = createStyledButton("View Assigned Sessions", "#0b3d61", "#04253d");
-        btnAssignedSessions.setOnAction(e -> {
-            Stage stage = (Stage) getScene().getWindow();
-            stage.setScene(new Scene(new AssignedMenteeView(controller.getMentor()), 800, 600));
-        });
-        btnAssignedSessions.setPrefWidth(350);
-
-        Button btnEditProfile = createStyledButton("Edit Profile", "#0b3d61", "#04253d");
-        btnEditProfile.setOnAction(e -> {
-            Stage stage = (Stage) getScene().getWindow();
-            Scene currentScene = stage.getScene();
-            stage.setScene(new Scene(new EditProfileView(controller, currentScene,false), 800, 600));
-        });
-        btnEditProfile.setPrefWidth(350);
-
-        // Add all components to the content box
-        contentBox.getChildren().addAll(logoImageView, welcomeLabel, btnSetAvailability, btnAssignedSessions,btnEditProfile);
-
-        // Style the content box
         contentBox.setMaxWidth(400);
         contentBox.setStyle(
                 "-fx-background-color: #FFFFFF; " +
@@ -70,19 +76,41 @@ public class MentorView extends VBox {
                         "-fx-padding: 40px; " +
                         "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0.5, 0, 4);"
         );
-
-        // Clear existing children and add the new content box
-        getChildren().clear();
-        setAlignment(Pos.CENTER);
-        getChildren().add(contentBox);
+        return contentBox;
     }
 
-    private Button createStyledButton(String text, String defaultColor, String hoverColor) {
-        Button button = new Button(text);
-        button.setStyle(getButtonStyle(defaultColor));
+    private ImageView createLogoImageView() {
+        ImageView imageView = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/university-logo.png"))));
+        imageView.setFitWidth(350);
+        imageView.setFitHeight(350);
+        imageView.setPreserveRatio(true);
+        return imageView;
+    }
 
-        button.setOnMouseEntered(e -> button.setStyle(getButtonStyle(hoverColor)));
-        button.setOnMouseExited(e -> button.setStyle(getButtonStyle(defaultColor)));
+    private Label createWelcomeLabel(String username) {
+        Label welcomeLabel = new Label("Welcome, " + username + "!");
+        welcomeLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+        return welcomeLabel;
+    }
+
+    private Button createNavigationButton(String text, EventHandler<ActionEvent> action) {
+        Button button = createStyledButton(text);
+        button.setPrefWidth(350);
+        button.setOnAction(action);
+        return button;
+    }
+
+    private void navigateTo(Parent view, double width, double height) {
+        Stage stage = (Stage) getScene().getWindow();
+        stage.setScene(new Scene(view, width, height));
+    }
+
+    private Button createStyledButton(String text) {
+        Button button = new Button(text);
+        button.setStyle(getButtonStyle("#0b3d61"));
+
+        button.setOnMouseEntered(e -> button.setStyle(getButtonStyle("#04253d")));
+        button.setOnMouseExited(e -> button.setStyle(getButtonStyle("#0b3d61")));
 
         button.setPrefWidth(200);
         return button;

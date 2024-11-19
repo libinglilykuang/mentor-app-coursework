@@ -37,37 +37,32 @@ public class AdminPairingView extends VBox {
     }
 
     private void buildView() {
-        URL imageUrl = getClass().getResource("/pairing_image.png");
-        if (imageUrl == null) {
-            throw new IllegalArgumentException("Image resource not found: /pairing_image.png");
-        }
-        Image image = new Image(imageUrl.toExternalForm());
-        ImageView imageView = new ImageView(image);
-        imageView.setFitWidth(170);
-        imageView.setFitHeight(170);
-        imageView.setPreserveRatio(true);
+        VBox topContainerWithSeparator = createTopContainer();
+        HBox listsContainer = createListsContainer();
+        HBox buttonContainer = createButtonContainer();
+        getChildren().addAll(topContainerWithSeparator, listsContainer, buttonContainer);
+        setSpacing(5);
+        setAlignment(Pos.TOP_CENTER);
 
+        setupListViewSelection();
+        refreshLists();
+    }
+
+    private VBox createTopContainer() {
+        ImageView imageView = createImageView("/pairing_image.png");
         VBox imageContainer = new VBox(imageView);
         imageContainer.setAlignment(Pos.TOP_LEFT);
         imageContainer.setPadding(new Insets(10));
 
-        Label pairingLabel = new Label("Pairing Mentors");
-        Label viewReportLabel = new Label("View Assigned Report");
-        Label adminHomeLabel = new Label("Home");
+        Label adminHomeLabel = createLabel("Home", false);
+        Label pairingLabel = createLabel("Pairing Mentors", true);
+        Label viewReportLabel = createLabel("View Assigned Report", false);
 
-        // Set styles for labels
-        adminHomeLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #0b3d61; -fx-font-weight: bold; -fx-underline: false; -fx-cursor: hand;");
         adminHomeLabel.setOnMouseClicked(e -> switchToAdminHome(adminHomeLabel, pairingLabel, viewReportLabel));
-
-        // Set styles and actions for labels
-        pairingLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #ff5722; -fx-font-weight: bold; -fx-underline: true; -fx-cursor: hand;");
         pairingLabel.setOnMouseClicked(e -> switchToPairingView(adminHomeLabel, pairingLabel, viewReportLabel));
-
-        viewReportLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #0b3d61; -fx-font-weight: bold; -fx-underline: false; -fx-cursor: hand;");
         viewReportLabel.setOnMouseClicked(e -> openReportWindow(adminHomeLabel, pairingLabel, viewReportLabel));
 
-        // Label container
-        HBox labelContainer = new HBox(20, adminHomeLabel,pairingLabel, viewReportLabel);
+        HBox labelContainer = new HBox(20, adminHomeLabel, pairingLabel, viewReportLabel);
         labelContainer.setAlignment(Pos.CENTER_LEFT);
 
         HBox topContainer = new HBox(20, imageContainer, labelContainer);
@@ -78,9 +73,27 @@ public class AdminPairingView extends VBox {
         Separator separator = new Separator();
         separator.setPrefHeight(1);
         separator.setStyle("-fx-background-color: #cccccc;");
+
         VBox topContainerWithSeparator = new VBox(topContainer, separator);
         topContainerWithSeparator.setSpacing(0);
 
+        return topContainerWithSeparator;
+    }
+
+    private ImageView createImageView(String imagePath) {
+        URL imageUrl = getClass().getResource(imagePath);
+        if (imageUrl == null) {
+            throw new IllegalArgumentException("Image resource not found: " + imagePath);
+        }
+        Image image = new Image(imageUrl.toExternalForm());
+        ImageView imageView = new ImageView(image);
+        imageView.setFitWidth(170);
+        imageView.setFitHeight(170);
+        imageView.setPreserveRatio(true);
+        return imageView;
+    }
+
+    private HBox createButtonContainer() {
         Button pairButton = new Button("Pair Mentor and Mentee");
         pairButton.setStyle("-fx-background-color: #0b3d61; -fx-text-fill: white; -fx-font-weight: bold;" +
                 "-fx-font-size: 14px; -fx-padding: 10px 20px; -fx-border-radius: 5px; -fx-background-radius: 5px;");
@@ -93,32 +106,15 @@ public class AdminPairingView extends VBox {
                         "-fx-font-size: 14px; -fx-padding: 10px 20px; -fx-border-radius: 5px; -fx-background-radius: 5px;"));
 
         pairButton.setOnAction(e -> pairSelectedMenteeAndMentor());
+        HBox buttonContainer = new HBox(pairButton);
+        buttonContainer.setAlignment(Pos.CENTER);
+        buttonContainer.setPrefHeight(80);
+        return buttonContainer;
+    }
 
-        // Adjust the size of menteeListView
-        menteeListView.setMinWidth(400); // Minimum width
-        menteeListView.setMinHeight(450); // Minimum height
-        menteeListView.setPrefWidth(450); // Preferred width
-        menteeListView.setPrefHeight(550); // Preferred height
-
-        // Adjust the size of mentorListView
-        mentorListView.setMinWidth(200); // Minimum width
-        mentorListView.setMinHeight(450); // Minimum height
-        mentorListView.setPrefWidth(250); // Preferred width
-        mentorListView.setPrefHeight(550); // Preferred height
-
-        menteeListView.setMaxWidth(Double.MAX_VALUE);
-        menteeListView.setMaxHeight(Double.MAX_VALUE);
-        menteeListView.setStyle("-fx-border-color: #0b3d61; -fx-border-width: 1px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 5, 0, 0, 1);");
-
-        mentorListView.setMaxWidth(Double.MAX_VALUE);
-        mentorListView.setMaxHeight(Double.MAX_VALUE);
-        mentorListView.setStyle("-fx-border-color: #0b3d61; -fx-border-width: 1px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 5, 0, 0, 1);");
-
-        HBox listsContainer = new HBox(20);
-        listsContainer.setPrefWidth(Double.MAX_VALUE);
-
-        HBox.setHgrow(menteeListView, Priority.ALWAYS);
-        HBox.setHgrow(mentorListView, Priority.ALWAYS);
+    private HBox createListsContainer() {
+        configureMenteeListView();
+        configureMentorListView();
 
         Label menteeLabel = new Label("Unpaired Mentees");
         menteeLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #0b3d61;");
@@ -134,96 +130,102 @@ public class AdminPairingView extends VBox {
         mentorContainer.setPadding(new Insets(10));
         mentorContainer.setAlignment(Pos.TOP_CENTER);
 
-        menteeContainer.setPadding(new Insets(10, 10, 10, 10));
-        mentorContainer.setPadding(new Insets(10, 10, 10, 10));
+        HBox listsContainer = new HBox(20, menteeContainer, mentorContainer);
+        listsContainer.setPrefWidth(Double.MAX_VALUE);
         listsContainer.setSpacing(5);
 
         HBox.setHgrow(menteeContainer, Priority.ALWAYS);
         HBox.setHgrow(mentorContainer, Priority.ALWAYS);
 
-        listsContainer.getChildren().addAll(menteeContainer, mentorContainer);
-        setupListViewSelection();
+        return listsContainer;
+    }
 
-        refreshLists();
+    private void configureMenteeListView() {
+        menteeListView.setMinWidth(400);
+        menteeListView.setMinHeight(450);
+        menteeListView.setPrefWidth(450);
+        menteeListView.setPrefHeight(550);
+        menteeListView.setMaxWidth(Double.MAX_VALUE);
+        menteeListView.setMaxHeight(Double.MAX_VALUE);
+        menteeListView.setStyle("-fx-border-color: #0b3d61; -fx-border-width: 1px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 5, 0, 0, 1);");
+    }
 
-        HBox buttonContainer = new HBox(pairButton);
-        buttonContainer.setAlignment(Pos.CENTER);
-        buttonContainer.setPrefHeight(80);
+    private void configureMentorListView() {
+        mentorListView.setMinWidth(200);
+        mentorListView.setMinHeight(450);
+        mentorListView.setPrefWidth(250);
+        mentorListView.setPrefHeight(550);
+        mentorListView.setMaxWidth(Double.MAX_VALUE);
+        mentorListView.setMaxHeight(Double.MAX_VALUE);
+        mentorListView.setStyle("-fx-border-color: #0b3d61; -fx-border-width: 1px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 5, 0, 0, 1);");
+    }
 
-        getChildren().addAll(topContainerWithSeparator, listsContainer, buttonContainer);
-        setSpacing(5);
-        setAlignment(Pos.TOP_CENTER);
+    private Label createLabel(String text, boolean isActive) {
+        Label label = new Label(text);
+        label.setStyle(isActive ? "-fx-font-size: 16px; -fx-text-fill: #ff5722; -fx-font-weight: bold; -fx-underline: true; -fx-cursor: hand;"
+                : "-fx-font-size: 16px; -fx-text-fill: #0b3d61; -fx-font-weight: bold; -fx-underline: false; -fx-cursor: hand;");
+        return label;
     }
 
     private void switchToPairingView(Label adminHomeLabel, Label pairingLabel, Label viewReportLabel) {
-        // Update styles
-        adminHomeLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #0b3d61; -fx-font-weight: bold; -fx-underline: false; -fx-cursor: hand;");
-        pairingLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #ff5722; -fx-font-weight: bold; -fx-underline: true; -fx-cursor: hand;");
-        viewReportLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #0b3d61; -fx-font-weight: bold; -fx-underline: false; -fx-cursor: hand;");
-
-        // Logic to refresh or focus on the pairing view
+        updateLabelStyles(adminHomeLabel, pairingLabel, viewReportLabel, "pairing");
         System.out.println("Switched to Pairing Interface");
     }
 
     private void switchToAdminHome(Label adminHomeLabel, Label pairingLabel, Label viewReportLabel) {
-        // Update styles
-        adminHomeLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #ff5722; -fx-font-weight: bold; -fx-underline: true; -fx-cursor: hand;");
-        pairingLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #0b3d61; -fx-font-weight: bold; -fx-underline: false; -fx-cursor: hand;");
-        viewReportLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #0b3d61; -fx-font-weight: bold; -fx-underline: false; -fx-cursor: hand;");
-
-        // Notify the main controller or parent layout to switch views
+        updateLabelStyles(adminHomeLabel, pairingLabel, viewReportLabel, "home");
         getScene().setRoot(new AdminView(adminController)); // Replace the current view with AdminView
     }
 
     private void openReportWindow(Label adminHomeLabel, Label pairingLabel, Label viewReportLabel) {
-        // Update styles
-        adminHomeLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #0b3d61; -fx-font-weight: bold; -fx-underline: false; -fx-cursor: hand;");
-        pairingLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #0b3d61; -fx-font-weight: bold; -fx-underline: false; -fx-cursor: hand;");
-        viewReportLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #ff5722; -fx-font-weight: bold; -fx-underline: true; -fx-cursor: hand;");
-
+        updateLabelStyles(adminHomeLabel, pairingLabel, viewReportLabel, "report");
         getScene().setRoot(new AssignedReportView(adminController));
     }
 
+    private void updateLabelStyles(Label adminHomeLabel, Label pairingLabel, Label viewReportLabel, String activeView) {
+        String activeStyle = "-fx-font-size: 14px; -fx-text-fill: #ff5722; -fx-font-weight: bold; -fx-underline: true; -fx-cursor: hand;";
+        String inactiveStyle = "-fx-font-size: 14px; -fx-text-fill: #0b3d61; -fx-font-weight: bold; -fx-underline: false; -fx-cursor: hand;";
+
+        adminHomeLabel.setStyle(activeView.equals("home") ? activeStyle : inactiveStyle);
+        pairingLabel.setStyle(activeView.equals("pairing") ? activeStyle : inactiveStyle);
+        viewReportLabel.setStyle(activeView.equals("report") ? activeStyle : inactiveStyle);
+    }
+
     private void setupListViewSelection() {
-        TableColumn<Mentee, String> usernameColumn = new TableColumn<>("Mentee Name");
-        usernameColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getUsername()));
-        usernameColumn.setPrefWidth(100);
+        setupMenteeColumns();
+        setupMentorColumns();
+        setupMenteeRowFactory();
+        setupMentorRowFactory();
+    }
 
-        TableColumn<Mentee, String> requestTypeColumn = new TableColumn<>("Request Type");
-        requestTypeColumn.setCellValueFactory(cellData -> {
-            Mentee mentee = cellData.getValue();
-            String activityType = mentee.getSupportRequest() != null
-                    ? mentee.getSupportRequest().getDisplayName()
-                    : "No Request";
-            return new SimpleStringProperty(activityType);
-        });
-        requestTypeColumn.setPrefWidth(325);
+    private void setupMenteeColumns() {
+        menteeListView.getColumns().clear();
 
-        TableColumn<Mentee, String> preferredMentorTypeColumn = new TableColumn<>("Preferred Mentor Type");
-        preferredMentorTypeColumn.setCellValueFactory(cellData -> {
-            Mentee mentee = cellData.getValue();
-            MentorType preferredType = mentee.getPreferredMentorType();
-            return new SimpleStringProperty(preferredType != null ? preferredType.getDescription() : "Not Set");
-        });
-        preferredMentorTypeColumn.setPrefWidth(180);
+        menteeListView.getColumns().addAll(
+                createTableColumn("Mentee Name", 100, mentee -> mentee.getUsername()),
+                createTableColumn("Request Type", 325, mentee -> {
+                    return mentee.getSupportRequest() != null
+                            ? mentee.getSupportRequest().getDisplayName()
+                            : "No Request";
+                }),
+                createTableColumn("Preferred Mentor Type", 180, mentee -> {
+                    MentorType preferredType = mentee.getPreferredMentorType();
+                    return preferredType != null ? preferredType.getDescription() : "Not Set";
+                }),
+                createTableColumn("Mentee Type", 130, mentee -> {
+                    MenteeType menteeType = mentee.getMenteeType();
+                    return menteeType != null ? menteeType.getDescription() : "Not Set";
+                }),
+                createCVSummaryColumn()
+        );
+    }
 
-
-        TableColumn<Mentee, String> menteeTypeColumn = new TableColumn<>("Mentee Type");
-        menteeTypeColumn.setCellValueFactory(cellData -> {
-            Mentee mentee = cellData.getValue();
-            MenteeType menteeType = mentee.getMenteeType();
-            return new SimpleStringProperty(menteeType != null ? menteeType.getDescription() : "Not Set");
-        });
-        menteeTypeColumn.setPrefWidth(130);
-
-
+    private TableColumn<Mentee, String> createCVSummaryColumn() {
         TableColumn<Mentee, String> cvTextColumn = new TableColumn<>("CV Summary");
-        cvTextColumn.setCellValueFactory(cellData -> {
-            String fullCvText = cellData.getValue().getCvText();
-            return new SimpleStringProperty(fullCvText);
-        });
+        cvTextColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getCvText()));
         cvTextColumn.setCellFactory(column -> new TableCell<>() {
             private Tooltip tooltip;
+
             @Override
             protected void updateItem(String fullCvText, boolean empty) {
                 super.updateItem(fullCvText, empty);
@@ -239,89 +241,36 @@ public class AdminPairingView extends VBox {
                     tooltip.setMaxWidth(400);
                     tooltip.setStyle("-fx-font-size: 14px;");
 
-                    tooltip.setShowDelay(javafx.util.Duration.ZERO);
-                    tooltip.setHideDelay(javafx.util.Duration.INDEFINITE);
-                    tooltip.setShowDuration(javafx.util.Duration.INDEFINITE);
-
                     setOnMouseEntered(event -> setTooltip(tooltip));
                     setOnMouseExited(event -> setTooltip(null));
                 }
             }
         });
+        return cvTextColumn;
+    }
 
-        // Add columns to menteeListView
-        menteeListView.getColumns().clear();
-        menteeListView.getColumns().add(usernameColumn);
-        menteeListView.getColumns().add(requestTypeColumn);
-        menteeListView.getColumns().add(preferredMentorTypeColumn);
-        menteeListView.getColumns().add(menteeTypeColumn);
-        menteeListView.getColumns().add(cvTextColumn);
+    private void setupMentorColumns() {
+        mentorListView.getColumns().clear();
 
-        // RowFactory for Mentee TableView to alternate row colors
-        menteeListView.setRowFactory(tv -> new TableRow<>() {
-            @Override
-            protected void updateItem(Mentee item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setStyle(""); // Reset style for empty rows
-                } else {
-                    Mentee selectedMentee = menteeListView.getSelectionModel().getSelectedItem();
-                    if (item.equals(selectedMentee)) {
-                        setStyle("-fx-text-fill: black; -fx-font-weight: bold;");
-                    } else {
-                        // Apply alternating row colors
-                        if (getIndex() % 2 == 0) {
-                            setStyle("-fx-background-color: #e8f4fc; -fx-text-fill: black; -fx-padding: 5px;");
-                        } else {
-                            setStyle("-fx-background-color: white; -fx-text-fill: black; -fx-padding: 5px;");
-                        }
-                    }
-                }
-            }
-        });
+        mentorListView.getColumns().addAll(
+                createTableColumn("Mentor Name", mentor -> mentor.getUsername()),
+                createTableColumn("Available Time", mentor -> {
+                    return formatAvailability(mentor.getStartAvailability(), mentor.getEndAvailability());
+                }),
+                createTableColumn("Mentor Type", 180, mentor -> {
+                    MentorType mentorType = mentor.getMentorType();
+                    return mentorType != null ? mentorType.getDescription() : "Not Set";
+                }),
+                createMentorStatusColumn()
+        );
+    }
 
-        // Mouse click event for menteeListView
-        menteeListView.setOnMouseClicked(event -> {
-            Mentee selected = menteeListView.getSelectionModel().getSelectedItem();
-            if (selected != null && selected.equals(lastSelectedMentee)) {
-                menteeListView.getSelectionModel().clearSelection();
-                lastSelectedMentee = null;
-            } else {
-                lastSelectedMentee = selected;
-            }
-            menteeListView.refresh(); // Refresh menteeListView only
-        });
-
-        // Mentor TableView setup
-        TableColumn<Mentor, String> nameColumn = new TableColumn<>("Mentor Name");
-        nameColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getUsername()));
-
-        TableColumn<Mentor, String> availabilityColumn = new TableColumn<>("Available Time");
-        availabilityColumn.setCellValueFactory(cellData -> {
-            Mentor mentor = cellData.getValue();
-            String availability = formatAvailability(mentor.getStartAvailability(), mentor.getEndAvailability());
-            return new SimpleStringProperty(availability);
-        });
-
-        TableColumn<Mentor, String> mentorTypeColumn = new TableColumn<>("Mentor Type");
-        mentorTypeColumn.setCellValueFactory(cellData -> {
-            Mentor mentor = cellData.getValue();
-            MentorType mentorType = mentor.getMentorType();
-            return new SimpleStringProperty(mentorType != null ? mentorType.getDescription() : "Not Set");
-        });
-        mentorTypeColumn.setPrefWidth(180);
-
+    private TableColumn<Mentor, String> createMentorStatusColumn() {
         TableColumn<Mentor, String> statusColumn = new TableColumn<>("Status");
+
         statusColumn.setCellValueFactory(cellData -> {
             Mentor mentor = cellData.getValue();
-            String status;
-            if (mentor.getEndAvailability() != null && mentor.getEndAvailability().isBefore(LocalDateTime.now())) {
-                status = "Expired";
-            } else if (!mentor.isAvailable()) {
-                status = "Paired";
-            } else {
-                status = "Available";
-            }
+            String status = determineMentorStatus(mentor);
             return new SimpleStringProperty(status);
         });
 
@@ -333,96 +282,127 @@ public class AdminPairingView extends VBox {
                     setGraphic(null);
                     return;
                 }
-
-                Label statusLabel = new Label(status);
-                statusLabel.setStyle("-fx-text-fill: black; -fx-font-weight: bold;");
-
-                String backgroundColor;
-                switch (status) {
-                    case "Available":
-                        backgroundColor = "#d4edda";
-                        break;
-                    case "Paired":
-                        backgroundColor = "#f5c6cb";
-                        break;
-                    case "Expired":
-                        backgroundColor = "#fff3cd";
-                        break;
-                    default:
-                        backgroundColor = "#ffffff";
-                        break;
-                }
-
-                HBox statusBox = new HBox(statusLabel);
-                statusBox.setAlignment(Pos.CENTER);
-                statusBox.setStyle("-fx-background-color: " + backgroundColor + "; " +
-                        "-fx-background-radius: 5px; " +
-                        "-fx-padding: 5px;");
-
-                setGraphic(statusBox);
+                setGraphic(createStatusGraphic(status));
             }
         });
-        statusColumn.setPrefWidth(100);
 
-        mentorListView.getColumns().clear();
-        mentorListView.getColumns().add(nameColumn);
-        mentorListView.getColumns().add(availabilityColumn);
-        mentorListView.getColumns().add(mentorTypeColumn);
-        mentorListView.getColumns().add(statusColumn);
+        return statusColumn;
+    }
 
+    private String determineMentorStatus(Mentor mentor) {
+        if (mentor.getEndAvailability() != null && mentor.getEndAvailability().isBefore(LocalDateTime.now())) {
+            return "Expired";
+        }
+        return mentor.isAvailable() ? "Available" : "Paired";
+    }
 
-        // RowFactory for Mentor TableView
-        mentorListView.setRowFactory(tv -> new TableRow<>() {
+    private HBox createStatusGraphic(String status) {
+        Label statusLabel = new Label(status);
+        statusLabel.setStyle("-fx-text-fill: black; -fx-font-weight: bold;");
+
+        String backgroundColor = switch (status) {
+            case "Available" -> "#d4edda";
+            case "Paired" -> "#f5c6cb";
+            case "Expired" -> "#fff3cd";
+            default -> "#ffffff";
+        };
+
+        HBox statusBox = new HBox(statusLabel);
+        statusBox.setAlignment(Pos.CENTER);
+        statusBox.setStyle("-fx-background-color: " + backgroundColor + "; " +
+                "-fx-background-radius: 5px; " +
+                "-fx-padding: 5px;");
+
+        return statusBox;
+    }
+
+    private void setupMenteeRowFactory() {
+        menteeListView.setRowFactory(tv -> new TableRow<>() {
             @Override
-            protected void updateItem(Mentor item, boolean empty) {
+            protected void updateItem(Mentee item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || item == null) {
-                    setStyle(""); // Reset style for empty rows
+                    setStyle("");
                 } else {
-                    Mentor selectedMentor = mentorListView.getSelectionModel().getSelectedItem();
-                    if (item.equals(selectedMentor)) {
+                    Mentee selectedMentee = menteeListView.getSelectionModel().getSelectedItem();
+                    if (item.equals(selectedMentee)) {
                         setStyle("-fx-text-fill: black; -fx-font-weight: bold;");
                     } else {
-                        // Apply alternating row colors
-                        if (getIndex() % 2 == 0) {
-                            setStyle("-fx-background-color: #e8f4fc; -fx-text-fill: black;");
-                        } else {
-                            setStyle("-fx-background-color: white; -fx-text-fill: black;");
-                        }
+                        setStyle(getIndex() % 2 == 0
+                                ? "-fx-background-color: #e8f4fc; -fx-text-fill: black; -fx-padding: 5px;"
+                                : "-fx-background-color: white; -fx-text-fill: black; -fx-padding: 5px;");
                     }
                 }
             }
         });
 
-        mentorListView.setOnMouseClicked(event -> {
-            Mentor selectedMentor = mentorListView.getSelectionModel().getSelectedItem();
-            if (selectedMentor == null || selectedMentor.equals(lastSelectedMentor)) {
-                mentorListView.getSelectionModel().clearSelection();
-                lastSelectedMentor = null;
-            } else {
-                lastSelectedMentor = selectedMentor;
+        menteeListView.setOnMouseClicked(event -> handleSelection(menteeListView, selected -> lastSelectedMentee = selected));
+    }
+
+    private void setupMentorRowFactory() {
+        mentorListView.setRowFactory(tv -> new TableRow<>() {
+            @Override
+            protected void updateItem(Mentor item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setStyle("");
+                } else {
+                    Mentor selectedMentor = mentorListView.getSelectionModel().getSelectedItem();
+                    if (item.equals(selectedMentor)) {
+                        setStyle("-fx-text-fill: black; -fx-font-weight: bold;");
+                    } else {
+                        setStyle(getIndex() % 2 == 0
+                                ? "-fx-background-color: #e8f4fc; -fx-text-fill: black;"
+                                : "-fx-background-color: white; -fx-text-fill: black;");
+                    }
+                }
             }
-            mentorListView.refresh();
-            menteeListView.refresh();
         });
+
+        mentorListView.setOnMouseClicked(event -> handleSelection(mentorListView, selected -> lastSelectedMentor = selected));
+    }
+
+    private <T> void handleSelection(TableView<T> tableView, java.util.function.Consumer<T> selectionConsumer) {
+        T selected = tableView.getSelectionModel().getSelectedItem();
+        if (selected != null && selected.equals(selectionConsumer)) {
+            tableView.getSelectionModel().clearSelection();
+            selectionConsumer.accept(null);
+        } else {
+            selectionConsumer.accept(selected);
+        }
+        tableView.refresh();
+    }
+
+    private <T> TableColumn<T, String> createTableColumn(String title, java.util.function.Function<T, String> valueExtractor) {
+        return createTableColumn(title, -1, valueExtractor);
+    }
+
+    private <T> TableColumn<T, String> createTableColumn(String title, double prefWidth, java.util.function.Function<T, String> valueExtractor) {
+        TableColumn<T, String> column = new TableColumn<>(title);
+        column.setCellValueFactory(cellData -> new SimpleStringProperty(valueExtractor.apply(cellData.getValue())));
+        if (prefWidth > 0) column.setPrefWidth(prefWidth);
+        return column;
     }
 
     private void pairSelectedMenteeAndMentor() {
         Mentee selectedMentee = menteeListView.getSelectionModel().getSelectedItem();
         Mentor selectedMentor = mentorListView.getSelectionModel().getSelectedItem();
 
-        if (selectedMentee != null && selectedMentor != null) {
-            boolean success = adminController.pairMenteeWithMentor(selectedMentee.getUsername(), selectedMentor.getUsername());
-            if (success) {
-                showSnackbar("Successfully paired!",true);
-                refreshLists();
-            } else {
-                showSnackbar("Pairing failed: Mentor \"" + selectedMentor.getUsername() + "\" is unavailable.", false);
-            }
-
-        } else {
-            showSnackbar("Please select both a mentee and a mentor to proceed.", false);
+        if (selectedMentee == null || selectedMentor == null) {
+            displaySnackbar(false, "Please select both a mentee and a mentor to proceed.");
+            return;
         }
+
+        boolean success = adminController.pairMenteeWithMentor(selectedMentee.getUsername(), selectedMentor.getUsername());
+        displaySnackbar(success, success
+                ? "Successfully paired!"
+                : "Pairing failed: Mentor \"" + selectedMentor.getUsername() + "\" is unavailable.");
+
+        if (success) refreshLists();
+    }
+
+    private void displaySnackbar(boolean success, String message) {
+        showSnackbar(message, success);
     }
 
     private void showSnackbar(String message, boolean success) {
@@ -452,15 +432,14 @@ public class AdminPairingView extends VBox {
     }
 
     private void refreshLists() {
-        menteeItems.clear();
-        List<Mentee> mentees = adminController.getAllUnpairedMentees();
-        menteeItems.addAll(mentees);
-        menteeListView.setItems(menteeItems);
+        refreshList(menteeItems, menteeListView, adminController.getAllUnpairedMentees());
+        refreshList(mentorItems, mentorListView, adminController.getAvailableMentors());
+    }
 
-        mentorItems.clear();
-        List<Mentor> mentors = adminController.getAvailableMentors();
-        mentorItems.addAll(mentors);
-        mentorListView.setItems(mentorItems);
+    private <T> void refreshList(ObservableList<T> items, TableView<T> tableView, List<T> newData) {
+        items.clear();
+        items.addAll(newData);
+        tableView.setItems(items);
     }
 
     private String formatAvailability(LocalDateTime start, LocalDateTime end) {

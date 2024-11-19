@@ -1,5 +1,6 @@
 package uk.ac.nott.cs.comp2013.mentorapp.view;
 
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -14,6 +15,7 @@ import uk.ac.nott.cs.comp2013.mentorapp.controller.MentorController;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentee;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentor;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.MentorType;
+import javafx.event.ActionEvent;
 
 public class EditProfileView extends VBox {
     private final MenteeController menteeController;
@@ -38,128 +40,128 @@ public class EditProfileView extends VBox {
     }
 
     private void buildView() {
+        setupContainerStyle();
+        Label lblTitle = createStyledLabel("Profile");
+        VBox usernameBox = createInputBox("Username:", getUsername(), "Enter your username");
+        VBox passwordBox = createInputBox("Password:", getPassword(), "Enter your password");
+        VBox realNameBox = createInputBox("Real Name:", getRealName(), "Real Name (optional)");
+        VBox gradeBox = setupGradeBox();
+        HBox buttonBox = createButtonBox(
+                createButton("Save", e -> handleSave(usernameBox, passwordBox, realNameBox, gradeBox)),
+                createButton("Cancel", e -> handleCancel())
+        );
+        VBox container = new VBox(20, lblTitle, usernameBox, passwordBox, realNameBox);
+        if (gradeBox != null) container.getChildren().add(gradeBox);
+        container.getChildren().add(buttonBox);
+        styleContainer(container);
+        getChildren().add(container);
+    }
+
+    private void setupContainerStyle() {
         setSpacing(20);
         setPadding(new Insets(20));
         setAlignment(Pos.CENTER);
         setStyle("-fx-background-color: #f5f5f5;");
+    }
 
-        Label lblTitle = new Label("Profile");
-        lblTitle.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+    private VBox createInputBox(String label, String value, String placeholder) {
+        Label lbl = createStyledLabel(label);
+        TextField txtField = createStyledTextField(value, placeholder);
+        return createCenteredBox(lbl, txtField);
+    }
 
-        Label lblUsername = createStyledLabel("Username:");
-        TextField txtUsername = createStyledTextField(getUsername(), "Enter your username");
-        VBox usernameBox = createCenteredBox(lblUsername, txtUsername);
+    private VBox setupGradeBox() {
+        if (menteeController == null) return null;
+        Label lblGrade = createStyledLabel("Select Your Grade:");
+        ComboBox<MentorType> gradeComboBox = new ComboBox<>();
+        gradeComboBox.getItems().addAll(MentorType.values());
+        gradeComboBox.setStyle("-fx-font-size: 12px; -fx-border-color: #DDDDDD; -fx-border-radius: 5px; -fx-padding: 5px;");
+        gradeComboBox.setPromptText("Choose your grade");
+        gradeComboBox.setMaxWidth(400);
+        MentorType currentGrade = menteeController.getMentee().getPreferredMentorType();
+        if (currentGrade != null) gradeComboBox.setValue(currentGrade);
+        gradeComboBox.setOnAction(e -> menteeController.getMentee().setPreferredMentorType(gradeComboBox.getValue()));
+        return createCenteredBox(lblGrade, gradeComboBox);
+    }
 
-        Label lblPassword = createStyledLabel("Password:");
-        TextField txtPassword = createStyledTextField(getPassword(), "Enter your password");
-        VBox passwordBox = createCenteredBox(lblPassword, txtPassword);
-
-        Label lblRealName = createStyledLabel("Real Name:");
-        TextField txtRealName = createStyledTextField(getRealName(), "Real Name (optional)");
-        VBox realNameBox = createCenteredBox(lblRealName, txtRealName);
-
-        // Grade selection only for mentee
-        VBox gradeBox = null;
-        if (menteeController != null) {
-            Label lblGrade = createStyledLabel("Select Your Grade:");
-            ComboBox<MentorType> gradeComboBox = new ComboBox<>();
-            gradeComboBox.getItems().addAll(MentorType.values());
-            gradeComboBox.setStyle("-fx-font-size: 12px; -fx-border-color: #DDDDDD; -fx-border-radius: 5px; -fx-padding: 5px;");
-            gradeComboBox.setPromptText("Choose your grade");
-            gradeComboBox.setMaxWidth(400);
-
-            MentorType currentGrade = menteeController.getMentee().getPreferredMentorType();
-            if (currentGrade != null) {
-                gradeComboBox.setValue(currentGrade);
-            }
-
-            gradeBox = createCenteredBox(lblGrade, gradeComboBox);
-            gradeComboBox.setOnAction(e -> menteeController.getMentee().setPreferredMentorType(gradeComboBox.getValue()));
-        }
-
-        Button btnSave = new Button("Save");
-        btnSave.setStyle("-fx-background-color: #0b3d61; -fx-text-fill: white; -fx-font-weight: bold;" +
-                "-fx-font-size: 14px; -fx-padding: 10px 20px; -fx-border-radius: 5px; -fx-background-radius: 5px;");
-        btnSave.setOnAction(e -> {
-            String username = txtUsername.getText() != null ? txtUsername.getText().trim() : "";
-            String password = txtPassword.getText() != null ? txtPassword.getText().trim() : "";
-            String realName = txtRealName.getText() != null ? txtRealName.getText().trim() : "";
-
-            if (username.isEmpty() || password.isEmpty()) {
-                showError("Username and Password cannot be empty.");
-                return;
-            }
-
-            if (!isPasswordValid(password)) {
-                showError("Password must be at least 6 characters long and cannot contain ',', '\\n', '\\r\\n', or spaces.");
-                return;
-            }
-
-            if (realName.isEmpty()) {
-                realName = "";
-            }
-
-            // Update mentee or mentor data
-            if (isNewUser) {
-                if (menteeController != null) {
-                    boolean success = menteeController.getRepository().insert(new Mentee(username, password, realName)) != null;
-                    if (!success) {
-                        showError("A user with this username already exists.");
-                        return;
-                    }
-                } else if (mentorController != null) {
-                    boolean success = mentorController.getRepository().insert(new Mentor(username, password, realName)) != null;
-                    if (!success) {
-                        showError("A user with this username already exists.");
-                        return;
-                    }
-                }
-                showSuccess("New user created successfully!");
-            }
-            else {
-                if (menteeController != null) {
-                    menteeController.getMentee().setUsername(username);
-                    menteeController.getMentee().setPassword(password);
-                    menteeController.getMentee().setRealName(realName);
-                } else if (mentorController != null) {
-                    mentorController.getMentor().setUsername(username);
-                    mentorController.getMentor().setPassword(password);
-                    mentorController.getMentor().setRealName(realName);
-                }
-                showSuccess("Profile updated successfully!");
-            }
-
-            Stage stage = (Stage) getScene().getWindow();
-            if (previousScene != null) {
-                stage.setScene(previousScene);
-            }
-        });
-
-        Button btnCancel = new Button("Cancel");
-        btnCancel.setStyle("-fx-background-color: #0b3d61; -fx-text-fill: white; -fx-font-weight: bold;" +
-                "-fx-font-size: 14px; -fx-padding: 10px 20px; -fx-border-radius: 5px; -fx-background-radius: 5px;");
-        btnCancel.setOnAction(e -> {
-            Stage stage = (Stage) getScene().getWindow();
-            if (previousScene != null) {
-                stage.setScene(previousScene);
-            }
-        });
-
+    private HBox createButtonBox(Button btnSave, Button btnCancel) {
         HBox buttonBox = new HBox(20, btnSave, btnCancel);
         buttonBox.setAlignment(Pos.CENTER);
+        return buttonBox;
+    }
 
-        VBox container = new VBox(20, lblTitle, usernameBox, passwordBox, realNameBox);
+    private Button createButton(String text, EventHandler<ActionEvent> eventHandler) {
+        Button button = new Button(text);
+        button.setStyle("-fx-background-color: #0b3d61; -fx-text-fill: white; -fx-font-weight: bold;" +
+                "-fx-font-size: 14px; -fx-padding: 10px 20px; -fx-border-radius: 5px; -fx-background-radius: 5px;");
+        button.setOnAction(eventHandler);
+        return button;
+    }
 
-        if (gradeBox != null) {
-            container.getChildren().add(gradeBox);
+    private void handleSave(VBox usernameBox, VBox passwordBox, VBox realNameBox, VBox gradeBox) {
+        TextField txtUsername = (TextField) usernameBox.getChildren().get(1);
+        TextField txtPassword = (TextField) passwordBox.getChildren().get(1);
+        TextField txtRealName = (TextField) realNameBox.getChildren().get(1);
+        String username = txtUsername.getText() != null ? txtUsername.getText().trim() : "";
+        String password = txtPassword.getText() != null ? txtPassword.getText().trim() : "";
+        String realName = txtRealName.getText() != null ? txtRealName.getText().trim() : "";
+        if (!validateInputs(username, password, realName)) return;
+        updateUserData(username, password, realName);
+        Stage stage = (Stage) getScene().getWindow();
+        if (previousScene != null) stage.setScene(previousScene);
+    }
+
+    private boolean validateInputs(String username, String password, String realName) {
+        if (username.isEmpty() || password.isEmpty()) {
+            showError("Username and Password cannot be empty.");
+            return false;
         }
-        container.getChildren().add(buttonBox);
+        if (!isPasswordValid(password)) {
+            showError("Password must be at least 6 characters long and cannot contain ',', '\\n', '\\r\\n', or spaces.");
+            return false;
+        }
+        return true;
+    }
+
+    private void updateUserData(String username, String password, String realName) {
+        if (isNewUser) {
+            if (menteeController != null) {
+                boolean success = menteeController.getRepository().insert(new Mentee(username, password, realName)) != null;
+                if (!success) {
+                    showError("A user with this username already exists.");
+                    return;
+                }
+            } else if (mentorController != null) {
+                boolean success = mentorController.getRepository().insert(new Mentor(username, password, realName)) != null;
+                if (!success) {
+                    showError("A user with this username already exists.");
+                    return;
+                }
+            }
+            showSuccess("New user created successfully!");
+        } else {
+            if (menteeController != null) {
+                menteeController.getMentee().setUsername(username);
+                menteeController.getMentee().setPassword(password);
+                menteeController.getMentee().setRealName(realName);
+            } else if (mentorController != null) {
+                mentorController.getMentor().setUsername(username);
+                mentorController.getMentor().setPassword(password);
+                mentorController.getMentor().setRealName(realName);
+            }
+            showSuccess("Profile updated successfully!");
+        }
+    }
+
+    private void handleCancel() {
+        Stage stage = (Stage) getScene().getWindow();
+        if (previousScene != null) stage.setScene(previousScene);
+    }
+
+    private void styleContainer(VBox container) {
         container.setAlignment(Pos.CENTER);
         container.setMaxWidth(500);
-
         setUnifiedBorderStyle(container);
-
-        getChildren().add(container);
     }
 
     private void showSuccess(String message) {
@@ -169,7 +171,6 @@ public class EditProfileView extends VBox {
         alert.setContentText(message);
         alert.showAndWait();
     }
-
 
     private String getUsername() {
         if (menteeController != null) {
@@ -223,14 +224,11 @@ public class EditProfileView extends VBox {
         if (password.length() < 6) {
             return false;
         }
-
         if (password.contains(",") || password.contains("\n") || password.contains("\r\n") || password.contains(" ")) {
             return false;
         }
-
         return true;
     }
-
 
     private void showError(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);

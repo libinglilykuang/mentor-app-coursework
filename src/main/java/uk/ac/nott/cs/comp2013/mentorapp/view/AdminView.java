@@ -20,33 +20,22 @@ public class AdminView extends VBox {
     }
 
     private void buildMainMenu() {
+        VBox contentBox = createContentBox();
+        ImageView logoImageView = createLogoImageView();
+        Label welcomeLabel = createWelcomeLabel();
+        Button btnPairMentorStudent = createMenuButton("Pair Mentor and Student", this::showPairingInterface);
+        Button btnViewReports = createMenuButton("View Assigned Report", this::showReportInterface);
+        contentBox.getChildren().addAll(logoImageView, welcomeLabel, btnPairMentorStudent, btnViewReports);
+
+        getChildren().clear();
+        setAlignment(Pos.CENTER);
+        getChildren().add(contentBox);
+    }
+
+    private VBox createContentBox() {
         VBox contentBox = new VBox();
         contentBox.setSpacing(20);
         contentBox.setAlignment(Pos.CENTER);
-
-        ImageView logoImageView = new ImageView(new Image("/university-logo.png"));
-        logoImageView.setFitWidth(350);
-        logoImageView.setFitHeight(350);
-        logoImageView.setPreserveRatio(true);
-
-        Label welcomeLabel = new Label("Welcome, Admin!");
-        welcomeLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
-
-        Button btnPairMentorStudent = createStyledButton("Pair Mentor and Student", "#0b3d61", "#04253d");
-        btnPairMentorStudent.setOnAction(e -> showPairingInterface());
-        btnPairMentorStudent.setPrefWidth(350);
-
-        Button btnViewReports = createStyledButton("View Assigned Report", "#0b3d61", "#04253d");
-        btnViewReports.setOnAction(e -> showReportInterface());
-        btnViewReports.setPrefWidth(350);
-
-        btnPairMentorStudent.setOnAction(e -> showPairingInterface());
-        btnViewReports.setOnAction(e -> showReportInterface());
-
-        setSpacing(20);
-        setAlignment(Pos.CENTER);
-        contentBox.getChildren().addAll(logoImageView,welcomeLabel, btnPairMentorStudent, btnViewReports);
-
         contentBox.setMaxWidth(400);
         contentBox.setStyle(
                 "-fx-background-color: #FFFFFF; " +
@@ -57,20 +46,30 @@ public class AdminView extends VBox {
                         "-fx-padding: 40px; " +
                         "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0.5, 0, 4);"
         );
-
-        getChildren().clear();
-        setAlignment(Pos.CENTER);
-        getChildren().add(contentBox);
+        return contentBox;
     }
 
-    private Button createStyledButton(String text, String defaultColor, String hoverColor) {
+    private ImageView createLogoImageView() {
+        ImageView logoImageView = new ImageView(new Image("/university-logo.png"));
+        logoImageView.setFitWidth(350);
+        logoImageView.setFitHeight(350);
+        logoImageView.setPreserveRatio(true);
+        return logoImageView;
+    }
+
+    private Label createWelcomeLabel() {
+        Label welcomeLabel = new Label("Welcome, Admin!");
+        welcomeLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+        return welcomeLabel;
+    }
+
+    private Button createMenuButton(String text, Runnable action) {
         Button button = new Button(text);
-        button.setStyle(getButtonStyle(defaultColor));
-
-        button.setOnMouseEntered(e -> button.setStyle(getButtonStyle(hoverColor)));
-        button.setOnMouseExited(e -> button.setStyle(getButtonStyle(defaultColor)));
-
-        button.setPrefWidth(200);
+        button.setStyle(getButtonStyle("#0b3d61"));
+        button.setPrefWidth(350);
+        button.setOnMouseEntered(e -> button.setStyle(getButtonStyle("#04253d")));
+        button.setOnMouseExited(e -> button.setStyle(getButtonStyle("#0b3d61")));
+        button.setOnAction(e -> action.run());
         return button;
     }
 
@@ -92,7 +91,6 @@ public class AdminView extends VBox {
         Platform.runLater(() -> stage.setScene(pairingScene));
         stage.setMaximized(true);
     }
-
 
     private void showReportInterface() {
         getScene().setRoot(new AssignedReportView(adminController));

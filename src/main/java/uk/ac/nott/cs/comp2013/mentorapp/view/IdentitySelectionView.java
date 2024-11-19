@@ -1,5 +1,7 @@
 package uk.ac.nott.cs.comp2013.mentorapp.view;
 
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -20,7 +22,6 @@ import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentee;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.User;
 
 public class IdentitySelectionView extends VBox{
-
     private final IdentitySelectionHandler selectionHandler;
 
     public IdentitySelectionView(IdentitySelectionHandler selectionHandler) {
@@ -32,12 +33,10 @@ public class IdentitySelectionView extends VBox{
         HBox topContainer = createTopContainer();
         VBox centerContainer = createCenterContainer();
         HBox bottomContainer = createBottomContainer();
-
         VBox container = new VBox(10, topContainer,centerContainer,bottomContainer);
         container.setAlignment(Pos.CENTER);
         setUnifiedBorderStyle(container);
         container.setMaxWidth(500);
-
         setSpacing(5);
         setAlignment(Pos.CENTER);
         setStyle("-fx-padding: 20; -fx-background-color: white;");
@@ -70,15 +69,12 @@ public class IdentitySelectionView extends VBox{
 
         Label title = new Label("Student Life");
         title.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #003366;");
-
         HBox titleContainer = new HBox(title);
         titleContainer.setAlignment(Pos.CENTER_RIGHT);
         titleContainer.setPadding(new Insets(0, 10, 0, 10));
-
         HBox topContainer = new HBox(20, logoView, titleContainer);
         topContainer.setAlignment(Pos.CENTER);
         topContainer.setPadding(new Insets(10, 20, 0, 20));
-
         return topContainer;
     }
 
@@ -86,7 +82,6 @@ public class IdentitySelectionView extends VBox{
         Label subtitle = new Label("Log in as a");
         subtitle.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #666666;");
         subtitle.setPadding(new Insets(5, 0, 10, 0));
-
         HBox subtitleContainer = new HBox(subtitle);
         subtitleContainer.setAlignment(Pos.CENTER_LEFT);
         subtitleContainer.setPadding(new Insets(0, 0, 10, 10));
@@ -117,24 +112,31 @@ public class IdentitySelectionView extends VBox{
     }
 
     private HBox createBottomContainer() {
-        Hyperlink newUserLink = new Hyperlink("New User?");
-        newUserLink.setStyle("-fx-font-size: 14px; -fx-text-fill: #003366;");
-        newUserLink.setOnAction(e -> {
-                    Stage stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
-                    Repository<User, String> menteeRepository = new HashMapRepository<>();
-                    Mentee newMentee = new Mentee("", "", "");
-                    MenteeController newMenteeController = new MenteeController(menteeRepository,newMentee);
-                    stage.setScene(new Scene(new EditProfileView(newMenteeController, stage.getScene(), true), 600, 400));
-        });
-        Hyperlink havingProblemsLink = new Hyperlink("Having Problems?");
-        havingProblemsLink.setStyle("-fx-font-size: 14px; -fx-text-fill: #003366;");
-        havingProblemsLink.setOnAction(e -> System.out.println("Having Problems clicked"));
-
+        Hyperlink newUserLink = createHyperlink("New User?", e -> handleNewUserLink());
+        Hyperlink havingProblemsLink = createHyperlink("Having Problems?", e -> handleHavingProblemsLink());
         HBox bottomContainer = new HBox(20, newUserLink, havingProblemsLink);
         bottomContainer.setAlignment(Pos.CENTER);
         bottomContainer.setPadding(new Insets(10, 0, 20, 0));
         return bottomContainer;
+    }
 
+    private Hyperlink createHyperlink(String text, EventHandler<ActionEvent> action) {
+        Hyperlink hyperlink = new Hyperlink(text);
+        hyperlink.setStyle("-fx-font-size: 14px; -fx-text-fill: #003366;");
+        hyperlink.setOnAction(action);
+        return hyperlink;
+    }
+
+    private void handleNewUserLink() {
+        Stage stage = (Stage) this.getScene().getWindow();
+        Repository<User, String> menteeRepository = new HashMapRepository<>();
+        Mentee newMentee = new Mentee("", "", "");
+        MenteeController newMenteeController = new MenteeController(menteeRepository, newMentee);
+        stage.setScene(new Scene(new EditProfileView(newMenteeController, stage.getScene(), true), 600, 400));
+    }
+
+    private void handleHavingProblemsLink() {
+        System.out.println("Having Problems clicked");
     }
 
     private Button createStyledButton(String text) {
@@ -143,7 +145,6 @@ public class IdentitySelectionView extends VBox{
                 "-fx-padding: 10 20; -fx-background-radius: 5px;");
         button.setMaxWidth(300);
         button.setMinHeight(40);
-
         button.setOnMouseEntered(e -> button.setStyle("-fx-background-color: #003366; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;" +
                 "-fx-padding: 10 20; -fx-background-radius: 5px;"));
         button.setOnMouseExited(e -> button.setStyle("-fx-background-color: #004586; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;" +

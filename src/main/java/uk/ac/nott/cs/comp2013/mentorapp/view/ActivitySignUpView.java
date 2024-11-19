@@ -14,6 +14,7 @@ import javafx.stage.Stage;
 import uk.ac.nott.cs.comp2013.mentorapp.controller.MenteeController;
 import uk.ac.nott.cs.comp2013.mentorapp.model.session.SupportType;
 import java.net.URL;
+import java.util.Objects;
 
 public class ActivitySignUpView extends VBox {
     private final MenteeController menteeController;
@@ -30,48 +31,56 @@ public class ActivitySignUpView extends VBox {
     }
 
     private void buildView() {
-        // Load image for header
+        HBox topContainer = createTopContainer();
+        VBox headerBox = createHeaderBox();
+        configureListView();
+        Button submitButton = createSubmitButton();
+
+        setSpacing(10);
+        setPadding(new Insets(20));
+        setAlignment(Pos.TOP_CENTER);
+        getChildren().addAll(topContainer, headerBox, listView, submitButton);
+    }
+
+    private HBox createTopContainer() {
+        ImageView imageView = createHeaderImage();
+        VBox imageContainer = new VBox(imageView);
+        imageContainer.setAlignment(Pos.TOP_LEFT);
+        imageContainer.setPadding(new Insets(10));
+
+        Label signingLabel = createStyledLabel("Signing up for Activities", getActiveStyle());
+        Label viewMentorLabel = createStyledLabel("View Assigned Mentor", getInactiveStyle());
+        Label menteeHomeLabel = createStyledLabel("Home", getInactiveStyle());
+        menteeHomeLabel.setOnMouseClicked(e -> getScene().setRoot(new MenteeView(menteeController)));
+        viewMentorLabel.setOnMouseClicked(e -> getScene().setRoot(new AssignedMentorView(menteeController)));
+        HBox labelContainer = new HBox(20, menteeHomeLabel, signingLabel, viewMentorLabel);
+        labelContainer.setAlignment(Pos.CENTER_LEFT);
+
+        HBox profileBox = createUserProfileButton();
+        HBox.setHgrow(profileBox, Priority.ALWAYS);
+
+        HBox topContainer = new HBox(20, imageContainer, labelContainer, profileBox);
+        topContainer.setAlignment(Pos.CENTER_LEFT);
+        topContainer.setPadding(new Insets(10, 10, 5, 10));
+        topContainer.setStyle("-fx-background-color: white;");
+        return topContainer;
+    }
+
+    private ImageView createHeaderImage() {
         URL imageUrl = getClass().getResource("/pairing_image.png");
         if (imageUrl == null) {
-            throw new IllegalArgumentException("Image resource not found: /pairing_image.png");
+            throw new IllegalArgumentException("Image resource not found: " + "/pairing_image.png");
         }
         ImageView imageView = new ImageView(new Image(imageUrl.toExternalForm()));
         imageView.setFitWidth(170);
         imageView.setFitHeight(170);
         imageView.setPreserveRatio(true);
+        return imageView;
+    }
 
-        VBox imageContainer = new VBox(imageView);
-        imageContainer.setAlignment(Pos.TOP_LEFT);
-        imageContainer.setPadding(new Insets(10));
-
-        // Navigation labels
-        Label signingLabel = new Label("Signing up for Activities");
-        Label viewMentorLabel = new Label("View Assigned Mentor");
-        Label menteeHomeLabel = new Label("Home");
-
-        menteeHomeLabel.setStyle(getInactiveStyle());
-        signingLabel.setStyle(getActiveStyle());
-        viewMentorLabel.setStyle(getInactiveStyle());
-
-        menteeHomeLabel.setOnMouseClicked(e -> getScene().setRoot(new MenteeView(menteeController)));
-        viewMentorLabel.setOnMouseClicked(e -> getScene().setRoot(new AssignedMentorView(menteeController)));
-
-        // Navigation bar
-        HBox labelContainer = new HBox(20, menteeHomeLabel, signingLabel, viewMentorLabel);
-        labelContainer.setAlignment(Pos.CENTER_LEFT);
-
-        HBox profileBox = createUserProfileButton();
-
-        HBox topContainer = new HBox(20, imageContainer, labelContainer, profileBox);
-        topContainer.setAlignment(Pos.CENTER_LEFT);
-        HBox.setHgrow(profileBox, Priority.ALWAYS);
-        topContainer.setPadding(new Insets(10, 10, 5, 10));
-        setStyle("-fx-background-color: white;");
-
-        // Header with title and search bar
-        Label titleLabel = new Label("Sign up for Activities");
-        titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;");
-
+    private VBox createHeaderBox() {
+        Label titleLabel = createStyledLabel("Sign up for Activities",
+                "-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;");
         HBox filterBox = createFilterBox();
         searchField.setPromptText("Search Activities...");
         searchField.textProperty().addListener((observable, oldValue, newValue) -> filterActivities(newValue));
@@ -80,51 +89,38 @@ public class ActivitySignUpView extends VBox {
         VBox headerBox = new VBox(15, titleLabel, filterBox, searchField);
         headerBox.setStyle("-fx-background-color:#0278a4; -fx-padding: 20;");
         headerBox.setAlignment(Pos.TOP_LEFT);
+        return headerBox;
+    }
 
-        // List view configuration
-        configureListView();
-
-        // Submit button
-        Button submitButton = createSubmitButton();
-
-        // Layout configuration
-        setSpacing(10);
-        setPadding(new Insets(20));
-        setAlignment(Pos.TOP_CENTER);
-        getChildren().addAll(topContainer, headerBox, listView, submitButton);
+    private Label createStyledLabel(String text, String style) {
+        Label label = new Label(text);
+        label.setStyle(style);
+        return label;
     }
 
     private HBox createUserProfileButton() {
-        // User icon
-        ImageView userIcon = new ImageView(new Image(getClass().getResourceAsStream("/user_icon.png"))); // Replace with your icon path
+        ImageView userIcon = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/user_icon.png")))); // Replace with your icon path
         userIcon.setFitWidth(30);
         userIcon.setPreserveRatio(true);
 
-        // Username label
         Label usernameLabel = new Label(menteeController.getMentee().getUsername());
         usernameLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #0b3d61; -fx-font-weight: bold;");
 
-        // Combine user icon and username
         HBox profileButton = new HBox(8, userIcon, usernameLabel);
         profileButton.setAlignment(Pos.CENTER_RIGHT);
         profileButton.setPadding(new Insets(5));
         profileButton.setStyle("-fx-cursor: hand;");
-
-        // Add click event to navigate to EditProfileView
         profileButton.setOnMouseClicked(e -> {
-            // Ensure the Scene and Window are accessed during the event
             Stage stage = (Stage) profileButton.getScene().getWindow();
-            Scene currentScene = stage.getScene(); // Safely get the current scene
+            Scene currentScene = stage.getScene();
             stage.setScene(new Scene(new EditProfileView(menteeController, currentScene,false), 800, 600));
         });
-
         return profileButton;
     }
 
     private HBox createFilterBox() {
         Label mentorLabel = new Label("Mentor:");
         mentorLabel.setStyle("-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;");
-
         ComboBox<String> adviserComboBox = new ComboBox<>();
         adviserComboBox.getItems().addAll(
                 "Any",
@@ -136,13 +132,10 @@ public class ActivitySignUpView extends VBox {
         adviserComboBox.setValue("Any");
         adviserComboBox.setStyle("-fx-background-color: white;");
         adviserComboBox.setPrefWidth(200);
-
         HBox mentorBox = new HBox(10, mentorLabel, adviserComboBox);
         mentorBox.setAlignment(Pos.CENTER_LEFT);
-
         HBox filterBox = new HBox(40, mentorBox);
         filterBox.setAlignment(Pos.CENTER_LEFT);
-
         return filterBox;
     }
 
@@ -204,7 +197,6 @@ public class ActivitySignUpView extends VBox {
                 "-fx-border-radius: 5px; " +
                 "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0.3, 0, 2);");
 
-        // Add snackbar to the scene
         Scene scene = this.getScene();
         if (scene == null) return;
 
@@ -212,7 +204,6 @@ public class ActivitySignUpView extends VBox {
         StackPane snackbarPane = new StackPane(messageLabel);
         snackbarPane.setAlignment(Pos.BOTTOM_CENTER); // Position at the bottom center
         snackbarPane.setPadding(new Insets(20, 20, 50, 20)); // Adjust padding for better visibility
-
         root.getChildren().add(snackbarPane);
 
         // Auto-hide after 3 seconds

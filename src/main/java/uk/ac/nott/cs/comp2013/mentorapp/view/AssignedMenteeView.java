@@ -28,9 +28,42 @@ public class AssignedMenteeView extends VBox {
     }
 
     private void buildView() {
+        HBox topContainer = createTopContainer();
+        Label titleLabel = createTitleLabel();
+        VBox sessionBox = createSessionBox();
+
+        setSpacing(20);
+        setPadding(new Insets(20));
+        setAlignment(Pos.TOP_CENTER);
+        setStyle("-fx-background-color: #f9f9f9;");
+        getChildren().addAll(topContainer, titleLabel, sessionBox);
+    }
+
+    private HBox createTopContainer() {
+        VBox imageContainer = createImageContainer();
+        Label mentorHomeLabel = createNavigationLabel("Home", getInactiveStyle());
+        Label settingLabel = createNavigationLabel("Set Available Time", getInactiveStyle());
+        Label viewMentorLabel = createNavigationLabel("View Assigned Session", getActiveStyle());
+
+        MentorController mentorController = new MentorController(mentor);
+        mentorHomeLabel.setOnMouseClicked(e -> getScene().setRoot(new MentorView(mentorController)));
+        settingLabel.setOnMouseClicked(e -> getScene().setRoot(new MentorAvailabilityView(mentor)));
+        viewMentorLabel.setOnMouseClicked(e -> getScene().setRoot(new AssignedMenteeView(mentor)));
+
+        HBox labelContainer = new HBox(20, mentorHomeLabel, settingLabel, viewMentorLabel);
+        labelContainer.setAlignment(Pos.CENTER_LEFT);
+        HBox profileBox = createUserProfileButton();
+        HBox.setHgrow(profileBox, Priority.ALWAYS);
+        HBox topContainer = new HBox(20, imageContainer, labelContainer, profileBox);
+        topContainer.setAlignment(Pos.CENTER_LEFT);
+        topContainer.setPadding(new Insets(10, 10, 5, 10));
+        return topContainer;
+    }
+
+    private VBox createImageContainer() {
         URL imageUrl = getClass().getResource("/pairing_image.png");
         if (imageUrl == null) {
-            throw new IllegalArgumentException("Image resource not found: /pairing_image.png");
+            throw new IllegalArgumentException("Image resource not found: " + "/pairing_image.png");
         }
         ImageView imageView = new ImageView(new Image(imageUrl.toExternalForm()));
         imageView.setFitWidth(170);
@@ -40,82 +73,70 @@ public class AssignedMenteeView extends VBox {
         VBox imageContainer = new VBox(imageView);
         imageContainer.setAlignment(Pos.TOP_LEFT);
         imageContainer.setPadding(new Insets(10));
+        return imageContainer;
+    }
 
-        Label settingLabel = new Label("Set Available Time");
-        Label viewMentorLabel = new Label("View Assigned Session");
-        Label mentorHomeLabel = new Label("Home");
+    private Label createNavigationLabel(String text, String style) {
+        Label label = new Label(text);
+        label.setStyle(style);
+        return label;
+    }
 
-        mentorHomeLabel.setStyle(getInactiveStyle());
-        settingLabel.setStyle(getInactiveStyle());
-        viewMentorLabel.setStyle(getActiveStyle());
-
-        MentorController mentorController = new MentorController(mentor);
-        mentorHomeLabel.setOnMouseClicked(e -> getScene().setRoot(new MentorView(mentorController)));
-        settingLabel.setOnMouseClicked(e->getScene().setRoot(new MentorAvailabilityView(mentor)));
-        viewMentorLabel.setOnMouseClicked(e->getScene().setRoot(new AssignedMenteeView(mentor)));
-
-        // Navigation bar
-        HBox labelContainer = new HBox(20, mentorHomeLabel, settingLabel, viewMentorLabel);
-        labelContainer.setAlignment(Pos.CENTER_LEFT);
-
-        HBox profileBox = createUserProfileButton();
-        HBox.setHgrow(profileBox, Priority.ALWAYS);
-        HBox topContainer = new HBox(20, imageContainer, labelContainer,profileBox );
-        topContainer.setAlignment(Pos.CENTER_LEFT);
-        topContainer.setPadding(new Insets(10, 10, 5, 10));
-        setStyle("-fx-background-color: white;");
-
-        setSpacing(20);
-        setPadding(new Insets(20));
-        setAlignment(Pos.TOP_CENTER);
-        setStyle("-fx-background-color: #f9f9f9;");
-
-        // Page Title
+    private Label createTitleLabel() {
         Label titleLabel = new Label("Assigned Mentee Sessions");
         titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #0b3d61;");
+        return titleLabel;
+    }
 
-        // Session List
+    private VBox createSessionBox() {
         Label sessionListLabel = new Label("Your Assigned Sessions:");
         sessionListLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #333333; -fx-font-weight: bold;");
-
         sessionListView.setPrefHeight(300);
         sessionListView.setStyle("-fx-border-color: #dddddd; -fx-border-radius: 5px; -fx-padding: 10px;");
-        populateSessionList(); // Populate the session list with mentor's sessions
+        populateSessionList();
 
         VBox sessionBox = new VBox(10, sessionListLabel, sessionListView);
         sessionBox.setPadding(new Insets(10));
-
-        setSpacing(20);
-        setPadding(new Insets(20));
-        setAlignment(Pos.TOP_CENTER);
-        getChildren().addAll(topContainer,titleLabel,  sessionBox);
+        return sessionBox;
     }
 
     private HBox createUserProfileButton() {
-        // User icon
-        ImageView userIcon = new ImageView(new Image(getClass().getResourceAsStream("/user_icon.png"))); // Replace with your icon path
+        ImageView userIcon = createUserIcon();
+        Label usernameLabel = createUsernameLabel(mentor.getUsername());
+
+        HBox profileButton = new HBox(8, userIcon, usernameLabel);
+        configureProfileButton(profileButton);
+
+        return profileButton;
+    }
+
+    private ImageView createUserIcon() {
+        URL iconUrl = getClass().getResource("/user_icon.png");
+        if (iconUrl == null) {
+            throw new IllegalArgumentException("User icon resource not found: " + "/user_icon.png");
+        }
+        ImageView userIcon = new ImageView(new Image(iconUrl.toExternalForm()));
         userIcon.setFitWidth(30);
         userIcon.setPreserveRatio(true);
+        return userIcon;
+    }
 
-        // Username label
-        Label usernameLabel = new Label(mentor.getUsername());
+    private Label createUsernameLabel(String username) {
+        Label usernameLabel = new Label(username);
         usernameLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #0b3d61; -fx-font-weight: bold;");
+        return usernameLabel;
+    }
 
-        // Combine user icon and username
-        HBox profileButton = new HBox(8, userIcon, usernameLabel);
+    private void configureProfileButton(HBox profileButton) {
         profileButton.setAlignment(Pos.CENTER_RIGHT);
         profileButton.setPadding(new Insets(5));
         profileButton.setStyle("-fx-cursor: hand;");
 
-        // Add click event to navigate to EditProfileView
         profileButton.setOnMouseClicked(e -> {
-            // Ensure the Scene and Window are accessed during the event
             Stage stage = (Stage) profileButton.getScene().getWindow();
-            Scene currentScene = stage.getScene(); // Safely get the current scene
-            stage.setScene(new Scene(new EditProfileView(new MentorController(mentor), currentScene,true), 800, 600));
+            Scene currentScene = stage.getScene();
+            stage.setScene(new Scene(new EditProfileView(new MentorController(mentor), currentScene, true), 800, 600));
         });
-
-        return profileButton;
     }
 
     private void populateSessionList() {

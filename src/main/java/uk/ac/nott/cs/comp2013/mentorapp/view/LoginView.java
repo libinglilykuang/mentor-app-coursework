@@ -1,6 +1,5 @@
 package uk.ac.nott.cs.comp2013.mentorapp.view;
 
-import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.EventHandler;
@@ -13,15 +12,13 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
+import java.util.Objects;
 import uk.ac.nott.cs.comp2013.mentorapp.controller.LoginController;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.User;
-
 import static uk.ac.nott.cs.comp2013.mentorapp.view.ViewManager.*;
 import static uk.ac.nott.cs.comp2013.mentorapp.view.ViewManager.ADMIN;
 
 public class LoginView extends VBox implements ManagedView {
-
   private final LoginController controller;
   protected ObjectProperty<EventHandler<? super ViewChangeEvent>> onViewChange;
   private TextField txtUsername, txtPassword;
@@ -35,9 +32,41 @@ public class LoginView extends VBox implements ManagedView {
   }
 
   private void buildView() {
+    VBox logoContainer = createLogoContainer();
+    Label lblWelcome = createStyledLabel(
+            "Welcome to the University of Nottingham's CS Mentoring App",
+            "-fx-text-fill: #4F4F4F; -fx-font-size: 14; -fx-font-weight: bold;",
+            500
+    );
+    Label lblTitle = createStyledLabel(
+            "Login to Mentoring System",
+            "-fx-background-color: #003366; -fx-text-fill: white; -fx-font-size: 14; " +
+                    "-fx-font-weight: bold; -fx-padding: 10; -fx-border-radius: 5; -fx-background-radius: 5;",
+            400
+    );
+    VBox usernameBox = createInputBox("Username", txtUsername = new TextField());
+    VBox passwordBox = createInputBox("Password", txtPassword = new PasswordField());
+
+    btnLogin = createStyledButton("Login", "-fx-background-color: #B22222; -fx-text-fill: white; -fx-font-size: 12;");
+    btnLogin.setOnAction(e -> onLoginClickAction());
+    lblMessage = new Label();
+    lblMessage.setStyle("-fx-text-fill: red;");
+    clearMessageOnTextChange();
+
+    VBox container = new VBox(15, logoContainer, lblWelcome, lblTitle, usernameBox, passwordBox, btnLogin, lblMessage);
+    container.setAlignment(Pos.CENTER);
+    setUnifiedBorderStyle(container);
+    container.setMaxWidth(500);
+    setSpacing(10);
+    setAlignment(Pos.CENTER);
+    setStyle("-fx-padding: 20; -fx-background-color: white;");
+    getChildren().add(container);
+  }
+
+  private VBox createLogoContainer() {
     ImageView logoView = null;
     try {
-      Image logo = new Image(getClass().getResourceAsStream("/university-logo.png"));
+      Image logo = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/university-logo.png")));
       logoView = new ImageView(logo);
       logoView.setFitWidth(350);
       logoView.setFitHeight(350);
@@ -47,64 +76,33 @@ public class LoginView extends VBox implements ManagedView {
     }
     VBox logoContainer = new VBox(logoView);
     logoContainer.setAlignment(Pos.CENTER);
+    return logoContainer;
+  }
 
-    Label lblWelcome = new Label("Welcome to the University of Nottingham's CS Mentoring App");
-    lblWelcome.setStyle("-fx-text-fill: #4F4F4F; -fx-font-size: 14; -fx-font-weight: normal;-fx-font-weight: bold;");
-    lblWelcome.setWrapText(true);
-    lblWelcome.setMaxWidth(500);
+  private Label createStyledLabel(String text, String style, double maxWidth) {
+    Label label = new Label(text);
+    label.setStyle(style);
+    label.setWrapText(true);
+    label.setMaxWidth(maxWidth);
+    return label;
+  }
 
-    Label lblTitle = new Label("Login to Mentoring System");
-    lblTitle.setStyle(
-            "-fx-background-color: #003366;" +
-                    "-fx-text-fill: white;" +
-                    "-fx-font-size: 14;" +
-                    "-fx-font-weight: bold;" +
-                    "-fx-padding: 10;" +
-                    "-fx-border-radius: 5;" +
-                    "-fx-background-radius: 5;"
-    );
-    lblTitle.setMaxWidth(400);
-    lblTitle.setMinHeight(25);
-    lblTitle.setAlignment(Pos.BASELINE_LEFT);
+  private VBox createInputBox(String labelText, TextField inputField) {
+    Label label = new Label(labelText);
+    label.setStyle("-fx-text-fill:#6C6C6C;-fx-font-size: 12; -fx-font-weight: bold;");
+    inputField.setMaxWidth(400);
+    inputField.setMinHeight(40);
+    VBox box = new VBox(5, label, inputField);
+    box.setMaxWidth(400);
+    return box;
+  }
 
-    Label lblUsername = new Label("Username");
-    lblUsername.setStyle("-fx-text-fill:#6C6C6C;-fx-font-size: 12; -fx-font-weight: bold;");
-    txtUsername = new TextField();
-    txtUsername.setMaxWidth(400);
-    txtUsername.setMinHeight(40);
-    VBox usernameBox = new VBox(5, lblUsername, txtUsername);
-    usernameBox.setMaxWidth(400);
-
-    Label lblPassword = new Label("Password");
-    lblPassword.setStyle("-fx-text-fill:#6C6C6C;-fx-font-size: 12; -fx-font-weight: bold;");
-    txtPassword = new PasswordField();
-    txtPassword.setMaxWidth(400);
-    txtPassword.setMinHeight(40);
-    VBox passwordBox = new VBox(5, lblPassword, txtPassword);
-    passwordBox.setMaxWidth(400);
-
-    btnLogin = new Button("Login");
-    btnLogin.setStyle("-fx-background-color: #B22222; -fx-text-fill: white; -fx-font-size: 12;");
-    btnLogin.setMaxWidth(400);
-    btnLogin.setMinHeight(40);
-    btnLogin.setOnAction(e -> onLoginClickAction());
-
-    lblMessage = new Label();
-    lblMessage.setStyle("-fx-text-fill: red;");
-
-    btnLogin.setOnAction(e -> onLoginClickAction());
-
-    clearMessageOnTextChange();
-
-    VBox container = new VBox(15, logoContainer, lblWelcome, lblTitle, usernameBox, passwordBox, btnLogin, lblMessage);
-    container.setAlignment(Pos.CENTER);
-    setUnifiedBorderStyle(container);
-    container.setMaxWidth(500);
-
-    setSpacing(10);
-    setAlignment(Pos.CENTER);
-    setStyle("-fx-padding: 20; -fx-background-color: white;");
-    getChildren().add(container);
+  private Button createStyledButton(String text, String style) {
+    Button button = new Button(text);
+    button.setStyle(style);
+    button.setMaxWidth(400);
+    button.setMinHeight(40);
+    return button;
   }
 
   private void setUnifiedBorderStyle(Region region) {
@@ -154,7 +152,7 @@ public class LoginView extends VBox implements ManagedView {
 
   @Override
   public EventHandler<? super ViewChangeEvent> getOnViewChange() {
-    return onViewChange.get();
+    return null;
   }
 
   @Override

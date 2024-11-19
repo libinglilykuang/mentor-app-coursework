@@ -18,13 +18,8 @@ public class LoginController {
       User u = user.get();
       if (u.getPassword().equals(password)) {
         currentUser = u;
-        System.out.println("Login successful for user: " + username);
         return true;
-      }else {
-        System.out.println("Incorrect password for user: " + username);
       }
-    }else {
-      System.out.println("User not found: " + username);
     }
     currentUser = null;
     return false;
