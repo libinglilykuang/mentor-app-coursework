@@ -158,4 +158,5 @@ public class Mentor implements User, HasAvailability {
   public List<SupportSession> getAssignedSessions() {
     return assignedSessions != null ? new ArrayList<>(assignedSessions) : new ArrayList<>();
   }
+
 }

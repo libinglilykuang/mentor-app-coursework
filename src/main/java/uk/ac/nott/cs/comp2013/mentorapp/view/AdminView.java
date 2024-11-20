@@ -10,6 +10,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import uk.ac.nott.cs.comp2013.mentorapp.controller.AdminController;
+import java.util.Objects;
 
 public class AdminView extends VBox {
     private final AdminController adminController;
@@ -17,6 +18,11 @@ public class AdminView extends VBox {
     public AdminView(AdminController adminController) {
         this.adminController = adminController;
         buildMainMenu();
+        this.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+                newScene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/styles/admin-view.css")).toExternalForm());
+            }
+        });
     }
 
     private void buildMainMenu() {
@@ -37,15 +43,7 @@ public class AdminView extends VBox {
         contentBox.setSpacing(20);
         contentBox.setAlignment(Pos.CENTER);
         contentBox.setMaxWidth(400);
-        contentBox.setStyle(
-                "-fx-background-color: #FFFFFF; " +
-                        "-fx-border-color: #DDDDDD; " +
-                        "-fx-border-width: 1px; " +
-                        "-fx-border-radius: 15px; " +
-                        "-fx-background-radius: 15px; " +
-                        "-fx-padding: 40px; " +
-                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0.5, 0, 4);"
-        );
+        contentBox.getStyleClass().add("content-box");
         return contentBox;
     }
 
@@ -59,30 +57,16 @@ public class AdminView extends VBox {
 
     private Label createWelcomeLabel() {
         Label welcomeLabel = new Label("Welcome, Admin!");
-        welcomeLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+        welcomeLabel.getStyleClass().add("welcome-label");
         return welcomeLabel;
     }
 
     private Button createMenuButton(String text, Runnable action) {
         Button button = new Button(text);
-        button.setStyle(getButtonStyle("#0b3d61"));
+        button.getStyleClass().add("menu-button");
         button.setPrefWidth(350);
-        button.setOnMouseEntered(e -> button.setStyle(getButtonStyle("#04253d")));
-        button.setOnMouseExited(e -> button.setStyle(getButtonStyle("#0b3d61")));
         button.setOnAction(e -> action.run());
         return button;
-    }
-
-    private String getButtonStyle(String backgroundColor) {
-        return String.format(
-                "-fx-font-size: 16px; " +
-                        "-fx-text-fill: white; " +
-                        "-fx-padding: 10px; " +
-                        "-fx-background-radius: 10px; " +
-                        "-fx-background-color: %s; " +
-                        "-fx-cursor: hand;",
-                backgroundColor
-        );
     }
 
     private void showPairingInterface() {

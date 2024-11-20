@@ -11,6 +11,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.util.Duration;
+import java.util.Objects;
 
 public class HomepageView extends StackPane {
     private final Runnable onVerifyIdentity;
@@ -18,6 +19,12 @@ public class HomepageView extends StackPane {
     public HomepageView(Runnable onVerifyIdentity) {
         this.onVerifyIdentity = onVerifyIdentity;
         buildView();
+
+        this.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+                newScene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/styles/homepage-view.css")).toExternalForm());
+            }
+        });
     }
 
     private void buildView() {
@@ -28,12 +35,7 @@ public class HomepageView extends StackPane {
     }
 
     private void setBackgroundStyle() {
-        this.setStyle(
-                "-fx-background-image: url('/university.jpg');" +
-                        "-fx-background-size: cover;" +
-                        "-fx-background-position: center;" +
-                        "-fx-background-repeat: no-repeat;"
-        );
+        getStyleClass().add("homepage-view");
     }
 
     private VBox createContentBox() {
@@ -51,30 +53,20 @@ public class HomepageView extends StackPane {
 
     private Text createTitleLine(String text) {
         Text titleLine = new Text(text);
-        titleLine.setStyle("-fx-font-size: 52px; -fx-font-weight: bold; -fx-fill: white;");
+        titleLine.getStyleClass().add("title-line");
         return titleLine;
     }
 
     private Text createSubtitle() {
         Text subtitle = new Text("BECOME A BEACON FOR FUTURE TALENT.");
-        subtitle.setStyle("-fx-font-size: 30px; -fx-font-weight: bold; -fx-fill: white;");
+        subtitle.getStyleClass().add("subtitle");
         subtitle.setTextAlignment(TextAlignment.LEFT);
         return subtitle;
     }
 
     private Button createVerifyButton() {
         Button verifyButton = new Button("Sign up");
-        verifyButton.setStyle(
-                "-fx-background-color: white; " +
-                        "-fx-text-fill: black; " +
-                        "-fx-font-size: 20px; " +
-                        "-fx-font-weight: bold; " +
-                        "-fx-padding: 15px 30px; " +
-                        "-fx-background-radius: 20px; " +
-                        "-fx-border-radius: 20px; " +
-                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 5, 0, 0, 2); " +
-                        "-fx-cursor: hand;"
-        );
+        verifyButton.getStyleClass().add("verify-button");
         verifyButton.setOnAction(event -> onVerifyIdentity.run());
         VBox.setMargin(verifyButton, new Insets(40, 0, 0, 0));
         return verifyButton;
@@ -101,5 +93,4 @@ public class HomepageView extends StackPane {
         animation.setDelay(Duration.seconds(delay));
         animation.play();
     }
-
 }

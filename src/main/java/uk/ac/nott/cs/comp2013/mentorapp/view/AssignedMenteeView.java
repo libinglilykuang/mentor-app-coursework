@@ -14,9 +14,11 @@ import javafx.stage.Stage;
 import uk.ac.nott.cs.comp2013.mentorapp.controller.MentorController;
 import uk.ac.nott.cs.comp2013.mentorapp.model.session.SupportSession;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentor;
+
 import java.net.URL;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Objects;
 
 public class AssignedMenteeView extends VBox {
     private final Mentor mentor;
@@ -25,25 +27,27 @@ public class AssignedMenteeView extends VBox {
     public AssignedMenteeView(Mentor mentor) {
         this.mentor = mentor;
         buildView();
+
+        this.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+                newScene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/styles/assigned-mentee-view.css")).toExternalForm());
+            }
+        });
     }
 
     private void buildView() {
         HBox topContainer = createTopContainer();
         Label titleLabel = createTitleLabel();
         VBox sessionBox = createSessionBox();
-
-        setSpacing(20);
-        setPadding(new Insets(20));
-        setAlignment(Pos.TOP_CENTER);
-        setStyle("-fx-background-color: #f9f9f9;");
+        getStyleClass().add("assigned-mentee-view");
         getChildren().addAll(topContainer, titleLabel, sessionBox);
     }
 
     private HBox createTopContainer() {
         VBox imageContainer = createImageContainer();
-        Label mentorHomeLabel = createNavigationLabel("Home", getInactiveStyle());
-        Label settingLabel = createNavigationLabel("Set Available Time", getInactiveStyle());
-        Label viewMentorLabel = createNavigationLabel("View Assigned Session", getActiveStyle());
+        Label mentorHomeLabel = createNavigationLabel("Home", "navigation-label-inactive");
+        Label settingLabel = createNavigationLabel("Set Available Time", "navigation-label-inactive");
+        Label viewMentorLabel = createNavigationLabel("View Assigned Session", "navigation-label-active");
 
         MentorController mentorController = new MentorController(mentor);
         mentorHomeLabel.setOnMouseClicked(e -> getScene().setRoot(new MentorView(mentorController)));
@@ -76,23 +80,24 @@ public class AssignedMenteeView extends VBox {
         return imageContainer;
     }
 
-    private Label createNavigationLabel(String text, String style) {
+    private Label createNavigationLabel(String text, String styleClass) {
         Label label = new Label(text);
-        label.setStyle(style);
+        label.getStyleClass().add(styleClass);
         return label;
     }
 
     private Label createTitleLabel() {
         Label titleLabel = new Label("Assigned Mentee Sessions");
-        titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #0b3d61;");
+        titleLabel.getStyleClass().add("title-label");
         return titleLabel;
     }
 
     private VBox createSessionBox() {
         Label sessionListLabel = new Label("Your Assigned Sessions:");
-        sessionListLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #333333; -fx-font-weight: bold;");
+        sessionListLabel.getStyleClass().add("session-list-label");
+
         sessionListView.setPrefHeight(300);
-        sessionListView.setStyle("-fx-border-color: #dddddd; -fx-border-radius: 5px; -fx-padding: 10px;");
+        sessionListView.getStyleClass().add("session-list");
         populateSessionList();
 
         VBox sessionBox = new VBox(10, sessionListLabel, sessionListView);
@@ -103,10 +108,9 @@ public class AssignedMenteeView extends VBox {
     private HBox createUserProfileButton() {
         ImageView userIcon = createUserIcon();
         Label usernameLabel = createUsernameLabel(mentor.getUsername());
-
         HBox profileButton = new HBox(8, userIcon, usernameLabel);
+        profileButton.getStyleClass().add("profile-button");
         configureProfileButton(profileButton);
-
         return profileButton;
     }
 
@@ -123,15 +127,11 @@ public class AssignedMenteeView extends VBox {
 
     private Label createUsernameLabel(String username) {
         Label usernameLabel = new Label(username);
-        usernameLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #0b3d61; -fx-font-weight: bold;");
+        usernameLabel.getStyleClass().add("username-label");
         return usernameLabel;
     }
 
     private void configureProfileButton(HBox profileButton) {
-        profileButton.setAlignment(Pos.CENTER_RIGHT);
-        profileButton.setPadding(new Insets(5));
-        profileButton.setStyle("-fx-cursor: hand;");
-
         profileButton.setOnMouseClicked(e -> {
             Stage stage = (Stage) profileButton.getScene().getWindow();
             Scene currentScene = stage.getScene();
@@ -157,13 +157,5 @@ public class AssignedMenteeView extends VBox {
                     menteeName, startDate, endDate, status);
             sessionListView.getItems().add(sessionInfo);
         }
-    }
-
-    private String getActiveStyle() {
-        return "-fx-font-size: 16px; -fx-text-fill: #ff5722; -fx-font-weight: bold; -fx-underline: true; -fx-cursor: hand;";
-    }
-
-    private String getInactiveStyle() {
-        return "-fx-font-size: 16px; -fx-text-fill: #0b3d61; -fx-font-weight: bold; -fx-underline: false; -fx-cursor: hand;";
     }
 }

@@ -5,7 +5,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -23,6 +23,12 @@ public class AssignedMentorView extends VBox {
     public AssignedMentorView(MenteeController menteeController) {
         this.menteeController = menteeController;
         buildView();
+
+        this.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+                newScene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/styles/assigned-mentor-view.css")).toExternalForm());
+            }
+        });
     }
 
     private void buildView() {
@@ -43,9 +49,7 @@ public class AssignedMentorView extends VBox {
         mainContainer.setPadding(new Insets(30));
         mainContainer.setAlignment(Pos.TOP_CENTER);
 
-        setSpacing(20);
-        setPadding(new Insets(20));
-        setAlignment(Pos.TOP_CENTER);
+        getStyleClass().add("assigned-mentor-view");
         getChildren().addAll(topContainer, titleLabel, mainContainer);
     }
 
@@ -64,9 +68,9 @@ public class AssignedMentorView extends VBox {
         imageContainer.setAlignment(Pos.TOP_LEFT);
         imageContainer.setPadding(new Insets(10));
 
-        Label menteeHomeLabel = createNavigationLabel("Home", getInactiveStyle(), e -> getScene().setRoot(new MenteeView(menteeController)));
-        Label signingLabel = createNavigationLabel("Signing up for Activities", getInactiveStyle(), e -> getScene().setRoot(new ActivitySignUpView(menteeController)));
-        Label viewMentorLabel = createNavigationLabel("View Assigned Mentor", getActiveStyle(), null);
+        Label menteeHomeLabel = createNavigationLabel("Home", "navigation-label-inactive", e -> getScene().setRoot(new MenteeView(menteeController)));
+        Label signingLabel = createNavigationLabel("Signing up for Activities", "navigation-label-inactive", e -> getScene().setRoot(new ActivitySignUpView(menteeController)));
+        Label viewMentorLabel = createNavigationLabel("View Assigned Mentor", "navigation-label-active", null);
 
         HBox labelContainer = new HBox(20, menteeHomeLabel, signingLabel, viewMentorLabel);
         labelContainer.setAlignment(Pos.CENTER_LEFT);
@@ -75,9 +79,7 @@ public class AssignedMentorView extends VBox {
         HBox.setHgrow(profileButton, Priority.ALWAYS);
 
         HBox topContainer = new HBox(20, imageContainer, labelContainer, profileButton);
-        topContainer.setAlignment(Pos.CENTER_LEFT);
-        topContainer.setPadding(new Insets(10, 10, 5, 10));
-        setStyle("-fx-background-color: white;");
+        topContainer.getStyleClass().add("top-container");
 
         return topContainer;
     }
@@ -94,9 +96,9 @@ public class AssignedMentorView extends VBox {
         return imageView;
     }
 
-    private Label createNavigationLabel(String text, String style, EventHandler<MouseEvent> onClick) {
+    private Label createNavigationLabel(String text, String styleClass, EventHandler<MouseEvent> onClick) {
         Label label = new Label(text);
-        label.setStyle(style);
+        label.getStyleClass().add(styleClass);
         if (onClick != null) {
             label.setOnMouseClicked(onClick);
         }
@@ -105,7 +107,7 @@ public class AssignedMentorView extends VBox {
 
     private Label createTitleLabel() {
         Label titleLabel = new Label("Assigned Mentors");
-        titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+        titleLabel.getStyleClass().add("title-label");
         return titleLabel;
     }
 
@@ -113,7 +115,7 @@ public class AssignedMentorView extends VBox {
         ImageView userIcon = createUserIcon("/user_icon.png", 30);
         Label usernameLabel = createUsernameLabel(menteeController.getMentee().getUsername());
         HBox profileButton = new HBox(8, userIcon, usernameLabel);
-        styleProfileButton(profileButton);
+        profileButton.getStyleClass().add("profile-button");
         profileButton.setOnMouseClicked(event -> navigateToEditProfile(profileButton));
         return profileButton;
     }
@@ -127,56 +129,39 @@ public class AssignedMentorView extends VBox {
 
     private Label createUsernameLabel(String username) {
         Label usernameLabel = new Label(username);
-        usernameLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #0b3d61; -fx-font-weight: bold;");
+        usernameLabel.getStyleClass().add("username-label");
         return usernameLabel;
     }
 
-    private void styleProfileButton(HBox profileButton) {
-        profileButton.setAlignment(Pos.CENTER_RIGHT);
-        profileButton.setPadding(new Insets(5));
-        profileButton.setStyle("-fx-cursor: hand;");
-    }
-
     private void navigateToEditProfile(HBox profileButton) {
-        Stage stage = (Stage) profileButton.getScene().getWindow();
-        Scene currentScene = stage.getScene();
+        Scene currentScene = profileButton.getScene();
+        Stage stage = (Stage) currentScene.getWindow();
         stage.setScene(new Scene(new EditProfileView(menteeController, currentScene, true), 800, 600));
     }
 
     private HBox createTitleBox(String title) {
         Label titleLabel = new Label(title);
-        titleLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: white;");
+        titleLabel.getStyleClass().add("section-title");
 
         HBox titleBox = new HBox(titleLabel);
-        titleBox.setStyle("-fx-background-color: #0056a1; -fx-padding: 10;");
-        titleBox.setAlignment(Pos.CENTER_LEFT);
+        titleBox.getStyleClass().add("section-title");
         return titleBox;
     }
 
     private VBox createActivityCard(String activityType, String mentorUsername, String availability) {
         Label activityTypeLabel = new Label(activityType);
-        activityTypeLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #0b3d61;");
+        activityTypeLabel.getStyleClass().add("activity-type");
 
         Label mentorLabel = new Label("Mentor: " + mentorUsername);
-        mentorLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #555555;");
+        mentorLabel.getStyleClass().add("mentor-label");
 
         Label availabilityLabel = new Label("Available Time: " + availability);
-        availabilityLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #555555;");
+        availabilityLabel.getStyleClass().add("availability-label");
 
         VBox cardContent = new VBox(10, activityTypeLabel, mentorLabel, availabilityLabel);
-        cardContent.setPadding(new Insets(10));
-
         VBox activityCard = new VBox(cardContent);
-        activityCard.setStyle("-fx-background-color: white; -fx-border-color: #dcdcdc; -fx-border-width: 1px; -fx-border-radius: 5px;");
+        activityCard.getStyleClass().add("activity-card");
+
         return activityCard;
     }
-
-    private String getActiveStyle() {
-        return "-fx-font-size: 16px; -fx-text-fill: #ff5722; -fx-font-weight: bold; -fx-underline: true; -fx-cursor: hand;";
-    }
-
-    private String getInactiveStyle() {
-        return "-fx-font-size: 16px; -fx-text-fill: #0b3d61; -fx-font-weight: bold; -fx-underline: false; -fx-cursor: hand;";
-    }
-
 }

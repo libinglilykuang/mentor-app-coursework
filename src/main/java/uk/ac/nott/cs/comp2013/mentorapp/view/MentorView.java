@@ -1,7 +1,6 @@
 package uk.ac.nott.cs.comp2013.mentorapp.view;
 
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -20,41 +19,16 @@ public class MentorView extends VBox {
     public MentorView(MentorController controller) {
         this.controller = controller;
         buildView();
+        addCSSListener();
     }
 
     private void buildView() {
         VBox contentBox = createContentBox();
         ImageView logoImageView = createLogoImageView();
         Label welcomeLabel = createWelcomeLabel(controller.getMentor().getUsername());
-        Button btnSetAvailability = createNavigationButton(
-                "Set Availability",
-                new EventHandler<ActionEvent>() {
-                    @Override
-                    public void handle(ActionEvent event) {
-                        navigateTo(new MentorAvailabilityView(controller.getMentor()), 400, 300);
-                    }
-                }
-        );
-        Button btnAssignedSessions = createNavigationButton(
-                "View Assigned Sessions",
-                new EventHandler<ActionEvent>() {
-                    @Override
-                    public void handle(ActionEvent event) {
-                        navigateTo(new AssignedMenteeView(controller.getMentor()), 800, 600);
-                    }
-                }
-        );
-        Button btnEditProfile = createNavigationButton(
-                "Edit Profile",
-                new EventHandler<ActionEvent>() {
-                    @Override
-                    public void handle(ActionEvent event) {
-                        Stage stage = (Stage) getScene().getWindow();
-                        Scene currentScene = stage.getScene();
-                        stage.setScene(new Scene(new EditProfileView(controller, currentScene, false), 800, 600));
-                    }
-                }
-        );
+        Button btnSetAvailability = createNavigationButton("Set Availability", e -> navigateTo(new MentorAvailabilityView(controller.getMentor()), 400, 300));
+        Button btnAssignedSessions = createNavigationButton("View Assigned Sessions", e -> navigateTo(new AssignedMenteeView(controller.getMentor()), 800, 600));
+        Button btnEditProfile = createNavigationButton("Edit Profile", e -> navigateToEditProfile());
 
         contentBox.getChildren().addAll(logoImageView, welcomeLabel, btnSetAvailability, btnAssignedSessions, btnEditProfile);
         getChildren().clear();
@@ -62,40 +36,37 @@ public class MentorView extends VBox {
         getChildren().add(contentBox);
     }
 
+    private void addCSSListener() {
+        this.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+                newScene.getStylesheets().add(
+                        Objects.requireNonNull(getClass().getResource("/styles/mentor-view.css")).toExternalForm()
+                );
+            }
+        });
+    }
+
     private VBox createContentBox() {
         VBox contentBox = new VBox();
-        contentBox.setSpacing(20);
-        contentBox.setAlignment(Pos.CENTER);
-        contentBox.setMaxWidth(400);
-        contentBox.setStyle(
-                "-fx-background-color: #FFFFFF; " +
-                        "-fx-border-color: #DDDDDD; " +
-                        "-fx-border-width: 1px; " +
-                        "-fx-border-radius: 15px; " +
-                        "-fx-background-radius: 15px; " +
-                        "-fx-padding: 40px; " +
-                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0.5, 0, 4);"
-        );
+        contentBox.getStyleClass().add("content-box");
         return contentBox;
     }
 
     private ImageView createLogoImageView() {
         ImageView imageView = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/university-logo.png"))));
-        imageView.setFitWidth(350);
-        imageView.setFitHeight(350);
-        imageView.setPreserveRatio(true);
+        imageView.getStyleClass().add("logo-image");
         return imageView;
     }
 
     private Label createWelcomeLabel(String username) {
         Label welcomeLabel = new Label("Welcome, " + username + "!");
-        welcomeLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+        welcomeLabel.getStyleClass().add("welcome-label");
         return welcomeLabel;
     }
 
-    private Button createNavigationButton(String text, EventHandler<ActionEvent> action) {
-        Button button = createStyledButton(text);
-        button.setPrefWidth(350);
+    private Button createNavigationButton(String text, javafx.event.EventHandler<ActionEvent> action) {
+        Button button = new Button(text);
+        button.getStyleClass().add("navigation-button");
         button.setOnAction(action);
         return button;
     }
@@ -105,26 +76,9 @@ public class MentorView extends VBox {
         stage.setScene(new Scene(view, width, height));
     }
 
-    private Button createStyledButton(String text) {
-        Button button = new Button(text);
-        button.setStyle(getButtonStyle("#0b3d61"));
-
-        button.setOnMouseEntered(e -> button.setStyle(getButtonStyle("#04253d")));
-        button.setOnMouseExited(e -> button.setStyle(getButtonStyle("#0b3d61")));
-
-        button.setPrefWidth(200);
-        return button;
-    }
-
-    private String getButtonStyle(String backgroundColor) {
-        return String.format(
-                "-fx-font-size: 16px; " +
-                        "-fx-text-fill: white; " +
-                        "-fx-padding: 10px; " +
-                        "-fx-background-radius: 10px; " +
-                        "-fx-background-color: %s; " +
-                        "-fx-cursor: hand;",
-                backgroundColor
-        );
+    private void navigateToEditProfile() {
+        Stage stage = (Stage) getScene().getWindow();
+        Scene currentScene = stage.getScene();
+        stage.setScene(new Scene(new EditProfileView(controller, currentScene, false), 800, 600));
     }
 }

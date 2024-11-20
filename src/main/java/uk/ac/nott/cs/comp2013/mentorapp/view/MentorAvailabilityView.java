@@ -9,6 +9,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import uk.ac.nott.cs.comp2013.mentorapp.controller.MentorController;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentor;
 import java.net.URL;
@@ -28,6 +29,7 @@ public class MentorAvailabilityView extends VBox {
     public MentorAvailabilityView(Mentor mentor) {
         this.mentor = mentor;
         buildView();
+        addCSSListener();
     }
 
     private void buildView() {
@@ -41,71 +43,100 @@ public class MentorAvailabilityView extends VBox {
         setSpacing(20);
         setPadding(new Insets(20));
         setAlignment(Pos.TOP_CENTER);
-        setStyle("-fx-background-color: #f9f9f9;");
+    }
+
+    private void addCSSListener() {
+        this.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+                newScene.getStylesheets().add(
+                        Objects.requireNonNull(
+                                getClass().getResource("/styles/mentor-availability-view.css")
+                        ).toExternalForm()
+                );
+            }
+        });
     }
 
     private HBox createTopContainer() {
         VBox imageContainer = createImageContainer();
         HBox labelContainer = createLabelContainer();
         HBox profileBox = createUserProfileButton();
-        HBox topContainer = new HBox(20, imageContainer, labelContainer, profileBox);
-        styleTopContainer(topContainer, profileBox);
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        HBox topContainer = new HBox(20, imageContainer, labelContainer, spacer, profileBox);
+        topContainer.setAlignment(Pos.CENTER_LEFT);
+        topContainer.setPadding(new Insets(10, 10, 5, 10));
+        topContainer.setStyle("-fx-background-color: white;");
         return topContainer;
     }
 
+    private HBox createUserProfileButton() {
+        ImageView userIcon = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/user_icon.png"))));
+        userIcon.getStyleClass().add("profile-icon");
+        Label usernameLabel = new Label(mentor.getUsername());
+        usernameLabel.getStyleClass().add("profile-label");
+        HBox profileButton = new HBox(8, userIcon, usernameLabel);
+        profileButton.getStyleClass().add("profile-button");
+        profileButton.setAlignment(Pos.CENTER);
+        profileButton.setOnMouseClicked(e -> navigateToEditProfile());
+        return profileButton;
+    }
+
+    private void navigateToEditProfile() {
+        Stage stage = (Stage) getScene().getWindow();
+        Scene currentScene = stage.getScene();
+        stage.setScene(new Scene(new EditProfileView(new MentorController(mentor), currentScene, true), 800, 600));
+    }
+
     private VBox createImageContainer() {
-        ImageView imageView = createImageView("/pairing_image.png", 170, 170);
+        ImageView imageView = createImageView();
         VBox imageContainer = new VBox(imageView);
         imageContainer.setAlignment(Pos.TOP_LEFT);
         imageContainer.setPadding(new Insets(10));
         return imageContainer;
     }
 
-    private ImageView createImageView(String imagePath, double width, double height) {
-        URL imageUrl = getClass().getResource(imagePath);
+    private ImageView createImageView() {
+        URL imageUrl = getClass().getResource("/pairing_image.png");
         if (imageUrl == null) {
-            throw new IllegalArgumentException("Image resource not found: " + imagePath);
+            throw new IllegalArgumentException("Image resource not found: " + "/pairing_image.png");
         }
         ImageView imageView = new ImageView(new Image(imageUrl.toExternalForm()));
-        imageView.setFitWidth(width);
-        imageView.setFitHeight(height);
+        imageView.setFitWidth(170);
+        imageView.setFitHeight(170);
         imageView.setPreserveRatio(true);
         return imageView;
     }
 
     private HBox createLabelContainer() {
-        Label mentorHomeLabel = createStyledLabel("Home", getInactiveStyle());
-        Label signingLabel = createStyledLabel("Set Available Time", getActiveStyle());
-        Label viewMentorLabel = createStyledLabel("View Assigned Session", getInactiveStyle());
+        Label mentorHomeLabel = createStyledLabel("Home", "inactive-label");
+        Label signingLabel = createStyledLabel("Set Available Time", "active-label");
+        Label viewMentorLabel = createStyledLabel("View Assigned Session", "inactive-label");
+
         MentorController mentorController = new MentorController(mentor);
         mentorHomeLabel.setOnMouseClicked(e -> getScene().setRoot(new MentorView(mentorController)));
         viewMentorLabel.setOnMouseClicked(e -> getScene().setRoot(new AssignedMenteeView(mentor)));
+
         HBox labelContainer = new HBox(20, mentorHomeLabel, signingLabel, viewMentorLabel);
         labelContainer.setAlignment(Pos.CENTER_LEFT);
         return labelContainer;
     }
 
-    private Label createStyledLabel(String text, String style) {
+    private Label createStyledLabel(String text, String styleClass) {
         Label label = new Label(text);
-        label.setStyle(style);
+        label.getStyleClass().add(styleClass);
         return label;
-    }
-
-    private void styleTopContainer(HBox topContainer, HBox profileBox) {
-        topContainer.setAlignment(Pos.CENTER_LEFT);
-        topContainer.setPadding(new Insets(10, 10, 5, 10));
-        topContainer.setStyle("-fx-background-color: white;");
-        HBox.setHgrow(profileBox, Priority.ALWAYS);
     }
 
     private VBox createHeaderBox() {
         Label titleLabel = new Label("Set Your Availability");
-        titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;");
+        titleLabel.getStyleClass().add("header-title");
         Label descriptionLabel = new Label("Choose dates and times when you will be available.");
-        descriptionLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: white;");
+        descriptionLabel.getStyleClass().add("header-description");
+
         VBox headerBox = new VBox(5, titleLabel, descriptionLabel);
         headerBox.setAlignment(Pos.TOP_LEFT);
-        headerBox.setStyle("-fx-background-color: #0278a4; -fx-padding: 15;");
+        headerBox.getStyleClass().add("header-box");
         return headerBox;
     }
 
@@ -114,88 +145,43 @@ public class MentorAvailabilityView extends VBox {
         GridPane gridPane = new GridPane();
         gridPane.setHgap(15);
         gridPane.setVgap(15);
-        gridPane.setPadding(new Insets(15));
-        gridPane.setStyle("-fx-background-color: #ffffff; -fx-border-color: #dddddd; -fx-border-radius: 10px; -fx-padding: 15px;");
+        gridPane.getStyleClass().add("availability-grid");
 
-        styleDatePicker(startDatePicker);
-        styleDatePicker(endDatePicker);
-        styleComboBox(startTimePicker);
-        styleComboBox(endTimePicker);
-
-        gridPane.add(createStyledLabel("Start Date:"), 0, 0);
+        gridPane.add(new Label("Start Date:"), 0, 0);
         gridPane.add(startDatePicker, 1, 0);
-        gridPane.add(createStyledLabel("Start Time:"), 2, 0);
+        gridPane.add(new Label("Start Time:"), 2, 0);
         gridPane.add(startTimePicker, 3, 0);
-        gridPane.add(createStyledLabel("End Date:"), 0, 1);
+        gridPane.add(new Label("End Date:"), 0, 1);
         gridPane.add(endDatePicker, 1, 1);
-        gridPane.add(createStyledLabel("End Time:"), 2, 1);
+        gridPane.add(new Label("End Time:"), 2, 1);
         gridPane.add(endTimePicker, 3, 1);
 
         return gridPane;
     }
 
     private HBox createButtonBox() {
-        Button saveButton = createStyledButton();
+        Button saveButton = new Button("Save Availability");
+        saveButton.getStyleClass().add("save-button");
         saveButton.setOnAction(e -> saveAvailability());
-        HBox buttonBox = new HBox(10, saveButton);
+        HBox buttonBox = new HBox(saveButton);
         buttonBox.setAlignment(Pos.CENTER);
-        buttonBox.setPadding(new Insets(20, 0, 30, 0));
         return buttonBox;
     }
 
     private VBox createBelowBox() {
         Label availabilityTitle = new Label("Your Selected Time Slots");
-        availabilityTitle.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;");
+        availabilityTitle.getStyleClass().add("below-box-title");
         VBox belowBox = new VBox(5, availabilityTitle);
         belowBox.setAlignment(Pos.TOP_LEFT);
-        belowBox.setStyle("-fx-background-color: #0278a4; -fx-padding: 15;");
-        belowBox.setPadding(new Insets(0, 0, 5, 0));
+        belowBox.getStyleClass().add("below-box");
         return belowBox;
     }
 
     private VBox createAvailabilityBox() {
-        availabilityLabel.setWrapText(true);
-        VBox availabilityBox = new VBox(10, availabilityLabel);
-        availabilityBox.setAlignment(Pos.TOP_LEFT);
-        availabilityBox.setStyle("-fx-background-color: #ffffff; -fx-border-color: #dddddd; -fx-border-radius: 10px; -fx-padding: 15px;");
-        availabilityBox.setPadding(new Insets(5));
+        availabilityLabel.getStyleClass().add("availability-label");
+        VBox availabilityBox = new VBox(availabilityLabel);
+        availabilityBox.getStyleClass().add("availability-box");
         return availabilityBox;
-    }
-
-    private HBox createUserProfileButton() {
-        ImageView userIcon = createUserIcon();
-        Label usernameLabel = createUsernameLabel(mentor.getUsername());
-        HBox profileButton = new HBox(8, userIcon, usernameLabel);
-        styleProfileButton(profileButton);
-        attachProfileButtonAction(profileButton);
-        return profileButton;
-    }
-
-    private ImageView createUserIcon() {
-        ImageView userIcon = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/user_icon.png"))));
-        userIcon.setFitWidth(30);
-        userIcon.setPreserveRatio(true);
-        return userIcon;
-    }
-
-    private Label createUsernameLabel(String username) {
-        Label usernameLabel = new Label(username);
-        usernameLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #0b3d61; -fx-font-weight: bold;");
-        return usernameLabel;
-    }
-
-    private void styleProfileButton(HBox profileButton) {
-        profileButton.setAlignment(Pos.CENTER_RIGHT);
-        profileButton.setPadding(new Insets(5));
-        profileButton.setStyle("-fx-cursor: hand;");
-    }
-
-    private void attachProfileButtonAction(HBox profileButton) {
-        profileButton.setOnMouseClicked(e -> {
-            Stage stage = (Stage) profileButton.getScene().getWindow();
-            Scene currentScene = stage.getScene();
-            stage.setScene(new Scene(new EditProfileView(new MentorController(mentor), currentScene, true), 800, 600));
-        });
     }
 
     private void saveAvailability() {
@@ -203,105 +189,47 @@ public class MentorAvailabilityView extends VBox {
         LocalDate endDate = endDatePicker.getValue();
         String startTime = startTimePicker.getValue();
         String endTime = endTimePicker.getValue();
+
         if (startDate == null || endDate == null || startTime == null || endTime == null) {
-            availabilityLabel.setText("You have not set any available time yet.");
             showSnackbar("Please fill in all fields.", false);
             return;
         }
+
         LocalDateTime startDateTime = LocalDateTime.of(startDate, LocalTime.parse(startTime));
         LocalDateTime endDateTime = LocalDateTime.of(endDate, LocalTime.parse(endTime));
+
         if (endDateTime.isBefore(startDateTime)) {
-            availabilityLabel.setText("You have not set any available time yet.");
             showSnackbar("End time cannot be earlier than start time.", false);
             return;
         }
+
         String formattedStart = startDateTime.format(java.time.format.DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm"));
         String formattedEnd = endDateTime.format(java.time.format.DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm"));
         availabilityLabel.setText("From: " + formattedStart + "\n" + "To: " + formattedEnd);
-        availabilityLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #0b3d61; -fx-font-weight: bold;");
         showSnackbar("Availability set successfully.", true);
     }
 
     private void showSnackbar(String message, boolean success) {
-        Label messageLabel = new Label(message);
-        messageLabel.setStyle((success
-                ? "-fx-background-color: #d4edda; -fx-text-fill: #155724;"
-                : "-fx-background-color: #f8d7da; -fx-text-fill: #721c24;")
-                + "-fx-font-size: 14px; "
-                + "-fx-padding: 10px 20px; "
-                + "-fx-background-radius: 10px; "
-                + "-fx-border-radius: 10px; "
-                + "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 5, 0, 0, 1);");
-
+        Label snackbar = new Label(message);
+        snackbar.getStyleClass().add(success ? "snackbar-success" : "snackbar-error");
         Scene scene = getScene();
         if (scene == null) return;
-        Pane root = (Pane) scene.getRoot();
-        StackPane snackbarPane = new StackPane(messageLabel);
+        StackPane snackbarPane = new StackPane(snackbar);
         snackbarPane.setAlignment(Pos.BOTTOM_CENTER);
-        snackbarPane.setPadding(new Insets(0, 0, 20, 0));
+        Pane root = (Pane) scene.getRoot();
         root.getChildren().add(snackbarPane);
-        PauseTransition delay = new PauseTransition(javafx.util.Duration.seconds(3));
-        delay.setOnFinished(event -> root.getChildren().remove(snackbarPane));
+        PauseTransition delay = new PauseTransition(Duration.seconds(3));
+        delay.setOnFinished(e -> root.getChildren().remove(snackbarPane));
         delay.play();
-    }
-
-    private Label createStyledLabel(String text) {
-        Label label = new Label(text);
-        label.setStyle("-fx-font-size: 14px; " + "-fx-font-weight: bold; " + "-fx-text-fill: #333333;");
-        return label;
-    }
-
-    private Button createStyledButton() {
-        Button button = new Button("Save Availability");
-        button.setStyle(getButtonStyle("#0b3d61"));
-        button.setOnMouseEntered(e -> button.setStyle(getButtonStyle("#04253d")));
-        button.setOnMouseExited(e -> button.setStyle(getButtonStyle("#0b3d61")));
-        return button;
-    }
-
-    private String getButtonStyle(String backgroundColor) {
-        return String.format(
-                "-fx-font-size: 14px; " +
-                        "-fx-text-fill: white; " +
-                        "-fx-padding: 10px 20px; " +
-                        "-fx-background-radius: 10px; " +
-                        "-fx-background-color: %s; " +
-                        "-fx-cursor: hand;",
-                backgroundColor
-        );
-    }
-
-    private void styleDatePicker(DatePicker datePicker) {
-        datePicker.setStyle(
-                "-fx-background-color: #ffffff; " +
-                        "-fx-border-color: #0b3d61; " +
-                        "-fx-border-radius: 5px; " +
-                        "-fx-padding: 5px;");
-    }
-
-    private void styleComboBox(ComboBox<String> comboBox) {
-        comboBox.setStyle(
-                "-fx-background-color: #ffffff; " +
-                        "-fx-border-color: #0b3d61; " +
-                        "-fx-border-radius: 5px; " +
-                        "-fx-padding: 5px;");
     }
 
     private void initializeTimePickers() {
         for (int i = 0; i < 24; i++) {
-            String hour = String.format("%02d:00", i);
-            startTimePicker.getItems().add(hour);
-            endTimePicker.getItems().add(hour);
+            String time = String.format("%02d:00", i);
+            startTimePicker.getItems().add(time);
+            endTimePicker.getItems().add(time);
         }
         startTimePicker.setValue("09:00");
         endTimePicker.setValue("17:00");
-    }
-
-    private String getActiveStyle() {
-        return "-fx-font-size: 16px; -fx-text-fill: #ff5722; -fx-font-weight: bold; -fx-underline: true; -fx-cursor: hand;";
-    }
-
-    private String getInactiveStyle() {
-        return "-fx-font-size: 16px; -fx-text-fill: #0b3d61; -fx-font-weight: bold; -fx-underline: false; -fx-cursor: hand;";
     }
 }

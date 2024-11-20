@@ -1,0 +1,40 @@
+/* Background style for the homepage */
+.homepage-view {
+    -fx-background-image: url('/university.jpg');
+    -fx-background-size: cover;
+    -fx-background-position: center;
+    -fx-background-repeat: no-repeat;
+}
+
+/* Title styles */
+.title-line {
+    -fx-font-size: 52px;
+    -fx-font-weight: bold;
+    -fx-fill: white;
+}
+
+/* Subtitle styles */
+.subtitle {
+    -fx-font-size: 30px;
+    -fx-font-weight: bold;
+    -fx-fill: white;
+    -fx-text-alignment: left;
+}
+
+/* Button styles */
+.verify-button {
+    -fx-background-color: white;
+    -fx-text-fill: black;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-padding: 15px 30px;
+    -fx-background-radius: 20px;
+    -fx-border-radius: 20px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 5, 0, 0, 2);
+    -fx-cursor: hand;
+}
+
+/* Margin for verify button */
+.verify-button-container {
+    -fx-margin-top: 40px;
+}

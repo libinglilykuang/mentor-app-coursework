@@ -1,14 +1,12 @@
 package uk.ac.nott.cs.comp2013.mentorapp.view;
 
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
 import uk.ac.nott.cs.comp2013.mentorapp.controller.MenteeController;
 import uk.ac.nott.cs.comp2013.mentorapp.controller.MentorController;
@@ -16,6 +14,7 @@ import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentee;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentor;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.MentorType;
 import javafx.event.ActionEvent;
+import java.util.Objects;
 
 public class EditProfileView extends VBox {
     private final MenteeController menteeController;
@@ -55,13 +54,16 @@ public class EditProfileView extends VBox {
         container.getChildren().add(buttonBox);
         styleContainer(container);
         getChildren().add(container);
+
+        this.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+                newScene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/styles/edit-profile-view.css")).toExternalForm());
+            }
+        });
     }
 
     private void setupContainerStyle() {
-        setSpacing(20);
-        setPadding(new Insets(20));
-        setAlignment(Pos.CENTER);
-        setStyle("-fx-background-color: #f5f5f5;");
+        getStyleClass().add("edit-profile-view");
     }
 
     private VBox createInputBox(String label, String value, String placeholder) {
@@ -92,8 +94,7 @@ public class EditProfileView extends VBox {
 
     private Button createButton(String text, EventHandler<ActionEvent> eventHandler) {
         Button button = new Button(text);
-        button.setStyle("-fx-background-color: #0b3d61; -fx-text-fill: white; -fx-font-weight: bold;" +
-                "-fx-font-size: 14px; -fx-padding: 10px 20px; -fx-border-radius: 5px; -fx-background-radius: 5px;");
+        button.getStyleClass().add("button");
         button.setOnAction(eventHandler);
         return button;
     }
@@ -159,9 +160,7 @@ public class EditProfileView extends VBox {
     }
 
     private void styleContainer(VBox container) {
-        container.setAlignment(Pos.CENTER);
-        container.setMaxWidth(500);
-        setUnifiedBorderStyle(container);
+        container.getStyleClass().add("profile-container");
     }
 
     private void showSuccess(String message) {
@@ -201,16 +200,14 @@ public class EditProfileView extends VBox {
 
     private Label createStyledLabel(String text) {
         Label label = new Label(text);
-        label.setStyle("-fx-text-fill: #6C6C6C; -fx-font-size: 12px; -fx-font-weight: bold;");
+        label.getStyleClass().add("input-label");
         return label;
     }
 
     private TextField createStyledTextField(String initialValue, String promptText) {
         TextField textField = new TextField(initialValue != null ? initialValue : "");
         textField.setPromptText(promptText);
-        textField.setMaxWidth(400);
-        textField.setMinHeight(40);
-        textField.setStyle("-fx-font-size: 12px; -fx-border-color: #DDDDDD; -fx-border-radius: 5px; -fx-padding: 10px;");
+        textField.getStyleClass().add("text-field");
         return textField;
     }
 
@@ -237,16 +234,5 @@ public class EditProfileView extends VBox {
         alert.setContentText(message);
         alert.showAndWait();
     }
-
-    private void setUnifiedBorderStyle(Region region) {
-        region.setStyle(
-                "-fx-background-color: #FFFFFF; " +
-                        "-fx-border-color: #DDDDDD; " +
-                        "-fx-border-width: 2px; " +
-                        "-fx-border-radius: 10px; " +
-                        "-fx-background-radius: 10px; " +
-                        "-fx-padding: 20px; " +
-                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0.5, 0, 4);"
-        );
-    }
 }
+

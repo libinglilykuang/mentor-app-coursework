@@ -1,0 +1,116 @@
+.root {
+    -fx-background-color: white;
+}
+
+.top-container {
+    -fx-background-color: white;
+    -fx-padding: 10px 10px 5px 10px;
+}
+
+.header-box {
+    -fx-background-color: #0278a4;
+    -fx-padding: 15px;
+}
+
+.header-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.header-description {
+    -fx-font-size: 14px;
+    -fx-text-fill: white;
+}
+
+.availability-grid {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #dddddd;
+    -fx-border-radius: 10px;
+    -fx-padding: 15px;
+}
+
+.save-button {
+    -fx-background-color: #0278a4;
+    -fx-text-fill: white;
+    -fx-padding: 10px 20px;
+    -fx-font-size: 14px;
+    -fx-border-radius: 5px;
+}
+
+.save-button:hover {
+    -fx-background-color: #026c94;
+}
+
+.below-box {
+    -fx-background-color: #0278a4;
+    -fx-padding: 15px;
+}
+
+.below-box-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.availability-box {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #dddddd;
+    -fx-border-radius: 10px;
+    -fx-padding: 15px;
+}
+
+.availability-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #333333;
+}
+
+.snackbar-success {
+    -fx-background-color: #d4edda;
+    -fx-text-fill: #155724;
+    -fx-padding: 10px 20px;
+    -fx-border-radius: 10px;
+    -fx-font-size: 16px;
+}
+
+.snackbar-error {
+    -fx-background-color: #f8d7da;
+    -fx-text-fill: #721c24;
+    -fx-padding: 10px 20px;
+    -fx-border-radius: 10px;
+    -fx-font-size: 16px;
+}
+
+
+.inactive-label {
+    -fx-font-size: 16px;
+    -fx-text-fill: #0b3d61;
+    -fx-font-weight: bold;
+    -fx-underline: false;
+    -fx-cursor: hand;
+}
+
+.active-label {
+    -fx-font-size: 16px;
+    -fx-text-fill: #ff5722;
+    -fx-font-weight: bold;
+    -fx-underline: true;
+    -fx-cursor: hand;
+}
+
+.profile-button {
+    -fx-cursor: hand;
+    -fx-padding: 5px;
+}
+
+.profile-icon {
+    -fx-fit-width: 30px;
+    -fx-fit-height: 30px;
+    -fx-preserve-ratio: true;
+}
+
+.profile-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #0b3d61;
+    -fx-font-weight: bold;
+}
