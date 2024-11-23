@@ -17,21 +17,32 @@ import uk.ac.nott.cs.comp2013.mentorapp.model.session.SupportType;
 import java.net.URL;
 import java.util.Objects;
 
+/**
+ * ActivitySignUpView class provides a UI for mentees to sign up for activities.
+ */
 public class ActivitySignUpView extends VBox {
     private final MenteeController menteeController;
     private final ObservableList<SupportType> activityList;
     private final ListView<SupportType> listView;
     private final TextField searchField;
 
+    /**
+     * Constructor to initialize the ActivitySignUpView.
+     *
+     * @param controller The mentee controller to handle actions.
+     */
     public ActivitySignUpView(MenteeController controller) {
         this.menteeController = controller;
         this.activityList = FXCollections.observableArrayList(SupportType.values());
         this.listView = new ListView<>(activityList);
         this.searchField = new TextField();
         getStylesheets().add(Objects.requireNonNull(getClass().getResource("/styles/activity_signup.css")).toExternalForm());
-        buildView();
+        buildView(); // Builds the UI layout
     }
 
+    /**
+     * Builds the main layout of the view.
+     */
     private void buildView() {
         HBox topContainer = createTopContainer();
         VBox headerBox = createHeaderBox();
@@ -42,17 +53,24 @@ public class ActivitySignUpView extends VBox {
         getChildren().addAll(topContainer, headerBox, listView, submitButton);
     }
 
+    /**
+     * Creates the top navigation container.
+     */
     private HBox createTopContainer() {
         ImageView imageView = createHeaderImage();
         VBox imageContainer = new VBox(imageView);
         imageContainer.setAlignment(Pos.TOP_LEFT);
         imageContainer.setPadding(new Insets(10));
 
+        // Navigation labels
         Label signingLabel = createStyledLabel("Signing up for Activities", "active-label");
         Label viewMentorLabel = createStyledLabel("View Assigned Mentor", "inactive-label");
         Label menteeHomeLabel = createStyledLabel("Home", "inactive-label");
+
+        // Add navigation actions
         menteeHomeLabel.setOnMouseClicked(e -> getScene().setRoot(new MenteeView(menteeController)));
         viewMentorLabel.setOnMouseClicked(e -> getScene().setRoot(new AssignedMentorView(menteeController)));
+
         HBox labelContainer = new HBox(20, menteeHomeLabel, signingLabel, viewMentorLabel);
         labelContainer.setAlignment(Pos.CENTER_LEFT);
 
@@ -64,6 +82,9 @@ public class ActivitySignUpView extends VBox {
         return topContainer;
     }
 
+    /**
+     * Creates the header image.
+     */
     private ImageView createHeaderImage() {
         URL imageUrl = getClass().getResource("/pairing_image.png");
         if (imageUrl == null) {
@@ -76,10 +97,13 @@ public class ActivitySignUpView extends VBox {
         return imageView;
     }
 
+    /**
+     * Creates the header section with title, filters, and search field.
+     */
     private VBox createHeaderBox() {
         Label titleLabel = createStyledLabel("Sign up for Activities", "header-title");
         HBox filterBox = createFilterBox();
-        searchField.setPromptText("Search Activities...");
+        searchField.setPromptText("Search Activities..."); 
         searchField.textProperty().addListener((observable, oldValue, newValue) -> filterActivities(newValue));
         searchField.getStyleClass().add("search-field");
 
@@ -88,12 +112,18 @@ public class ActivitySignUpView extends VBox {
         return headerBox;
     }
 
+    /**
+     * Creates a styled label.
+     */
     private Label createStyledLabel(String text, String styleClass) {
         Label label = new Label(text);
         label.getStyleClass().add(styleClass);
         return label;
     }
 
+    /**
+     * Creates the user profile button in the header.
+     */
     private HBox createUserProfileButton() {
         ImageView userIcon = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/user_icon.png"))));
         userIcon.setFitWidth(30);
@@ -114,6 +144,9 @@ public class ActivitySignUpView extends VBox {
         return profileButton;
     }
 
+    /**
+     * Creates filters for activity selection.
+     */
     private HBox createFilterBox() {
         Label mentorLabel = new Label("Mentor:");
         mentorLabel.getStyleClass().add("mentor-label");
@@ -130,6 +163,9 @@ public class ActivitySignUpView extends VBox {
         return filterBox;
     }
 
+    /**
+     * Configures the ListView for displaying activities.
+     */
     private void configureListView() {
         listView.setCellFactory(param -> new ListCell<>() {
             @Override
@@ -155,13 +191,16 @@ public class ActivitySignUpView extends VBox {
         listView.getStyleClass().add("list-view");
     }
 
+    /**
+     * Creates the submit button.
+     */
     private Button createSubmitButton() {
         Button submitButton = new Button("Submit");
         submitButton.getStyleClass().add("submit-button");
         submitButton.setOnAction(e -> {
             SupportType selectedType = listView.getSelectionModel().getSelectedItem();
             if (selectedType != null) {
-                menteeController.requestSupport(selectedType);
+                menteeController.requestSupport(selectedType); // Request support for selected activity
                 showSnackbar("Successfully signed up for: " + selectedType.getDisplayName(), true);
             } else {
                 showSnackbar("Error: Please select an activity before submitting.", false);
@@ -170,6 +209,9 @@ public class ActivitySignUpView extends VBox {
         return submitButton;
     }
 
+    /**
+     * Displays a snackbar message for feedback.
+     */
     private void showSnackbar(String message, boolean success) {
         Label messageLabel = new Label(message);
         messageLabel.getStyleClass().add(success ? "snackbar-success" : "snackbar-error");
@@ -188,14 +230,19 @@ public class ActivitySignUpView extends VBox {
         delay.play();
     }
 
+    /**
+     * Filters the activities based on the search input.
+     *
+     * @param filter The filter string.
+     */
     private void filterActivities(String filter) {
         if (filter == null || filter.isEmpty()) {
-            listView.setItems(activityList);
+            listView.setItems(activityList); // Reset to full list
         } else {
             ObservableList<SupportType> filteredList = FXCollections.observableArrayList();
             for (SupportType activity : activityList) {
                 if (activity.getDisplayName().toLowerCase().contains(filter.toLowerCase())) {
-                    filteredList.add(activity);
+                    filteredList.add(activity); // Add matching activities
                 }
             }
             listView.setItems(filteredList);
