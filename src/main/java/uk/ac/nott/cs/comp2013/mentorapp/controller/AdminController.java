@@ -39,24 +39,15 @@ public class AdminController {
     public boolean pairMenteeWithMentor(String menteeId, String mentorId) {
         Optional<User> menteeOpt = userRepository.selectById(menteeId);
         Optional<User> mentorOpt = userRepository.selectById(mentorId);
-
-        if (menteeOpt.isPresent() && mentorOpt.isPresent()
-                && menteeOpt.get() instanceof Mentee mentee
+        if (menteeOpt.isPresent() && mentorOpt.isPresent() && menteeOpt.get() instanceof Mentee mentee
                 && mentorOpt.get() instanceof Mentor mentor) {
-
-            if (!mentor.isAvailable()) {
-                System.out.println("This mentor is already assigned.");
-                return false;
-            }
-
+            if (!mentor.isAvailable()) return false;
             if (mentor.assignMentee(mentee)) {
                 mentee.assignMentor(mentor);
                 createSupportSession(mentor, mentee);
-                System.out.println("Mentee " + menteeId + " successfully paired with Mentor " + mentorId);
                 return true;
             }
         }
-        System.out.println("Mentee or Mentor not found or invalid type.");
         return false;
     }
 
@@ -71,8 +62,6 @@ public class AdminController {
                 .filter(mentee -> mentee.getAssignedMentor() == null)
                 .collect(Collectors.toList());
     }
-
-
 
     public List<Mentor> getAvailableMentors() {
         return userRepository.selectAll().stream()

@@ -11,6 +11,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import uk.ac.nott.cs.comp2013.mentorapp.controller.MentorController;
+
+import java.util.Locale;
 import java.util.Objects;
 
 public class MentorView extends VBox {
@@ -18,6 +20,7 @@ public class MentorView extends VBox {
 
     public MentorView(MentorController controller) {
         this.controller = controller;
+        Locale.setDefault(Locale.ENGLISH);
         buildView();
         addCSSListener();
     }
