@@ -48,10 +48,16 @@ public class IdentitySelectionView extends VBox {
         getChildren().add(container);
     }
 
+    /**
+     * Sets a unified border style for a given region.
+     */
     private void setUnifiedBorderStyle(Region region) {
         region.getStyleClass().add("unified-border");
     }
 
+    /**
+     * Creates the top bar with the university logo and title.
+     */
     private HBox createTopContainer() {
         ImageView logoView = createLogoView();
 
@@ -67,6 +73,9 @@ public class IdentitySelectionView extends VBox {
         return topContainer;
     }
 
+    /**
+     * Creates the university logo view.
+     */
     private ImageView createLogoView() {
         ImageView logoView = null;
         try {
@@ -81,6 +90,9 @@ public class IdentitySelectionView extends VBox {
         return logoView;
     }
 
+    /**
+     * Creates the center section with identity selection buttons.
+     */
     private VBox createCenterContainer() {
         Label subtitle = new Label("Log in as a");
         subtitle.getStyleClass().add("subtitle");
@@ -99,6 +111,9 @@ public class IdentitySelectionView extends VBox {
         return centerContainer;
     }
 
+    /**
+     * Creates the bottom section with hyperlinks for new users and support.
+     */
     private HBox createBottomContainer() {
         Hyperlink newUserLink = createHyperlink("New User?", e -> handleNewUserLink());
         Hyperlink havingProblemsLink = createHyperlink("Having Problems?", e -> handleHavingProblemsLink());
@@ -109,6 +124,9 @@ public class IdentitySelectionView extends VBox {
         return bottomContainer;
     }
 
+    /**
+     * Creates a styled hyperlink with an action.
+     */
     private Hyperlink createHyperlink(String text, EventHandler<ActionEvent> action) {
         Hyperlink hyperlink = new Hyperlink(text);
         hyperlink.getStyleClass().add("hyperlink");
@@ -116,6 +134,9 @@ public class IdentitySelectionView extends VBox {
         return hyperlink;
     }
 
+    /**
+     * Creates a styled button for identity selection.
+     */
     private Button createStyledButton(String text) {
         Button button = new Button(text);
         button.getStyleClass().add("styled-button");
@@ -124,6 +145,9 @@ public class IdentitySelectionView extends VBox {
         return button;
     }
 
+    /**
+     * Handles the "New User" hyperlink click action.
+     */
     private void handleNewUserLink() {
         Stage stage = (Stage) this.getScene().getWindow();
         Repository<User, String> menteeRepository = new HashMapRepository<>();
@@ -132,10 +156,16 @@ public class IdentitySelectionView extends VBox {
         stage.setScene(new Scene(new EditProfileView(newMenteeController, stage.getScene(), true), 600, 400));
     }
 
+    /**
+     * Handles the "Having Problems" hyperlink click action.
+     */
     private void handleHavingProblemsLink() {
         System.out.println("Having Problems clicked");
     }
 
+    /**
+     * Interface for handling identity selection.
+     */
     @FunctionalInterface
     public interface IdentitySelectionHandler {
         void onIdentitySelected(String userType);
