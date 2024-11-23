@@ -21,10 +21,10 @@ import java.util.Objects;
  * ActivitySignUpView class provides a UI for mentees to sign up for activities.
  */
 public class ActivitySignUpView extends VBox {
-    private final MenteeController menteeController; // Controller to manage mentee actions
-    private final ObservableList<SupportType> activityList; // List of available activities
-    private final ListView<SupportType> listView; // ListView to display activities
-    private final TextField searchField; // Search field for filtering activities
+    private final MenteeController menteeController;
+    private final ObservableList<SupportType> activityList;
+    private final ListView<SupportType> listView;
+    private final TextField searchField;
 
     /**
      * Constructor to initialize the ActivitySignUpView.
@@ -44,20 +44,20 @@ public class ActivitySignUpView extends VBox {
      * Builds the main layout of the view.
      */
     private void buildView() {
-        HBox topContainer = createTopContainer(); // Header navigation
-        VBox headerBox = createHeaderBox(); // Header with title and filters
-        configureListView(); // Configure the activity list
-        Button submitButton = createSubmitButton(); // Submit button for signing up
+        HBox topContainer = createTopContainer();
+        VBox headerBox = createHeaderBox();
+        configureListView();
+        Button submitButton = createSubmitButton();
 
-        getStyleClass().add("root"); // Set the root style class
-        getChildren().addAll(topContainer, headerBox, listView, submitButton); // Add components to the layout
+        getStyleClass().add("root");
+        getChildren().addAll(topContainer, headerBox, listView, submitButton);
     }
 
     /**
      * Creates the top navigation container.
      */
     private HBox createTopContainer() {
-        ImageView imageView = createHeaderImage(); // Header image
+        ImageView imageView = createHeaderImage();
         VBox imageContainer = new VBox(imageView);
         imageContainer.setAlignment(Pos.TOP_LEFT);
         imageContainer.setPadding(new Insets(10));
@@ -74,7 +74,7 @@ public class ActivitySignUpView extends VBox {
         HBox labelContainer = new HBox(20, menteeHomeLabel, signingLabel, viewMentorLabel);
         labelContainer.setAlignment(Pos.CENTER_LEFT);
 
-        HBox profileBox = createUserProfileButton(); // Profile section
+        HBox profileBox = createUserProfileButton();
         HBox.setHgrow(profileBox, Priority.ALWAYS);
 
         HBox topContainer = new HBox(20, imageContainer, labelContainer, profileBox);
@@ -101,10 +101,10 @@ public class ActivitySignUpView extends VBox {
      * Creates the header section with title, filters, and search field.
      */
     private VBox createHeaderBox() {
-        Label titleLabel = createStyledLabel("Sign up for Activities", "header-title"); // Header title
-        HBox filterBox = createFilterBox(); // Filters for activities
-        searchField.setPromptText("Search Activities..."); // Search box
-        searchField.textProperty().addListener((observable, oldValue, newValue) -> filterActivities(newValue)); // Add filtering
+        Label titleLabel = createStyledLabel("Sign up for Activities", "header-title");
+        HBox filterBox = createFilterBox();
+        searchField.setPromptText("Search Activities..."); 
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> filterActivities(newValue));
         searchField.getStyleClass().add("search-field");
 
         VBox headerBox = new VBox(15, titleLabel, filterBox, searchField);
