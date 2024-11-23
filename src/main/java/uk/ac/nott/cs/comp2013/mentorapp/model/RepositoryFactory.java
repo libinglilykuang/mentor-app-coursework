@@ -35,7 +35,6 @@ public class RepositoryFactory {
 
     private static User parseUser(String[] record) {
         if (record.length < 3) {
-            System.out.println("Skipping incomplete record: " + String.join(", ", record));
             return null;
         }
 
@@ -53,10 +52,7 @@ public class RepositoryFactory {
             case "MENTEE" -> parseMentee(username, password, extraInfo, activityType, mentorType, menteeType);
             case "MENTOR" -> parseMentor(username, password, startDate, endDate, mentorType);
             case "ADMIN" -> new Administrator(username, password);
-            default -> {
-                System.out.println("Skipping record with invalid role: " + String.join(", ", record));
-                yield null;
-            }
+            default -> null;
         };
     }
 
