@@ -20,14 +20,18 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * View to display the sessions assigned to a mentor.
+ */
 public class AssignedMenteeView extends VBox {
-    private final Mentor mentor;
-    private final ListView<String> sessionListView = new ListView<>();
+    private final Mentor mentor; // The mentor associated with this view
+    private final ListView<String> sessionListView = new ListView<>(); // List view to display sessions
 
     public AssignedMenteeView(Mentor mentor) {
         this.mentor = mentor;
         buildView();
 
+        // Add CSS styling when the scene changes
         this.sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (newScene != null) {
                 newScene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/styles/assigned-mentee-view.css")).toExternalForm());
@@ -35,16 +39,22 @@ public class AssignedMenteeView extends VBox {
         });
     }
 
+    /**
+     * Builds the view components.
+     */
     private void buildView() {
-        HBox topContainer = createTopContainer();
-        Label titleLabel = createTitleLabel();
-        VBox sessionBox = createSessionBox();
+        HBox topContainer = createTopContainer(); // Top navigation bar
+        Label titleLabel = createTitleLabel(); // Title of the page
+        VBox sessionBox = createSessionBox(); // Section to display sessions
         getStyleClass().add("assigned-mentee-view");
         getChildren().addAll(topContainer, titleLabel, sessionBox);
     }
 
+    /**
+     * Creates the top navigation bar.
+     */
     private HBox createTopContainer() {
-        VBox imageContainer = createImageContainer();
+        VBox imageContainer = createImageContainer(); // Logo or header image
         Label mentorHomeLabel = createNavigationLabel("Home", "navigation-label-inactive");
         Label settingLabel = createNavigationLabel("Set Available Time", "navigation-label-inactive");
         Label viewMentorLabel = createNavigationLabel("View Assigned Session", "navigation-label-active");
@@ -52,18 +62,22 @@ public class AssignedMenteeView extends VBox {
         MentorController mentorController = new MentorController(mentor);
         mentorHomeLabel.setOnMouseClicked(e -> getScene().setRoot(new MentorView(mentorController)));
         settingLabel.setOnMouseClicked(e -> getScene().setRoot(new MentorAvailabilityView(mentor)));
-        viewMentorLabel.setOnMouseClicked(e -> getScene().setRoot(new AssignedMenteeView(mentor)));
 
         HBox labelContainer = new HBox(20, mentorHomeLabel, settingLabel, viewMentorLabel);
         labelContainer.setAlignment(Pos.CENTER_LEFT);
-        HBox profileBox = createUserProfileButton();
-        HBox.setHgrow(profileBox, Priority.ALWAYS);
-        HBox topContainer = new HBox(20, imageContainer, labelContainer, profileBox);
+
+        HBox profileButton = createUserProfileButton(); // Profile navigation button
+        HBox.setHgrow(profileButton, Priority.ALWAYS);
+
+        HBox topContainer = new HBox(20, imageContainer, labelContainer, profileButton);
         topContainer.setAlignment(Pos.CENTER_LEFT);
         topContainer.setPadding(new Insets(10, 10, 5, 10));
         return topContainer;
     }
 
+    /**
+     * Creates a container with the logo or header image.
+     */
     private VBox createImageContainer() {
         URL imageUrl = getClass().getResource("/pairing_image.png");
         if (imageUrl == null) {
@@ -80,40 +94,55 @@ public class AssignedMenteeView extends VBox {
         return imageContainer;
     }
 
+    /**
+     * Creates a styled navigation label.
+     */
     private Label createNavigationLabel(String text, String styleClass) {
         Label label = new Label(text);
         label.getStyleClass().add(styleClass);
         return label;
     }
 
+    /**
+     * Creates the title label for the page.
+     */
     private Label createTitleLabel() {
         Label titleLabel = new Label("Assigned Mentee Sessions");
         titleLabel.getStyleClass().add("title-label");
         return titleLabel;
     }
 
+    /**
+     * Creates the session list display box.
+     */
     private VBox createSessionBox() {
         Label sessionListLabel = new Label("Your Assigned Sessions:");
         sessionListLabel.getStyleClass().add("session-list-label");
 
         sessionListView.setPrefHeight(300);
         sessionListView.getStyleClass().add("session-list");
-        populateSessionList();
+        populateSessionList(); // Populate the session list with mentor's sessions
 
         VBox sessionBox = new VBox(10, sessionListLabel, sessionListView);
         sessionBox.setPadding(new Insets(10));
         return sessionBox;
     }
 
+    /**
+     * Creates the user profile button with a username label.
+     */
     private HBox createUserProfileButton() {
-        ImageView userIcon = createUserIcon();
-        Label usernameLabel = createUsernameLabel(mentor.getUsername());
+        ImageView userIcon = createUserIcon(); // User icon
+        Label usernameLabel = createUsernameLabel(mentor.getUsername()); // Username label
         HBox profileButton = new HBox(8, userIcon, usernameLabel);
         profileButton.getStyleClass().add("profile-button");
         configureProfileButton(profileButton);
         return profileButton;
     }
 
+    /**
+     * Creates the user icon for the profile button.
+     */
     private ImageView createUserIcon() {
         URL iconUrl = getClass().getResource("/user_icon.png");
         if (iconUrl == null) {
@@ -125,12 +154,18 @@ public class AssignedMenteeView extends VBox {
         return userIcon;
     }
 
+    /**
+     * Creates the username label for the profile button.
+     */
     private Label createUsernameLabel(String username) {
         Label usernameLabel = new Label(username);
         usernameLabel.getStyleClass().add("username-label");
         return usernameLabel;
     }
 
+    /**
+     * Configures the profile button to navigate to the edit profile view.
+     */
     private void configureProfileButton(HBox profileButton) {
         profileButton.setOnMouseClicked(e -> {
             Stage stage = (Stage) profileButton.getScene().getWindow();
@@ -139,8 +174,11 @@ public class AssignedMenteeView extends VBox {
         });
     }
 
+    /**
+     * Populates the session list with assigned sessions for the mentor.
+     */
     private void populateSessionList() {
-        List<SupportSession> sessions = mentor.getAssignedSessions(); // Assume mentor has a method to fetch sessions
+        List<SupportSession> sessions = mentor.getAssignedSessions(); // Fetch sessions
         if (sessions == null || sessions.isEmpty()) {
             sessionListView.getItems().add("No sessions assigned yet.");
             return;
