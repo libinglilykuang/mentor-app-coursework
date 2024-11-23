@@ -4,6 +4,7 @@ import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
 import uk.ac.nott.cs.comp2013.mentorapp.model.session.SupportType;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.*;
+
 import java.io.FileReader;
 import java.io.IOException;
 import java.time.Instant;
@@ -11,14 +12,25 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 
+/**
+ * Factory for creating a repository of users from a CSV file.
+ */
 public class RepositoryFactory {
+
+    /**
+     * Creates a repository from a CSV file.
+     *
+     * @param csvFilePath the path to the CSV file
+     * @return a repository populated with users
+     * @throws IOException if an error occurs during file reading or parsing
+     */
     public static HashMapRepository<User, String> createRepositoryFromCsv(String csvFilePath) throws IOException {
         HashMapRepository<User, String> repo = new HashMapRepository<>();
 
         try (CSVReader reader = new CSVReader(new FileReader(csvFilePath))) {
             List<String[]> records = reader.readAll();
             // Skip the header row
-            records.removeFirst();
+            records.remove(0);
 
             for (String[] record : records) {
                 User user = parseUser(record);
@@ -33,6 +45,12 @@ public class RepositoryFactory {
         return repo;
     }
 
+    /**
+     * Parses a user from a CSV record.
+     *
+     * @param record the CSV record as a string array
+     * @return the parsed user or null if invalid
+     */
     private static User parseUser(String[] record) {
         if (record.length < 3) {
             return null;
@@ -56,6 +74,9 @@ public class RepositoryFactory {
         };
     }
 
+    /**
+     * Parses a mentee from the record data.
+     */
     private static Mentee parseMentee(String username, String password, String extraInfo, String activityType, String mentorType, String menteeType) {
         SupportType supportType = parseSupportType(activityType);
         MentorType mentorTypeEnum = parseMentorType(mentorType);
@@ -70,6 +91,9 @@ public class RepositoryFactory {
         }
     }
 
+    /**
+     * Parses a mentor from the record data.
+     */
     private static Mentor parseMentor(String username, String password, String startDate, String endDate, String mentorType) {
         LocalDateTime start = parseDateSafely(startDate);
         LocalDateTime end = parseDateSafely(endDate);
@@ -81,6 +105,9 @@ public class RepositoryFactory {
         return new Mentor(username, password, start, end, type);
     }
 
+    /**
+     * Parses a SupportType from the activity type string.
+     */
     private static SupportType parseSupportType(String activityType) {
         for (SupportType type : SupportType.values()) {
             if (type.getDisplayName().equalsIgnoreCase(activityType)) {
@@ -90,6 +117,9 @@ public class RepositoryFactory {
         return null;
     }
 
+    /**
+     * Parses a MentorType from the mentor type string.
+     */
     private static MentorType parseMentorType(String mentorType) {
         if (mentorType == null || mentorType.trim().isEmpty()) {
             return null;
@@ -102,6 +132,9 @@ public class RepositoryFactory {
         return null;
     }
 
+    /**
+     * Parses a MenteeType from the mentee type string.
+     */
     private static MenteeType parseMenteeType(String menteeType) {
         if (menteeType == null || menteeType.trim().isEmpty()) {
             return null;
@@ -114,6 +147,9 @@ public class RepositoryFactory {
         return null;
     }
 
+    /**
+     * Safely parses a LocalDateTime from a string.
+     */
     private static LocalDateTime parseDateSafely(String date) {
         if (date == null || date.isEmpty()) {
             return null;
