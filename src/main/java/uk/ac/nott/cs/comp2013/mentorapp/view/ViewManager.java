@@ -11,11 +11,8 @@ import uk.ac.nott.cs.comp2013.mentorapp.controller.MenteeController;
 import uk.ac.nott.cs.comp2013.mentorapp.controller.MentorController;
 import uk.ac.nott.cs.comp2013.mentorapp.model.HashMapRepository;
 import uk.ac.nott.cs.comp2013.mentorapp.model.Repository;
-import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentee;
-import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentor;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.User;
 import javafx.scene.layout.Pane;
-
 
 /**
  * Manages the scenes available in the application and controls which scene is current presented in
