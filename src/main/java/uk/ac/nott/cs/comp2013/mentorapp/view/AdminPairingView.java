@@ -34,7 +34,11 @@ public class AdminPairingView extends VBox {
     private Mentor lastSelectedMentor = null;
     private List<Mentor> recommendedMentors = new ArrayList<>();
 
-
+    /**
+     * Constructor for AdminPairingView.
+     *
+     * @param adminController the controller handling mentor-mentee pairings
+     */
     public AdminPairingView(AdminController adminController) {
         this.adminController = adminController;
         buildView();
@@ -48,6 +52,9 @@ public class AdminPairingView extends VBox {
         refreshLists();
     }
 
+    /**
+     * Builds the UI layout for the pairing view.
+     */
     private void buildView() {
         VBox topContainerWithSeparator = createTopContainer();
         HBox listsContainer = createListsContainer();
@@ -59,12 +66,20 @@ public class AdminPairingView extends VBox {
         refreshLists();
     }
 
+    /**
+     * Sets up a listener to update mentor recommendations when a mentee is selected.
+     */
     private void setupMenteeSelectionListener() {
         menteeListView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             updateMentorRecommendations(newSelection);
         });
     }
 
+    /**
+     * Updates the mentor recommendations for the selected mentee.
+     *
+     * @param selectedMentee the selected mentee
+     */
     private void updateMentorRecommendations(Mentee selectedMentee) {
         if (selectedMentee == null) {
             return;
@@ -74,6 +89,9 @@ public class AdminPairingView extends VBox {
         mentorListView.refresh();
     }
 
+    /**
+     * Creates the top container with navigation and header.
+     */
     private VBox createTopContainer() {
         ImageView imageView = createImageView();
         VBox imageContainer = new VBox(imageView);
@@ -105,12 +123,18 @@ public class AdminPairingView extends VBox {
         return topContainerWithSeparator;
     }
 
+    /**
+     * Creates a label with a specific style.
+     */
     private Label createLabel(String text, String styleClass) {
         Label label = new Label(text);
         label.getStyleClass().add(styleClass);
         return label;
     }
 
+    /**
+     * Creates an image view for the header.
+     */
     private ImageView createImageView() {
         URL imageUrl = getClass().getResource("/pairing_image.png");
         if (imageUrl == null) {
@@ -124,6 +148,9 @@ public class AdminPairingView extends VBox {
         return imageView;
     }
 
+    /**
+     * Creates the button container for pairing actions.
+     */
     private HBox createButtonContainer() {
         Button pairButton = new Button("Pair Mentor and Mentee");
         pairButton.getStyleClass().add("pair-button");
@@ -134,6 +161,9 @@ public class AdminPairingView extends VBox {
         return buttonContainer;
     }
 
+    /**
+     * Creates the container for mentee and mentor lists.
+     */
     private HBox createListsContainer() {
         configureMenteeListView();
         configureMentorListView();
@@ -156,14 +186,23 @@ public class AdminPairingView extends VBox {
         return listsContainer;
     }
 
+    /**
+     * Configures the mentee list view.
+     */
     private void configureMenteeListView() {
         configureListView(menteeListView, "mentee-list-view", 400, 450);
     }
 
+    /**
+     * Configures the mentor list view.
+     */
     private void configureMentorListView() {
         configureListView(mentorListView, "mentor-list-view", 200, 250);
     }
 
+    /**
+     * Generic configuration for list views.
+     */
     private void configureListView(TableView<?> tableView, String styleClass, double minWidth, double prefWidth) {
         tableView.getStyleClass().add(styleClass);
         tableView.setMinWidth(minWidth);
@@ -176,11 +215,17 @@ public class AdminPairingView extends VBox {
         System.out.println("Switched to Pairing Interface");
     }
 
+    /**
+     * Switches to the admin home view.
+     */
     private void switchToAdminHome(Label adminHomeLabel, Label pairingLabel, Label viewReportLabel) {
         updateLabelStyles(adminHomeLabel, pairingLabel, viewReportLabel, "home");
         getScene().setRoot(new AdminView(adminController));
     }
 
+    /**
+     * Switches to the report view.
+     */
     private void openReportWindow(Label adminHomeLabel, Label pairingLabel, Label viewReportLabel) {
         updateLabelStyles(adminHomeLabel, pairingLabel, viewReportLabel, "report");
         getScene().setRoot(new AssignedReportView(adminController));
@@ -206,10 +251,13 @@ public class AdminPairingView extends VBox {
         setupMentorRowFactory();
     }
 
+    /**
+     * Sets up columns for the mentor list.
+     */
     private void setupMenteeColumns() {
         menteeListView.getColumns().clear();
 
-        menteeListView.getColumns().addAll(
+        /*menteeListView.getColumns().addAll(
                 createTableColumn("Mentee Name", 100, Mentee::getUsername),
                 createTableColumn("Request Type", 325, mentee -> {
                     return mentee.getSupportRequest() != null
@@ -225,9 +273,36 @@ public class AdminPairingView extends VBox {
                     return menteeType != null ? menteeType.getDescription() : "Not Set";
                 }),
                 createCVSummaryColumn()
-        );
+        );*/
+        TableColumn<Mentee, String> menteeNameColumn = createTableColumn("Mentee Name", 100, Mentee::getUsername);
+        menteeListView.getColumns().add(menteeNameColumn);
+
+        TableColumn<Mentee, String> requestTypeColumn = createTableColumn("Request Type", 325, mentee -> {
+            return mentee.getSupportRequest() != null
+                    ? mentee.getSupportRequest().getDisplayName()
+                    : "No Request";
+        });
+        menteeListView.getColumns().add(requestTypeColumn);
+
+        TableColumn<Mentee, String> preferredMentorTypeColumn = createTableColumn("Preferred Mentor Type", 180, mentee -> {
+            MentorType preferredType = mentee.getPreferredMentorType();
+            return preferredType != null ? preferredType.getDescription() : "Not Set";
+        });
+        menteeListView.getColumns().add(preferredMentorTypeColumn);
+
+        TableColumn<Mentee, String> menteeTypeColumn = createTableColumn("Mentee Type", 130, mentee -> {
+            MenteeType menteeType = mentee.getMenteeType();
+            return menteeType != null ? menteeType.getDescription() : "Not Set";
+        });
+        menteeListView.getColumns().add(menteeTypeColumn);
+
+        TableColumn<Mentee, String> cvSummaryColumn = createCVSummaryColumn();
+        menteeListView.getColumns().add(cvSummaryColumn);
     }
 
+    /**
+     * Creates a table column for displaying the mentee's CV summary with tooltips for full content.
+     */
     private TableColumn<Mentee, String> createCVSummaryColumn() {
         TableColumn<Mentee, String> cvTextColumn = new TableColumn<>("CV Summary");
         cvTextColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getCvText()));
@@ -235,6 +310,11 @@ public class AdminPairingView extends VBox {
         return cvTextColumn;
     }
 
+    /**
+     * Creates a table cell with a tooltip for displaying long text.
+     * @param <T> The type of items in the table.
+     * @return A customized TableCell with tooltip functionality.
+     */
     private <T> TableCell<T, String> createTooltipTableCell() {
         return new TableCell<>() {
             private final Tooltip tooltip = new Tooltip();
@@ -256,19 +336,30 @@ public class AdminPairingView extends VBox {
         };
     }
 
+    /**
+     * Sets up columns for the mentor table view.
+     */
     private void setupMentorColumns() {
         mentorListView.getColumns().clear();
-        mentorListView.getColumns().addAll(
-                createTableColumn("Mentor Name", Mentor::getUsername),
-                createTableColumn("Available Time", mentor -> formatAvailability(mentor.getStartAvailability(), mentor.getEndAvailability())),
-                createTableColumn("Mentor Type", 180, mentor -> {
+        TableColumn<Mentor, String> mentorNameColumn = createTableColumn("Mentor Name", Mentor::getUsername);
+        mentorListView.getColumns().add(mentorNameColumn);
+
+        TableColumn<Mentor, String> availableTimeColumn = createTableColumn("Available Time",
+                mentor -> formatAvailability(mentor.getStartAvailability(), mentor.getEndAvailability()));
+        mentorListView.getColumns().add(availableTimeColumn);
+
+        TableColumn<Mentor, String> mentorTypeColumn = createTableColumn("Mentor Type", 180,
+                mentor -> {
                     MentorType mentorType = mentor.getMentorType();
                     return mentorType != null ? mentorType.getDescription() : "Not Set";
-                }),
-                createMentorStatusColumn()
-        );
+                });
+        mentorListView.getColumns().add(mentorTypeColumn);
+        mentorListView.getColumns().add(createMentorStatusColumn());
     }
 
+    /**
+     * Creates a column for displaying the mentor's status (e.g., Available, Paired, Expired).
+     */
     private TableColumn<Mentor, String> createMentorStatusColumn() {
         TableColumn<Mentor, String> statusColumn = new TableColumn<>("Status");
         statusColumn.setCellValueFactory(cellData -> {
@@ -292,6 +383,9 @@ public class AdminPairingView extends VBox {
         return statusColumn;
     }
 
+    /**
+     * Determines the status of a mentor based on availability and pairing state.
+     */
     private String determineMentorStatus(Mentor mentor) {
         if (mentor.getEndAvailability() != null && mentor.getEndAvailability().isBefore(LocalDateTime.now())) {
             return "Expired";
@@ -299,6 +393,9 @@ public class AdminPairingView extends VBox {
         return mentor.isAvailable() ? "Available" : "Paired";
     }
 
+    /**
+     * Creates a graphical representation of the mentor's status.
+     */
     private HBox createStatusGraphic(String status) {
         Label statusLabel = new Label(status);
         statusLabel.getStyleClass().add("status-label");
@@ -313,6 +410,9 @@ public class AdminPairingView extends VBox {
         return statusBox;
     }
 
+    /**
+     * Configures the row factory for the mentee table, adding styles based on selection state.
+     */
     private void setupMenteeRowFactory() {
         menteeListView.setRowFactory(tv -> new TableRow<>() {
             @Override
@@ -335,6 +435,9 @@ public class AdminPairingView extends VBox {
         menteeListView.setOnMouseClicked(event -> handleSelection(menteeListView, selected -> lastSelectedMentee = selected));
     }
 
+    /**
+     * Configures the row factory for the mentor table, adding styles based on selection and recommendation.
+     */
     private void setupMentorRowFactory() {
         mentorListView.setRowFactory(tv -> new TableRow<>() {
             @Override
@@ -359,6 +462,13 @@ public class AdminPairingView extends VBox {
         });
     }
 
+    /**
+     * Handles selection of an item in a table view.
+     *
+     * @param tableView The table view.
+     * @param selectionConsumer The action to perform on the selected item.
+     * @param <T> The type of items in the table.
+     */
     private <T> void handleSelection(TableView<T> tableView, java.util.function.Consumer<T> selectionConsumer) {
         T selected = tableView.getSelectionModel().getSelectedItem();
         if (selected != null && selected.equals(selectionConsumer)) {
@@ -370,10 +480,27 @@ public class AdminPairingView extends VBox {
         tableView.refresh();
     }
 
+    /**
+     * Creates a table column with a specified title and data extractor function.
+     *
+     * @param title         The title of the column.
+     * @param valueExtractor A function to extract the data for each cell in the column.
+     * @param <T>           The type of the objects in the table.
+     * @return The configured table column.
+     */
     private <T> TableColumn<T, String> createTableColumn(String title, java.util.function.Function<T, String> valueExtractor) {
         return createTableColumn(title, -1, valueExtractor);
     }
 
+    /**
+     * Creates a table column with a specified title, preferred width, and data extractor function.
+     *
+     * @param title         The title of the column.
+     * @param prefWidth     The preferred width of the column. Use -1 if no specific width is required.
+     * @param valueExtractor A function to extract the data for each cell in the column.
+     * @param <T>           The type of the objects in the table.
+     * @return The configured table column.
+     */
     private <T> TableColumn<T, String> createTableColumn(String title, double prefWidth, java.util.function.Function<T, String> valueExtractor) {
         TableColumn<T, String> column = new TableColumn<>(title);
         column.setCellValueFactory(cellData -> new SimpleStringProperty(valueExtractor.apply(cellData.getValue())));
@@ -381,6 +508,10 @@ public class AdminPairingView extends VBox {
         return column;
     }
 
+    /**
+     * Handles the pairing of the selected mentee and mentor.
+     * Displays a success or error message based on the result of the pairing operation.
+     */
     private void pairSelectedMenteeAndMentor() {
         Mentee selectedMentee = menteeListView.getSelectionModel().getSelectedItem();
         Mentor selectedMentor = mentorListView.getSelectionModel().getSelectedItem();
@@ -398,10 +529,16 @@ public class AdminPairingView extends VBox {
         if (success) refreshLists();
     }
 
+    /**
+     * Displays a snackbar message to provide feedback on operations.
+     */
     private void displaySnackbar(boolean success, String message) {
         showSnackbar(message, success);
     }
 
+    /**
+     * Shows a snackbar notification at the center of the scene.
+     */
     private void showSnackbar(String message, boolean success) {
         Label messageLabel = new Label(message);
         messageLabel.getStyleClass().add(success ? "snackbar-success" : "snackbar-error");
@@ -416,17 +553,26 @@ public class AdminPairingView extends VBox {
         delay.play();
     }
 
+    /**
+     * Refreshes the mentee and mentor lists.
+     */
     private void refreshLists() {
         refreshList(menteeItems, menteeListView, adminController.getAllUnpairedMentees());
         refreshList(mentorItems, mentorListView, adminController.getAvailableMentors());
     }
 
+    /**
+     * Refreshes a given list with new data.
+     */
     private <T> void refreshList(ObservableList<T> items, TableView<T> tableView, List<T> newData) {
         items.clear();
         items.addAll(newData);
         tableView.setItems(items);
     }
 
+    /**
+     * Formats availability times for mentors.
+     */
     private String formatAvailability(LocalDateTime start, LocalDateTime end) {
         if (start == null || end == null) {
             return "Unavailable";
