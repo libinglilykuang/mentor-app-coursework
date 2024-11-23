@@ -11,19 +11,30 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import uk.ac.nott.cs.comp2013.mentorapp.controller.AdminController;
+
 import java.net.URL;
 import java.util.Objects;
 import java.util.function.Function;
 
+/**
+ * View for displaying assigned mentor-mentee pairs and their details.
+ */
 public class AssignedReportView extends VBox {
+
     private final AdminController adminController;
     private final TableView<Pair> reportTableView;
 
+    /**
+     * Constructs an AssignedReportView with the given admin controller.
+     *
+     * @param adminController Controller for managing mentor-mentee relationships.
+     */
     public AssignedReportView(AdminController adminController) {
         this.adminController = adminController;
         this.reportTableView = new TableView<>();
         buildView();
 
+        // Add CSS styles dynamically
         this.sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (newScene != null) {
                 newScene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/styles/assigned-report-view.css")).toExternalForm());
@@ -31,6 +42,9 @@ public class AssignedReportView extends VBox {
         });
     }
 
+    /**
+     * Builds the view layout, including the table and navigation labels.
+     */
     private void buildView() {
         HBox topContainer = createTopContainer();
         setupTableView();
@@ -40,6 +54,9 @@ public class AssignedReportView extends VBox {
         getChildren().addAll(topContainer, reportTableView);
     }
 
+    /**
+     * Creates the top container with navigation labels.
+     */
     private HBox createTopContainer() {
         VBox imageContainer = createImageContainer();
         Label pairingLabel = createLabel("Pairing Mentors", "navigation-label-inactive", e -> getScene().setRoot(new AdminPairingView(adminController)));
@@ -55,6 +72,9 @@ public class AssignedReportView extends VBox {
         return topContainer;
     }
 
+    /**
+     * Creates the image container for the top section.
+     */
     private VBox createImageContainer() {
         URL imageUrl = getClass().getResource("/pairing_image.png");
         if (imageUrl == null) {
@@ -71,6 +91,13 @@ public class AssignedReportView extends VBox {
         return imageContainer;
     }
 
+    /**
+     * Creates a navigation label with a click event.
+     *
+     * @param text      The label text.
+     * @param styleClass CSS class for styling.
+     * @param onClick   Click event handler.
+     */
     private Label createLabel(String text, String styleClass, javafx.event.EventHandler<javafx.scene.input.MouseEvent> onClick) {
         Label label = new Label(text);
         label.getStyleClass().add(styleClass);
@@ -80,6 +107,9 @@ public class AssignedReportView extends VBox {
         return label;
     }
 
+    /**
+     * Configures the table view with columns for displaying mentor-mentee details.
+     */
     private void setupTableView() {
         TableColumn<Pair, String> mentorColumn = createTableColumn("Mentor", 200, Pair::getMentorName);
         TableColumn<Pair, String> menteeColumn = createTableColumn("Mentee", 200, Pair::getMenteeName);
@@ -104,6 +134,13 @@ public class AssignedReportView extends VBox {
         VBox.setVgrow(reportTableView, Priority.ALWAYS);
     }
 
+    /**
+     * Creates a table column with the specified properties.
+     *
+     * @param title         The title of the column.
+     * @param width         The preferred width of the column.
+     * @param valueFunction Function to extract data for the column.
+     */
     private TableColumn<Pair, String> createTableColumn(String title, double width, Function<Pair, String> valueFunction) {
         TableColumn<Pair, String> column = new TableColumn<>(title);
         column.setCellValueFactory(data -> new SimpleStringProperty(valueFunction.apply(data.getValue())));
@@ -111,6 +148,9 @@ public class AssignedReportView extends VBox {
         return column;
     }
 
+    /**
+     * Creates a table column for displaying CV summaries.
+     */
     private TableColumn<Pair, String> createCVSummaryColumn() {
         TableColumn<Pair, String> cvColumn = new TableColumn<>("CV Summary");
         cvColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getCvText()));
@@ -118,6 +158,9 @@ public class AssignedReportView extends VBox {
         return cvColumn;
     }
 
+    /**
+     * Refreshes the report table with the latest mentor-mentee assignment data.
+     */
     private void refreshReport() {
         ObservableList<Pair> data = FXCollections.observableArrayList();
         adminController.getAssignedPairs().forEach(pair -> {
@@ -129,6 +172,9 @@ public class AssignedReportView extends VBox {
         reportTableView.setItems(data);
     }
 
+    /**
+     * Represents a pair of mentor and mentee with associated data.
+     */
     public static class Pair {
         private final String mentorName;
         private final String menteeName;
