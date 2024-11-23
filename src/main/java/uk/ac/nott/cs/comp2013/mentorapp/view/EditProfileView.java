@@ -66,12 +66,23 @@ public class EditProfileView extends VBox {
         getStyleClass().add("edit-profile-view");
     }
 
+    /**
+     * Creates a labeled input box.
+     *
+     * @param label The label text.
+     * @param value The initial value for the text field.
+     * @param placeholder The placeholder text.
+     * @return A VBox containing the label and text field.
+     */
     private VBox createInputBox(String label, String value, String placeholder) {
         Label lbl = createStyledLabel(label);
         TextField txtField = createStyledTextField(value, placeholder);
         return createCenteredBox(lbl, txtField);
     }
 
+    /**
+     * Creates a grade selection box for mentees.
+     */
     private VBox setupGradeBox() {
         if (menteeController == null) return null;
         Label lblGrade = createStyledLabel("Select Your Grade:");
@@ -86,6 +97,9 @@ public class EditProfileView extends VBox {
         return createCenteredBox(lblGrade, gradeComboBox);
     }
 
+    /**
+     * Creates a button box containing Save and Cancel buttons.
+     */
     private HBox createButtonBox(Button btnSave, Button btnCancel) {
         HBox buttonBox = new HBox(20, btnSave, btnCancel);
         buttonBox.setAlignment(Pos.CENTER);
@@ -99,6 +113,9 @@ public class EditProfileView extends VBox {
         return button;
     }
 
+    /**
+     * Handles the save button action.
+     */
     private void handleSave(VBox usernameBox, VBox passwordBox, VBox realNameBox, VBox gradeBox) {
         TextField txtUsername = (TextField) usernameBox.getChildren().get(1);
         TextField txtPassword = (TextField) passwordBox.getChildren().get(1);
@@ -112,6 +129,9 @@ public class EditProfileView extends VBox {
         if (previousScene != null) stage.setScene(previousScene);
     }
 
+    /**
+     * Validates the input fields.
+     */
     private boolean validateInputs(String username, String password, String realName) {
         if (username.isEmpty() || password.isEmpty()) {
             showError("Username and Password cannot be empty.");
@@ -124,6 +144,9 @@ public class EditProfileView extends VBox {
         return true;
     }
 
+    /**
+     * Updates the user data based on input.
+     */
     private void updateUserData(String username, String password, String realName) {
         if (isNewUser) {
             if (menteeController != null) {
@@ -154,6 +177,9 @@ public class EditProfileView extends VBox {
         }
     }
 
+    /**
+     * Handles the cancel button action.
+     */
     private void handleCancel() {
         Stage stage = (Stage) getScene().getWindow();
         if (previousScene != null) stage.setScene(previousScene);
@@ -163,9 +189,23 @@ public class EditProfileView extends VBox {
         container.getStyleClass().add("profile-container");
     }
 
+    /**
+     * Displays a success alert.
+     */
     private void showSuccess(String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Success");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    /**
+     * Displays an error alert.
+     */
+    private void showError(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
@@ -225,14 +265,6 @@ public class EditProfileView extends VBox {
             return false;
         }
         return true;
-    }
-
-    private void showError(String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error");
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
     }
 }
 
