@@ -151,6 +151,11 @@
     -fx-padding: 5px;
 }
 
+.mentor-recommended {
+    -fx-background-color: #dfefff;
+    -fx-text-fill: #333333;
+}
+
 .mentor-selected {
     -fx-text-fill: black;
     -fx-font-weight: bold;

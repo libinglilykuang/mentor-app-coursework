@@ -19,7 +19,6 @@ import uk.ac.nott.cs.comp2013.mentorapp.model.HashMapRepository;
 import uk.ac.nott.cs.comp2013.mentorapp.model.Repository;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentee;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.User;
-
 import java.util.Objects;
 
 public class IdentitySelectionView extends VBox {

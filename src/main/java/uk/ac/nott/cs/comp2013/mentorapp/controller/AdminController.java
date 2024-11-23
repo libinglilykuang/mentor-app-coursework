@@ -78,6 +78,7 @@ public class AdminController {
         return userRepository.selectAll().stream()
                 .filter(user -> user instanceof Mentor)
                 .map(user -> (Mentor) user)
+                .filter(Mentor::isAvailable)
                 .collect(Collectors.toList());
     }
 

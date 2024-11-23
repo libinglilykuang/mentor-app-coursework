@@ -13,10 +13,12 @@ import javafx.scene.image.ImageView;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import uk.ac.nott.cs.comp2013.mentorapp.controller.AdminController;
+import uk.ac.nott.cs.comp2013.mentorapp.model.logic.RecommendationEngine;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.MenteeType;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.MentorType;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentee;
@@ -30,6 +32,8 @@ public class AdminPairingView extends VBox {
     private final ObservableList<Mentor> mentorItems = FXCollections.observableArrayList();
     private Mentee lastSelectedMentee = null;
     private Mentor lastSelectedMentor = null;
+    private List<Mentor> recommendedMentors = new ArrayList<>();
+
 
     public AdminPairingView(AdminController adminController) {
         this.adminController = adminController;
@@ -39,6 +43,9 @@ public class AdminPairingView extends VBox {
                 newScene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/styles/admin_pairing.css")).toExternalForm());
             }
         });
+
+        setupMenteeSelectionListener();
+        refreshLists();
     }
 
     private void buildView() {
@@ -50,6 +57,21 @@ public class AdminPairingView extends VBox {
         setAlignment(Pos.TOP_CENTER);
         setupListViewSelection();
         refreshLists();
+    }
+
+    private void setupMenteeSelectionListener() {
+        menteeListView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            updateMentorRecommendations(newSelection);
+        });
+    }
+
+    private void updateMentorRecommendations(Mentee selectedMentee) {
+        if (selectedMentee == null) {
+            return;
+        }
+        recommendedMentors = RecommendationEngine.recommendMentors(selectedMentee, mentorItems);
+        mentorListView.getSelectionModel().clearSelection();
+        mentorListView.refresh();
     }
 
     private VBox createTopContainer() {
@@ -238,9 +260,7 @@ public class AdminPairingView extends VBox {
         mentorListView.getColumns().clear();
         mentorListView.getColumns().addAll(
                 createTableColumn("Mentor Name", Mentor::getUsername),
-                createTableColumn("Available Time", mentor -> {
-                    return formatAvailability(mentor.getStartAvailability(), mentor.getEndAvailability());
-                }),
+                createTableColumn("Available Time", mentor -> formatAvailability(mentor.getStartAvailability(), mentor.getEndAvailability())),
                 createTableColumn("Mentor Type", 180, mentor -> {
                     MentorType mentorType = mentor.getMentorType();
                     return mentorType != null ? mentorType.getDescription() : "Not Set";
@@ -321,20 +341,22 @@ public class AdminPairingView extends VBox {
             protected void updateItem(Mentor item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || item == null) {
-                    getStyleClass().removeAll("mentor-selected", "mentor-even-row", "mentor-odd-row");
+                    getStyleClass().removeAll("mentor-selected", "mentor-recommended", "mentor-even-row", "mentor-odd-row");
                 } else {
+                    getStyleClass().removeAll("mentor-selected", "mentor-recommended", "mentor-even-row", "mentor-odd-row");
                     Mentor selectedMentor = mentorListView.getSelectionModel().getSelectedItem();
-                    getStyleClass().removeAll("mentor-selected", "mentor-even-row", "mentor-odd-row");
                     if (item.equals(selectedMentor)) {
                         getStyleClass().add("mentor-selected");
-                    } else {
-                        getStyleClass().add(getIndex() % 2 == 0 ? "mentor-even-row" : "mentor-odd-row");
+                    } else if (recommendedMentors != null && recommendedMentors.contains(item)) {
+                        getStyleClass().add("mentor-recommended");
                     }
                 }
             }
         });
-
-        mentorListView.setOnMouseClicked(event -> handleSelection(mentorListView, selected -> lastSelectedMentor = selected));
+        mentorListView.setOnMouseClicked(event -> {
+            mentorListView.refresh();
+            handleSelection(mentorListView, selected -> lastSelectedMentor = selected);
+        });
     }
 
     private <T> void handleSelection(TableView<T> tableView, java.util.function.Consumer<T> selectionConsumer) {

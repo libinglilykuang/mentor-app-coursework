@@ -48,22 +48,4 @@ public class SupportSession {
         LocalDate today = LocalDate.now();
         return today.isAfter(startDate) && today.isBefore(endDate);
     }
-
-    public SessionStatus getSessionStatus() {
-        LocalDate today = LocalDate.now();
-        if (today.isBefore(startDate)) {
-            return SessionStatus.NOT_STARTED;
-        } else if (today.isBefore(endDate)) {
-            return SessionStatus.ACTIVE;
-        } else {
-            return SessionStatus.COMPLETED;
-        }
-    }
-
-
-    public enum SessionStatus {
-        NOT_STARTED,
-        ACTIVE,
-        COMPLETED
-    }
 }
