@@ -45,6 +45,9 @@ public class MentorAvailabilityView extends VBox {
         setAlignment(Pos.TOP_CENTER);
     }
 
+    /**
+     * Adds a listener to dynamically load CSS when the scene is set.
+     */
     private void addCSSListener() {
         this.sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (newScene != null) {
@@ -57,6 +60,11 @@ public class MentorAvailabilityView extends VBox {
         });
     }
 
+    /**
+     * Creates the top navigation bar.
+     *
+     * @return HBox with navigation elements.
+     */
     private HBox createTopContainer() {
         VBox imageContainer = createImageContainer();
         HBox labelContainer = createLabelContainer();
@@ -70,6 +78,11 @@ public class MentorAvailabilityView extends VBox {
         return topContainer;
     }
 
+    /**
+     * Creates a container for the mentor's profile button.
+     *
+     * @return HBox with the profile button.
+     */
     private HBox createUserProfileButton() {
         ImageView userIcon = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/user_icon.png"))));
         userIcon.getStyleClass().add("profile-icon");
@@ -82,12 +95,18 @@ public class MentorAvailabilityView extends VBox {
         return profileButton;
     }
 
+    /**
+     * Navigates to the edit profile view.
+     */
     private void navigateToEditProfile() {
         Stage stage = (Stage) getScene().getWindow();
         Scene currentScene = stage.getScene();
         stage.setScene(new Scene(new EditProfileView(new MentorController(mentor), currentScene, true), 800, 600));
     }
 
+    /**
+     * Creates the mentor logo container.
+     */
     private VBox createImageContainer() {
         ImageView imageView = createImageView();
         VBox imageContainer = new VBox(imageView);
@@ -96,6 +115,9 @@ public class MentorAvailabilityView extends VBox {
         return imageContainer;
     }
 
+    /**
+     * Creates the mentor logo.
+     */
     private ImageView createImageView() {
         URL imageUrl = getClass().getResource("/pairing_image.png");
         if (imageUrl == null) {
@@ -108,6 +130,9 @@ public class MentorAvailabilityView extends VBox {
         return imageView;
     }
 
+    /**
+     * Creates the navigation labels.
+     */
     private HBox createLabelContainer() {
         Label mentorHomeLabel = createStyledLabel("Home", "inactive-label");
         Label signingLabel = createStyledLabel("Set Available Time", "active-label");
@@ -128,6 +153,9 @@ public class MentorAvailabilityView extends VBox {
         return label;
     }
 
+    /**
+     * Creates the header section with instructions.
+     */
     private VBox createHeaderBox() {
         Label titleLabel = new Label("Set Your Availability");
         titleLabel.getStyleClass().add("header-title");
@@ -140,6 +168,9 @@ public class MentorAvailabilityView extends VBox {
         return headerBox;
     }
 
+    /**
+     * Creates the form for selecting availability.
+     */
     private GridPane createAvailabilityGrid() {
         initializeTimePickers();
         GridPane gridPane = new GridPane();
@@ -223,6 +254,9 @@ public class MentorAvailabilityView extends VBox {
         delay.play();
     }
 
+    /**
+     * Initializes time pickers with hourly intervals.
+     */
     private void initializeTimePickers() {
         for (int i = 0; i < 24; i++) {
             String time = String.format("%02d:00", i);
