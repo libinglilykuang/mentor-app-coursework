@@ -13,9 +13,17 @@ import javafx.scene.text.TextAlignment;
 import javafx.util.Duration;
 import java.util.Objects;
 
+/**
+ * View for the homepage, displaying an introduction and a sign-up button.
+ */
 public class HomepageView extends StackPane {
-    private final Runnable onVerifyIdentity;
+    private final Runnable onVerifyIdentity; // Action to run when the "Sign up" button is clicked
 
+    /**
+     * Creates the homepage view and sets up styles.
+     *
+     * @param onVerifyIdentity the action to execute when verifying identity
+     */
     public HomepageView(Runnable onVerifyIdentity) {
         this.onVerifyIdentity = onVerifyIdentity;
         buildView();
@@ -27,6 +35,9 @@ public class HomepageView extends StackPane {
         });
     }
 
+    /**
+     * Builds the layout of the view.
+     */
     private void buildView() {
         setBackgroundStyle();
         VBox contentBox = createContentBox();
@@ -34,10 +45,18 @@ public class HomepageView extends StackPane {
         playSlideInAnimation(contentBox);
     }
 
+    /**
+     * Sets the background style class for the view.
+     */
     private void setBackgroundStyle() {
         getStyleClass().add("homepage-view");
     }
 
+    /**
+     * Creates the content box with titles, subtitle, and button.
+     *
+     * @return the content box
+     */
     private VBox createContentBox() {
         VBox contentBox = new VBox(15,
                 createTitleLine("INSPIRE, LEAD, AND TRANSFORM"),
@@ -51,12 +70,23 @@ public class HomepageView extends StackPane {
         return contentBox;
     }
 
+    /**
+     * Creates a single title line.
+     *
+     * @param text the text for the title line
+     * @return the title line as a Text node
+     */
     private Text createTitleLine(String text) {
         Text titleLine = new Text(text);
         titleLine.getStyleClass().add("title-line");
         return titleLine;
     }
 
+    /**
+     * Creates the subtitle.
+     *
+     * @return the subtitle as a Text node
+     */
     private Text createSubtitle() {
         Text subtitle = new Text("BECOME A BEACON FOR FUTURE TALENT.");
         subtitle.getStyleClass().add("subtitle");
@@ -64,6 +94,11 @@ public class HomepageView extends StackPane {
         return subtitle;
     }
 
+    /**
+     * Creates the "Sign up" button.
+     *
+     * @return the button
+     */
     private Button createVerifyButton() {
         Button verifyButton = new Button("Sign up");
         verifyButton.getStyleClass().add("verify-button");
@@ -72,6 +107,11 @@ public class HomepageView extends StackPane {
         return verifyButton;
     }
 
+    /**
+     * Plays slide-in animations for the content box's children.
+     *
+     * @param contentBox the content box
+     */
     private void playSlideInAnimation(VBox contentBox) {
         int delayIndex = 0;
         for (var node : contentBox.getChildren()) {
@@ -80,6 +120,12 @@ public class HomepageView extends StackPane {
         }
     }
 
+    /**
+     * Animates a node sliding in from the bottom with a fade effect.
+     *
+     * @param node  the node to animate
+     * @param delay the delay before starting the animation
+     */
     private void slideInFromBottom(javafx.scene.Node node, double delay) {
         node.setTranslateY(50);
         node.setOpacity(0);
