@@ -14,16 +14,26 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import uk.ac.nott.cs.comp2013.mentorapp.controller.MenteeController;
+
 import java.net.URL;
 import java.util.Objects;
 
+/**
+ * View for displaying a mentee's assigned mentors and their activities.
+ */
 public class AssignedMentorView extends VBox {
-    private final MenteeController menteeController;
+    private final MenteeController menteeController; // Controller for mentee-related actions
 
+    /**
+     * Constructor to initialize the Assigned Mentor View.
+     *
+     * @param menteeController Controller for managing mentee actions.
+     */
     public AssignedMentorView(MenteeController menteeController) {
         this.menteeController = menteeController;
         buildView();
 
+        // Add stylesheet dynamically when the scene is set
         this.sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (newScene != null) {
                 newScene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/styles/assigned-mentor-view.css")).toExternalForm());
@@ -31,10 +41,14 @@ public class AssignedMentorView extends VBox {
         });
     }
 
+    /**
+     * Builds the main layout of the view.
+     */
     private void buildView() {
-        HBox topContainer = createTopContainer();
-        Label titleLabel = createTitleLabel();
+        HBox topContainer = createTopContainer(); // Top navigation bar
+        Label titleLabel = createTitleLabel(); // Main title
 
+        // Create sections for past and future activities
         VBox pastActivitiesBox = createActivitySection(
                 "Past Activities",
                 createActivityCard("CV Review", "Mentor1", "Mon - Fri, 10:00 AM - 4:00 PM")
@@ -49,10 +63,18 @@ public class AssignedMentorView extends VBox {
         mainContainer.setPadding(new Insets(30));
         mainContainer.setAlignment(Pos.TOP_CENTER);
 
+        // Add all components to the view
         getStyleClass().add("assigned-mentor-view");
         getChildren().addAll(topContainer, titleLabel, mainContainer);
     }
 
+    /**
+     * Creates a section for activities with a title and a list of activity cards.
+     *
+     * @param title Title of the section.
+     * @param activities List of activity cards.
+     * @return A VBox containing the section.
+     */
     private VBox createActivitySection(String title, Node... activities) {
         VBox sectionBox = new VBox(20);
         sectionBox.getChildren().addAll(createTitleBox(title));
@@ -62,12 +84,16 @@ public class AssignedMentorView extends VBox {
         return sectionBox;
     }
 
+    /**
+     * Creates the top navigation bar.
+     */
     private HBox createTopContainer() {
-        ImageView imageView = createImageView();
+        ImageView imageView = createImageView(); // Logo
         VBox imageContainer = new VBox(imageView);
         imageContainer.setAlignment(Pos.TOP_LEFT);
         imageContainer.setPadding(new Insets(10));
 
+        // Navigation labels
         Label menteeHomeLabel = createNavigationLabel("Home", "navigation-label-inactive", e -> getScene().setRoot(new MenteeView(menteeController)));
         Label signingLabel = createNavigationLabel("Signing up for Activities", "navigation-label-inactive", e -> getScene().setRoot(new ActivitySignUpView(menteeController)));
         Label viewMentorLabel = createNavigationLabel("View Assigned Mentor", "navigation-label-active", null);
@@ -75,7 +101,7 @@ public class AssignedMentorView extends VBox {
         HBox labelContainer = new HBox(20, menteeHomeLabel, signingLabel, viewMentorLabel);
         labelContainer.setAlignment(Pos.CENTER_LEFT);
 
-        HBox profileButton = createUserProfileButton();
+        HBox profileButton = createUserProfileButton(); // Profile button
         HBox.setHgrow(profileButton, Priority.ALWAYS);
 
         HBox topContainer = new HBox(20, imageContainer, labelContainer, profileButton);
@@ -84,6 +110,9 @@ public class AssignedMentorView extends VBox {
         return topContainer;
     }
 
+    /**
+     * Creates an ImageView for the logo.
+     */
     private ImageView createImageView() {
         URL imageUrl = getClass().getResource("/pairing_image.png");
         if (imageUrl == null) {
@@ -96,6 +125,9 @@ public class AssignedMentorView extends VBox {
         return imageView;
     }
 
+    /**
+     * Creates a navigation label with a click handler.
+     */
     private Label createNavigationLabel(String text, String styleClass, EventHandler<MouseEvent> onClick) {
         Label label = new Label(text);
         label.getStyleClass().add(styleClass);
@@ -105,12 +137,18 @@ public class AssignedMentorView extends VBox {
         return label;
     }
 
+    /**
+     * Creates the title label for the view.
+     */
     private Label createTitleLabel() {
         Label titleLabel = new Label("Assigned Mentors");
         titleLabel.getStyleClass().add("title-label");
         return titleLabel;
     }
 
+    /**
+     * Creates a user profile button with an icon and username.
+     */
     private HBox createUserProfileButton() {
         ImageView userIcon = createUserIcon("/user_icon.png", 30);
         Label usernameLabel = createUsernameLabel(menteeController.getMentee().getUsername());
@@ -120,6 +158,9 @@ public class AssignedMentorView extends VBox {
         return profileButton;
     }
 
+    /**
+     * Creates a user icon ImageView.
+     */
     private ImageView createUserIcon(String iconPath, double size) {
         ImageView userIcon = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream(iconPath))));
         userIcon.setFitWidth(size);
@@ -127,18 +168,27 @@ public class AssignedMentorView extends VBox {
         return userIcon;
     }
 
+    /**
+     * Creates a label for displaying the username.
+     */
     private Label createUsernameLabel(String username) {
         Label usernameLabel = new Label(username);
         usernameLabel.getStyleClass().add("username-label");
         return usernameLabel;
     }
 
+    /**
+     * Navigates to the Edit Profile view when the profile button is clicked.
+     */
     private void navigateToEditProfile(HBox profileButton) {
         Scene currentScene = profileButton.getScene();
         Stage stage = (Stage) currentScene.getWindow();
         stage.setScene(new Scene(new EditProfileView(menteeController, currentScene, true), 800, 600));
     }
 
+    /**
+     * Creates a title box for a section.
+     */
     private HBox createTitleBox(String title) {
         Label titleLabel = new Label(title);
         titleLabel.getStyleClass().add("section-title");
@@ -148,6 +198,14 @@ public class AssignedMentorView extends VBox {
         return titleBox;
     }
 
+    /**
+     * Creates an activity card with details about the activity.
+     *
+     * @param activityType The type of the activity.
+     * @param mentorUsername The mentor assigned to the activity.
+     * @param availability The time availability for the activity.
+     * @return A VBox representing the activity card.
+     */
     private VBox createActivityCard(String activityType, String mentorUsername, String availability) {
         Label activityTypeLabel = new Label(activityType);
         activityTypeLabel.getStyleClass().add("activity-type");
