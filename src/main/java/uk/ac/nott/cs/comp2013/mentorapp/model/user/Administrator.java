@@ -6,8 +6,8 @@ public class Administrator implements User {
   private String username, password;
 
   public Administrator(String username, String password) {
-    this.username = username;
-    this.password = password;
+    this.username=username;
+    this.password=password;
   }
 
   @Override

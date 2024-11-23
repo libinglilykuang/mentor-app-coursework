@@ -1,14 +1,14 @@
 package uk.ac.nott.cs.comp2013.mentorapp.model.user;
 
 import static org.junit.Assume.assumeFalse;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
+import uk.ac.nott.cs.comp2013.mentorapp.model.session.SupportType;
 
 @RunWith(JUnitQuickcheck.class)
 public class MenteeTests {
@@ -20,11 +20,30 @@ public class MenteeTests {
   }
 
   @Property
-  public void testConstructor(String username, String password) {
+  public void testConstructorWithBasicInfo(String username, String password) {
     Mentee m = new Mentee(username, password);
     assertEquals(username, m.getUsername());
     assertEquals(password, m.getPassword());
-    assertEquals(0, m.getCvText().length());
+    assertNull(m.getCvText());
+    assertNull(m.getSupportRequest());
+  }
+
+  @Property
+  public void testConstructorWithRealName(String username, String password, String realName) {
+    Mentee m = new Mentee(username, password, realName);
+    assertEquals(username, m.getUsername());
+    assertEquals(password, m.getPassword());
+    assertEquals(realName, m.getRealName());
+  }
+
+  @Property
+  public void testConstructorWithCvTextAndSupportType(String username, String password, String cvText) {
+    SupportType supportType = SupportType.INTERVIEW_PREPARATION;
+    Mentee m = new Mentee(username, password, cvText, supportType);
+    assertEquals(username, m.getUsername());
+    assertEquals(password, m.getPassword());
+    assertEquals(cvText, m.getCvText());
+    assertEquals(supportType, m.getSupportRequest());
   }
 
   @Property
@@ -76,5 +95,11 @@ public class MenteeTests {
     Mentee m1 = new Mentee("testUser", "testPassword");
     Mentee m2 = new Mentee("testUser", "testPassword");
     assertEquals(m1.hashCode(), m2.hashCode());
+  }
+
+  @Test
+  public void testSetAndGetRealName() {
+    mentee.setRealName("John Doe");
+    assertEquals("John Doe", mentee.getRealName());
   }
 }

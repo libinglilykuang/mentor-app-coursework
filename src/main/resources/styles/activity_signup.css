@@ -1,0 +1,173 @@
+/* 根容器样式 */
+.root {
+    -fx-background-color: white;
+    -fx-spacing: 10;
+    -fx-padding: 20;
+    -fx-alignment: top-center;
+}
+
+/* 顶部容器样式 */
+.top-container {
+    -fx-alignment: center-left;
+    -fx-padding: 10 10 5 10;
+    -fx-spacing: 20;
+}
+
+/* 标签样式 */
+.active-label {
+    -fx-font-size: 16px;
+    -fx-text-fill: #ff5722;
+    -fx-font-weight: bold;
+    -fx-underline: true;
+    -fx-cursor: hand;
+}
+
+.inactive-label {
+    -fx-font-size: 16px;
+    -fx-text-fill: #0b3d61;
+    -fx-font-weight: bold;
+    -fx-underline: false;
+    -fx-cursor: hand;
+}
+
+/* 标题框样式 */
+.header-box {
+    -fx-background-color: #0278a4;
+    -fx-padding: 20;
+    -fx-spacing: 15;
+    -fx-alignment: top-left;
+}
+
+.header-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+/* 用户名标签样式 */
+.username-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #0b3d61;
+    -fx-font-weight: bold;
+}
+
+/* 筛选框样式 */
+.search-field {
+    -fx-padding: 10px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
+
+/* 列表视图样式 */
+.list-view {
+    -fx-background-color: white;
+    -fx-font-size: 14px;
+    -fx-border-color: #dcdcdc; /* 设置边框颜色为浅灰色 */
+    -fx-border-width: 1px; /* 边框宽度 */
+    -fx-border-radius: 5px; /* 边框圆角 */
+    -fx-min-width: 400;
+    -fx-pref-height: 380;
+}
+
+/* 列表单元格样式 */
+.list-cell-container {
+    -fx-padding: 10px 10px 10px 10px; /* 内容内边距 */
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 0 0 1 0; /* 下边框 */
+}
+/* 活动标题样式 */
+.activity-title {
+    -fx-font-size: 14px;
+    -fx-text-fill: black;
+}
+
+/* 活动描述样式 */
+.activity-description {
+    -fx-font-size: 12px;
+    -fx-text-fill: #555555;
+}
+
+/* 列表单元格未选中状态 */
+.list-cell {
+    -fx-background-color: white;
+}
+
+/* 列表单元格选中状态 */
+.list-cell:selected {
+    -fx-background-color: #d9eaff; /* 浅灰色背景 */
+}
+
+/* Mentor 标签样式 */
+.mentor-label {
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+/* 提交按钮样式 */
+.submit-button {
+    -fx-background-color: #0b3d61;
+    -fx-font-size: 16px;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-min-width: 100;
+    -fx-min-height: 50;
+}
+
+/* 成功的提示信息样式 */
+.snackbar-success {
+    -fx-background-color: #d4edda;
+    -fx-text-fill: #155724;
+    -fx-font-size: 14px;
+    -fx-padding: 10px 20px;
+    -fx-background-radius: 5px;
+    -fx-border-radius: 5px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 10, 0.3, 0, 2);
+}
+
+/* 错误的提示信息样式 */
+.snackbar-error {
+    -fx-background-color: #f8d7da;
+    -fx-text-fill: #721c24;
+    -fx-font-size: 14px;
+    -fx-padding: 10px 20px;
+    -fx-background-radius: 5px;
+    -fx-border-radius: 5px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 10, 0.3, 0, 2);
+}
+
+/* 用户配置文件按钮样式 */
+.user-profile-button {
+    -fx-cursor: hand;
+    -fx-padding: 5;
+}
+
+.user-icon {
+    -fx-fit-width: 30px;
+    -fx-preserve-ratio: true;
+}
+
+.user-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #0b3d61;
+    -fx-font-weight: bold;
+}
+
+/* ComboBox 样式 */
+.combo-box {
+    -fx-background-color: white;
+    -fx-font-size: 14px;
+    -fx-pref-width: 300; /* 宽度设置为 300px，确保更宽 */
+}
+
+/* ComboBox 列表项样式 */
+.combo-box .list-cell {
+    -fx-text-fill: black; /* 默认文字颜色为黑色 */
+    -fx-background-color: white; /* 默认背景为白色 */
+}
+
+/* ComboBox 列表项选中样式 */
+.combo-box .list-cell:selected {
+    -fx-text-fill: black; /* 选中时文字颜色保持为黑色 */
+    -fx-background-color: #d9eaff; /* 选中项背景变为淡蓝色 */
+}

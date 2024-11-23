@@ -1,0 +1,65 @@
+/* Root container styles */
+.identity-selection-view {
+    -fx-background-color: white;
+    -fx-padding: 20;
+    -fx-spacing: 5;
+    -fx-alignment: center;
+}
+
+/* Container border styles */
+.unified-border {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #DDDDDD;
+    -fx-border-width: 2px;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-padding: 20px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0.5, 0, 4);
+}
+
+/* Top container styles */
+.top-container {
+    -fx-alignment: center;
+    -fx-padding: 10;
+}
+
+/* Title styles */
+.title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #003366;
+}
+
+/* Subtitle styles */
+.subtitle {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #666666;
+    -fx-padding: 5 0 10 0;
+}
+
+/* Button styles */
+.styled-button {
+    -fx-background-color: #004586;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20;
+    -fx-background-radius: 5px;
+}
+
+.styled-button:hover {
+    -fx-background-color: #003366;
+}
+
+/* Hyperlink styles */
+.hyperlink {
+    -fx-font-size: 14px;
+    -fx-text-fill: #003366;
+}
+
+/* Bottom container styles */
+.bottom-container {
+    -fx-alignment: center;
+    -fx-padding: 10 0 20 0;
+}

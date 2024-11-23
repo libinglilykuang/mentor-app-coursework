@@ -1,19 +1,44 @@
 package uk.ac.nott.cs.comp2013.mentorapp.model.user;
 
+import uk.ac.nott.cs.comp2013.mentorapp.model.session.SupportType;
+
 public class Mentee implements User, HasCv {
 
   private UserRole role = UserRole.MENTEE;
   private String username, password, cvText;
+  private Mentor assignedMentor;
+  private SupportType supportRequest;
+  private MentorType preferredMentorType;
+  private String realName;
+  private MenteeType menteeType;
 
   public Mentee(String username, String password) {
-    this(username, password, "");
+    this.username = username;
+    this.password = password;
   }
 
-  public Mentee(String username, String password, String cvText) {
+  public Mentee(String username, String password, String realName) {
+    this.username = username;
+    this.password = password;
+    this.realName = realName;
+  }
+
+  public Mentee(String username, String password, String cvText,SupportType supportType) {
     this.username = username;
     this.password = password;
     this.cvText = cvText;
+    this.supportRequest=supportType;
   }
+
+  public Mentee(String username, String password, String cvText,SupportType supportType,MentorType preferredMentorType,MenteeType menteeType) {
+    this.username = username;
+    this.password = password;
+    this.cvText = cvText;
+    this.supportRequest=supportType;
+    this.preferredMentorType = preferredMentorType;
+    this.menteeType=menteeType;
+  }
+
   @Override
   public String getCvText() {
     return cvText;
@@ -66,4 +91,41 @@ public class Mentee implements User, HasCv {
   public int hashCode() {
     return username.hashCode();
   }
+
+  public Mentor getAssignedMentor() {
+    return assignedMentor;
+  }
+
+  public void assignMentor(Mentor mentor) {
+    this.assignedMentor = mentor;
+  }
+
+  public SupportType getSupportRequest() {
+    return supportRequest;
+  }
+
+  public void setSupportRequest(SupportType supportRequest) {
+    this.supportRequest = supportRequest;
+  }
+
+  public MentorType getPreferredMentorType() {
+    return preferredMentorType;
+  }
+
+  public void setPreferredMentorType(MentorType preferredMentorType) {
+    this.preferredMentorType = preferredMentorType;
+  }
+
+  public String getRealName() {
+    return realName;
+  }
+
+  public void setRealName(String realName) {
+    this.realName = realName;
+  }
+
+  public MenteeType getMenteeType() {
+    return menteeType;
+  }
+
 }

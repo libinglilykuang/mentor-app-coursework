@@ -1,0 +1,37 @@
+.content-box {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #DDDDDD;
+    -fx-border-width: 1px;
+    -fx-border-radius: 15px;
+    -fx-background-radius: 15px;
+    -fx-padding: 40px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0.5, 0, 4);
+    -fx-spacing: 20px;
+    -fx-alignment: center;
+    -fx-max-width: 400px;
+}
+
+.logo-image {
+    -fx-fit-width: 350px;
+    -fx-fit-height: 350px;
+    -fx-preserve-ratio: true;
+}
+
+.welcome-label {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+.navigation-button {
+    -fx-font-size: 16px;
+    -fx-text-fill: white;
+    -fx-padding: 10px;
+    -fx-background-radius: 10px;
+    -fx-background-color: #0b3d61;
+    -fx-cursor: hand;
+    -fx-pref-width: 350px;
+}
+
+.navigation-button:hover {
+    -fx-background-color: #04253d;
+}
