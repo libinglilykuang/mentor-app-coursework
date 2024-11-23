@@ -15,15 +15,22 @@ import uk.ac.nott.cs.comp2013.mentorapp.controller.LoginController;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.User;
 import java.util.Objects;
 import static uk.ac.nott.cs.comp2013.mentorapp.view.ViewManager.*;
-import static uk.ac.nott.cs.comp2013.mentorapp.view.ViewManager.ADMIN;
 
+/**
+ * View for handling user login.
+ */
 public class LoginView extends VBox implements ManagedView {
-  private final LoginController controller;
-  protected ObjectProperty<EventHandler<? super ViewChangeEvent>> onViewChange;
-  private TextField txtUsername, txtPassword;
-  private Button btnLogin;
-  private Label lblMessage;
+  private final LoginController controller; // Login controller
+  protected ObjectProperty<EventHandler<? super ViewChangeEvent>> onViewChange; // Handles view changes
+  private TextField txtUsername, txtPassword; // Input fields
+  private Button btnLogin; // Login button
+  private Label lblMessage; // Error message label
 
+  /**
+   * Initializes the login view and sets up CSS styles.
+   *
+   * @param controller the login controller
+   */
   public LoginView(LoginController controller) {
     this.controller = controller;
     this.onViewChange = new SimpleObjectProperty<>("onViewChange", null);
@@ -36,18 +43,13 @@ public class LoginView extends VBox implements ManagedView {
     });
   }
 
+  /**
+   * Builds the layout for the login view.
+   */
   private void buildView() {
     VBox logoContainer = createLogoContainer();
-    Label lblWelcome = createStyledLabel(
-            "Welcome to the University of Nottingham's CS Mentoring App",
-            "login-welcome",
-            500
-    );
-    Label lblTitle = createStyledLabel(
-            "Login to Mentoring System",
-            "login-title",
-            400
-    );
+    Label lblWelcome = createStyledLabel("Welcome to the University of Nottingham's CS Mentoring App", "login-welcome", 500);
+    Label lblTitle = createStyledLabel("Login to Mentoring System", "login-title", 400);
     VBox usernameBox = createInputBox("Username", txtUsername = new TextField());
     VBox passwordBox = createInputBox("Password", txtPassword = new PasswordField());
 
@@ -66,6 +68,9 @@ public class LoginView extends VBox implements ManagedView {
     getChildren().add(container);
   }
 
+  /**
+   * Creates the logo container.
+   */
   private VBox createLogoContainer() {
     ImageView logoView = null;
     try {
@@ -82,6 +87,9 @@ public class LoginView extends VBox implements ManagedView {
     return logoContainer;
   }
 
+  /**
+   * Creates a styled label.
+   */
   private Label createStyledLabel(String text, String styleClass, double maxWidth) {
     Label label = new Label(text);
     label.getStyleClass().add(styleClass);
@@ -90,6 +98,9 @@ public class LoginView extends VBox implements ManagedView {
     return label;
   }
 
+  /**
+   * Creates an input box for text fields.
+   */
   private VBox createInputBox(String labelText, TextField inputField) {
     Label label = new Label(labelText);
     label.getStyleClass().add("input-label");
@@ -100,6 +111,9 @@ public class LoginView extends VBox implements ManagedView {
     return box;
   }
 
+  /**
+   * Creates a styled button.
+   */
   private Button createStyledButton(String text, String styleClass) {
     Button button = new Button(text);
     button.getStyleClass().add(styleClass);
@@ -108,6 +122,9 @@ public class LoginView extends VBox implements ManagedView {
     return button;
   }
 
+  /**
+   * Handles login button click action.
+   */
   private void onLoginClickAction() {
     boolean success = controller.onLoginClick(txtUsername.getText(), txtPassword.getText());
     if (success) {
@@ -123,6 +140,9 @@ public class LoginView extends VBox implements ManagedView {
     }
   }
 
+  /**
+   * Switches to the appropriate view based on the user's role.
+   */
   private void switchToRoleView(User user) {
     String viewKey = switch (user.getRole()) {
       case MENTEE -> MENTEE;
@@ -135,6 +155,9 @@ public class LoginView extends VBox implements ManagedView {
     }
   }
 
+  /**
+   * Clears the error message when text changes in the input fields.
+   */
   private void clearMessageOnTextChange() {
     txtUsername.textProperty().addListener((obs, oldText, newText) -> lblMessage.setText(""));
     txtPassword.textProperty().addListener((obs, oldText, newText) -> lblMessage.setText(""));
