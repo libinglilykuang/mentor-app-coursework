@@ -4,41 +4,44 @@ import java.util.Optional;
 import uk.ac.nott.cs.comp2013.mentorapp.model.Repository;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.User;
 
+/**
+ * Handles user login and tracks the current logged-in user.
+ */
 public class LoginController {
-
-  private final Repository<User, String> repo;
+  private final Repository<User, String> repo; // User data repository
   private User currentUser;
 
+  /**
+   * Initializes the controller with a user repository.
+   *
+   * @param model the user data repository
+   */
   public LoginController(Repository<User, String> model) {
     this.repo = model;
   }
 
+  /**
+   * Attempts to log in with the given username and password.
+   *
+   * @param username the username to log in with
+   * @param password the password to log in with
+   * @return true if login succeeds, false otherwise
+   */
   public boolean onLoginClick(String username, String password) {
     Optional<User> user = repo.selectById(username);
-    /*if (user.isEmpty()) {
-      return false;
+    if (user.isPresent() && user.get().getPassword().equals(password)) {
+      currentUser = user.get();
+      return true;
     }
-
-    User u = user.get();
-    return u.getUsername().equals(username) && u.getPassword().equals(password);
-  }*/
-    if (user.isPresent()) {
-      User u = user.get();
-      if (u.getPassword().equals(password)) {
-        currentUser = u;
-        System.out.println("Login successful for user: " + username);
-        return true;
-      }else {
-        System.out.println("Incorrect password for user: " + username);
-      }
-    }else {
-      System.out.println("User not found: " + username);
-    }
-
     currentUser = null;
     return false;
   }
 
+  /**
+   * Gets the currently logged-in user.
+   *
+   * @return the current user or null if not logged in
+   */
   public User getCurrentUser() {
     return currentUser;
   }

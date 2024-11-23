@@ -17,8 +17,8 @@ public class MentorTests {
   @BeforeEach
   public void setUp() {
     mentor = new Mentor("testUser", "testPassword",
-            LocalDateTime.of(2023, 1, 1, 9, 0),
-            LocalDateTime.of(2024, 1, 1, 17, 0));
+            LocalDateTime.of(2024, 1, 1, 9, 0),
+            LocalDateTime.of(2026, 1, 1, 17, 0));
   }
 
   @Test
@@ -64,7 +64,7 @@ public class MentorTests {
 
   @Test
   public void testSetAndGetEndAvailability() {
-    LocalDateTime newEnd = LocalDateTime.of(2023, 1, 2, 17, 0);
+    LocalDateTime newEnd = LocalDateTime.of(2024, 1, 2, 17, 0);
     mentor.setEndAvailability(newEnd);
     assertEquals(newEnd, mentor.getEndAvailability());
   }
@@ -74,7 +74,6 @@ public class MentorTests {
     LocalDateTime start = LocalDateTime.of(2024, 1, 2, 17, 0);
     LocalDateTime end = LocalDateTime.of(2023, 1, 2, 9, 0);
     mentor.setStartAvailability(start);
-
     assertThrows(IllegalArgumentException.class, () -> mentor.setEndAvailability(end));
   }
 
@@ -106,5 +105,53 @@ public class MentorTests {
     Mentor m1 = new Mentor("testUser", "testPassword");
     Mentor m2 = new Mentor("testUser", "testPassword");
     assertEquals(m1.hashCode(), m2.hashCode());
+  }
+
+  @Test
+  public void testAssignMentee() {
+    Mentee mentee = new Mentee("menteeUser", "menteePassword");
+    assertTrue(mentor.isAvailable());
+    mentor.assignMentee(mentee);
+    assertEquals(mentee, mentor.getAssignedMentee());
+    assertFalse(mentor.isAvailable());
+  }
+
+  @Test
+  public void testAssignMenteeWhenNotAvailable() {
+    Mentee mentee1 = new Mentee("menteeUser1", "menteePassword1");
+    Mentee mentee2 = new Mentee("menteeUser2", "menteePassword2");
+    mentor.assignMentee(mentee1);
+    assertThrows(IllegalStateException.class, () -> mentor.assignMentee(mentee2));
+  }
+
+  @Test
+  public void testIsAvailableWithoutMentee() {
+    assertTrue(mentor.isAvailable());
+  }
+
+  @Test
+  public void testIsAvailableWithMentee() {
+    Mentee mentee = new Mentee("menteeUser", "menteePassword");
+    mentor.assignMentee(mentee);
+    assertFalse(mentor.isAvailable());
+  }
+
+  @Test
+  public void testIsAvailableOutsideAvailabilityPeriod() {
+    Mentor mentor = new Mentor("mentorUser", "mentorPassword",
+            LocalDateTime.of(2023, 1, 1, 9, 0),
+            LocalDateTime.of(2023, 1, 1, 17, 0));
+    assertFalse(mentor.isAvailable());
+  }
+
+  @Test
+  public void testSetAndGetRealName() {
+    mentor.setRealName("John Doe");
+    assertEquals("John Doe", mentor.getRealName());
+  }
+
+  @Test
+  public void testGetAssignedSessionsEmpty() {
+    assertTrue(mentor.getAssignedSessions().isEmpty());
   }
 }

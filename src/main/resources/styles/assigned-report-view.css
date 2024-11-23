@@ -1,0 +1,47 @@
+/* Root container styles */
+.assigned-report-view {
+    -fx-background-color: white;
+}
+
+/* Top container styles */
+.top-container {
+    -fx-alignment: center-left;
+    -fx-padding: 10;
+}
+
+/* Table view styles */
+.report-table-view {
+    -fx-border-color: #0b3d61;
+    -fx-border-width: 1px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
+
+.table-placeholder {
+    -fx-text-fill: gray;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+/* Navigation labels */
+.navigation-label-active {
+    -fx-font-size: 16px;
+    -fx-text-fill: #ff5722;
+    -fx-font-weight: bold;
+    -fx-underline: true;
+    -fx-cursor: hand;
+}
+
+.navigation-label-inactive {
+    -fx-font-size: 16px;
+    -fx-text-fill: #0b3d61;
+    -fx-font-weight: bold;
+    -fx-underline: false;
+    -fx-cursor: hand;
+}
+
+/* Image container styles */
+.image-container {
+    -fx-alignment: top-left;
+    -fx-padding: 10;
+}
