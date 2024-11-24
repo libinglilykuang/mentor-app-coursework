@@ -23,7 +23,7 @@ dependencies {
     testImplementation("com.pholser:junit-quickcheck-generators:1.0")
     testImplementation("org.mockito:mockito-core:5.14.+")
     mockitoAgent("org.mockito:mockito-core:5.14.+") { isTransitive = false }
-
+    implementation("org.slf4j:slf4j-simple:2.0.9")
     implementation("com.opencsv:opencsv:5.8")
 
 }

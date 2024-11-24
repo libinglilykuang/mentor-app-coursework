@@ -18,12 +18,17 @@ import java.util.List;
 import java.util.Objects;
 
 import uk.ac.nott.cs.comp2013.mentorapp.controller.AdminController;
-import uk.ac.nott.cs.comp2013.mentorapp.model.logic.RecommendationEngine;
+import uk.ac.nott.cs.comp2013.mentorapp.model.RecommendationEngine;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.MenteeType;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.MentorType;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentee;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentor;
 
+/**
+ * The AdminPairingView class provides a graphical user interface for administrators
+ * to manage and pair mentees with mentors. The class features mentor recommendations,
+ * real-time updates, and intuitive navigation for managing mentor-mentee assignments.
+ */
 public class AdminPairingView extends VBox {
     private final AdminController adminController;
     private final TableView<Mentee> menteeListView = new TableView<>();
@@ -47,7 +52,6 @@ public class AdminPairingView extends VBox {
                 newScene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/styles/admin_pairing.css")).toExternalForm());
             }
         });
-
         setupMenteeSelectionListener();
         refreshLists();
     }
@@ -62,8 +66,8 @@ public class AdminPairingView extends VBox {
         getChildren().addAll(topContainerWithSeparator, listsContainer, buttonContainer);
         setSpacing(5);
         setAlignment(Pos.TOP_CENTER);
-        setupListViewSelection();
-        refreshLists();
+        setupListViewSelection();// Set up column definitions and row factories for both tables
+        refreshLists();// Refresh the lists of mentees and mentors
     }
 
     /**
@@ -71,7 +75,7 @@ public class AdminPairingView extends VBox {
      */
     private void setupMenteeSelectionListener() {
         menteeListView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-            updateMentorRecommendations(newSelection);
+            updateMentorRecommendations(newSelection); // Update mentor recommendations when a mentee is selected
         });
     }
 
@@ -82,15 +86,18 @@ public class AdminPairingView extends VBox {
      */
     private void updateMentorRecommendations(Mentee selectedMentee) {
         if (selectedMentee == null) {
-            return;
+            return; // Return if no mentee is selected
         }
+        // Get a list of recommended mentors based on the mentee's preferences and availability
         recommendedMentors = RecommendationEngine.recommendMentors(selectedMentee, mentorItems);
         mentorListView.getSelectionModel().clearSelection();
-        mentorListView.refresh();
+        mentorListView.refresh(); // Refresh the mentor list view
     }
 
     /**
-     * Creates the top container with navigation and header.
+     * Creates the top navigation bar with header and navigation links.
+     *
+     * @return A VBox containing the top navigation bar.
      */
     private VBox createTopContainer() {
         ImageView imageView = createImageView();
@@ -124,7 +131,11 @@ public class AdminPairingView extends VBox {
     }
 
     /**
-     * Creates a label with a specific style.
+     * Creates a styled label for navigation and titles.
+     *
+     * @param text       The text to display on the label.
+     * @param styleClass The CSS style class to apply to the label.
+     * @return A styled Label object.
      */
     private Label createLabel(String text, String styleClass) {
         Label label = new Label(text);
@@ -134,6 +145,8 @@ public class AdminPairingView extends VBox {
 
     /**
      * Creates an image view for the header.
+     *
+     * @return An ImageView object displaying the header image.
      */
     private ImageView createImageView() {
         URL imageUrl = getClass().getResource("/pairing_image.png");
@@ -256,32 +269,12 @@ public class AdminPairingView extends VBox {
      */
     private void setupMenteeColumns() {
         menteeListView.getColumns().clear();
-
-        /*menteeListView.getColumns().addAll(
-                createTableColumn("Mentee Name", 100, Mentee::getUsername),
-                createTableColumn("Request Type", 325, mentee -> {
-                    return mentee.getSupportRequest() != null
-                            ? mentee.getSupportRequest().getDisplayName()
-                            : "No Request";
-                }),
-                createTableColumn("Preferred Mentor Type", 180, mentee -> {
-                    MentorType preferredType = mentee.getPreferredMentorType();
-                    return preferredType != null ? preferredType.getDescription() : "Not Set";
-                }),
-                createTableColumn("Mentee Type", 130, mentee -> {
-                    MenteeType menteeType = mentee.getMenteeType();
-                    return menteeType != null ? menteeType.getDescription() : "Not Set";
-                }),
-                createCVSummaryColumn()
-        );*/
         TableColumn<Mentee, String> menteeNameColumn = createTableColumn("Mentee Name", 100, Mentee::getUsername);
         menteeListView.getColumns().add(menteeNameColumn);
 
-        TableColumn<Mentee, String> requestTypeColumn = createTableColumn("Request Type", 325, mentee -> {
-            return mentee.getSupportRequest() != null
-                    ? mentee.getSupportRequest().getDisplayName()
-                    : "No Request";
-        });
+        TableColumn<Mentee, String> requestTypeColumn = createTableColumn("Request Type", 325, mentee -> mentee.getSupportRequest() != null
+                ? mentee.getSupportRequest().getDisplayName()
+                : "No Request");
         menteeListView.getColumns().add(requestTypeColumn);
 
         TableColumn<Mentee, String> preferredMentorTypeColumn = createTableColumn("Preferred Mentor Type", 180, mentee -> {
@@ -311,21 +304,32 @@ public class AdminPairingView extends VBox {
     }
 
     /**
-     * Creates a table cell with a tooltip for displaying long text.
-     * @param <T> The type of items in the table.
-     * @return A customized TableCell with tooltip functionality.
+     * Creates a custom TableCell that displays a truncated summary of the content,
+     * with a tooltip that shows the full content when hovered over.
+     * The tooltip is configured to wrap text and have a maximum width for better readability.
+     *
+     * @param <T> The type of the items in the table.
+     * @return A customized TableCell with a tooltip for displaying long text.
      */
     private <T> TableCell<T, String> createTooltipTableCell() {
+        // Create a new TableCell instance with a tooltip for displaying long text.
         return new TableCell<>() {
-            private final Tooltip tooltip = new Tooltip();
+            private final Tooltip tooltip = new Tooltip();  // Create a new Tooltip to display full text
+
             @Override
             protected void updateItem(String fullText, boolean empty) {
-                super.updateItem(fullText, empty);
+                super.updateItem(fullText, empty);  // Update the item in the TableCell
+
+                // If the item is empty or contains null text, clear the text and tooltip
                 if (empty || fullText == null) {
                     setText(null);
                     setTooltip(null);
-                } else {String summary = fullText.length() > 30 ? fullText.substring(0, 30) + "..." : fullText;
+                } else {
+                    // If the full text is too long, show a truncated summary
+                    String summary = fullText.length() > 30 ? fullText.substring(0, 30) + "..." : fullText;
                     setText(summary);
+
+                    // Configure the tooltip with the full text
                     tooltip.setText(fullText);
                     tooltip.setWrapText(true);
                     tooltip.setMaxWidth(400);
@@ -362,12 +366,15 @@ public class AdminPairingView extends VBox {
      */
     private TableColumn<Mentor, String> createMentorStatusColumn() {
         TableColumn<Mentor, String> statusColumn = new TableColumn<>("Status");
+
+        // Set the cell value factory to extract the mentor's status and display it as a string
         statusColumn.setCellValueFactory(cellData -> {
             Mentor mentor = cellData.getValue();
             String status = determineMentorStatus(mentor);
             return new SimpleStringProperty(status);
         });
 
+        // Set the cell factory to provide custom rendering for the status cell
         statusColumn.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(String status, boolean empty) {
@@ -376,11 +383,10 @@ public class AdminPairingView extends VBox {
                     setGraphic(null);
                     return;
                 }
-                setGraphic(createStatusGraphic(status));
+                setGraphic(createStatusGraphic(status)); // Set a graphic representation
             }
         });
-
-        return statusColumn;
+        return statusColumn; // Return the status column for inclusion in the TableView
     }
 
     /**
@@ -414,25 +420,37 @@ public class AdminPairingView extends VBox {
      * Configures the row factory for the mentee table, adding styles based on selection state.
      */
     private void setupMenteeRowFactory() {
+        // Set a custom row factory for the mentee list view
         menteeListView.setRowFactory(tv -> new TableRow<>() {
             @Override
             protected void updateItem(Mentee item, boolean empty) {
-                super.updateItem(item, empty);
+                super.updateItem(item, empty); // Ensure the default behavior is executed
                 if (empty || item == null) {
+                    // If the row is empty or contains a null item, remove all custom styles
                     getStyleClass().removeAll("mentee-selected", "mentee-even-row", "mentee-odd-row");
                 } else {
+                    // Get the currently selected mentee from the selection model
                     Mentee selectedMentee = menteeListView.getSelectionModel().getSelectedItem();
                     getStyleClass().removeAll("mentee-selected", "mentee-even-row", "mentee-odd-row");
+                    // If the current row item is the selected mentee, highlight it as selected
                     if (item.equals(selectedMentee)) {
                         getStyleClass().add("mentee-selected");
                     } else {
+                        // Otherwise, apply alternating row styles (even/odd rows)
                         getStyleClass().add(getIndex() % 2 == 0 ? "mentee-even-row" : "mentee-odd-row");
                     }
                 }
             }
         });
-
-        menteeListView.setOnMouseClicked(event -> handleSelection(menteeListView, selected -> lastSelectedMentee = selected));
+        menteeListView.setOnMouseClicked(event -> {
+            Mentee selectedMentee = menteeListView.getSelectionModel().getSelectedItem();
+            if (selectedMentee != null && selectedMentee.equals(lastSelectedMentee)) {
+                menteeListView.getSelectionModel().clearSelection();  // Deselect if same item clicked again
+                lastSelectedMentee = null;
+            } else {
+                lastSelectedMentee = selectedMentee;
+            }
+        });
     }
 
     /**
@@ -457,8 +475,13 @@ public class AdminPairingView extends VBox {
             }
         });
         mentorListView.setOnMouseClicked(event -> {
-            mentorListView.refresh();
-            handleSelection(mentorListView, selected -> lastSelectedMentor = selected);
+            Mentor selectedMentor = mentorListView.getSelectionModel().getSelectedItem();
+            if (selectedMentor != null && selectedMentor.equals(lastSelectedMentor)) {
+                mentorListView.getSelectionModel().clearSelection();  // Deselect if same item clicked again
+                lastSelectedMentor = null;
+            } else {
+                lastSelectedMentor = selectedMentor;
+            }
         });
     }
 
@@ -516,11 +539,13 @@ public class AdminPairingView extends VBox {
         Mentee selectedMentee = menteeListView.getSelectionModel().getSelectedItem();
         Mentor selectedMentor = mentorListView.getSelectionModel().getSelectedItem();
 
+        // Check if both a mentee and mentor are selected
         if (selectedMentee == null || selectedMentor == null) {
             displaySnackbar(false, "Please select both a mentee and a mentor to proceed.");
             return;
         }
 
+        // Attempt to pair the mentee with the selected mentor
         boolean success = adminController.pairMenteeWithMentor(selectedMentee.getUsername(), selectedMentor.getUsername());
         displaySnackbar(success, success
                 ? "Successfully paired!"
@@ -578,6 +603,6 @@ public class AdminPairingView extends VBox {
             return "Unavailable";
         }
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        return start.format(formatter) + " - " + end.format(formatter);
+        return start.format(formatter) + " - " + end.format(formatter); // Return formatted availability times
     }
 }

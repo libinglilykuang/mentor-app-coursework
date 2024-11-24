@@ -11,20 +11,21 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
+import java.util.Objects;
+
 import uk.ac.nott.cs.comp2013.mentorapp.controller.LoginController;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.User;
-import java.util.Objects;
 import static uk.ac.nott.cs.comp2013.mentorapp.view.ViewManager.*;
 
 /**
  * View for handling user login.
  */
 public class LoginView extends VBox implements ManagedView {
-  private final LoginController controller; // Login controller
-  protected ObjectProperty<EventHandler<? super ViewChangeEvent>> onViewChange; // Handles view changes
-  private TextField txtUsername, txtPassword; // Input fields
-  private Button btnLogin; // Login button
-  private Label lblMessage; // Error message label
+  private final LoginController controller;
+  protected ObjectProperty<EventHandler<? super ViewChangeEvent>> onViewChange;
+  private TextField txtUsername, txtPassword;
+  private Button btnLogin;
+  private Label lblMessage;
 
   /**
    * Initializes the login view and sets up CSS styles.

@@ -18,7 +18,8 @@ import java.net.URL;
 import java.util.Objects;
 
 /**
- * ActivitySignUpView class provides a UI for mentees to sign up for activities.
+ * The ActivitySignUpView class provides a user interface for mentees to browse and sign up for activities.
+ * It features search and filter functionalities for easier activity selection and supports submitting activity requests.
  */
 public class ActivitySignUpView extends VBox {
     private final MenteeController menteeController;
@@ -54,7 +55,9 @@ public class ActivitySignUpView extends VBox {
     }
 
     /**
-     * Creates the top navigation container.
+     * Creates the top navigation container for navigation buttons and user profile.
+     *
+     * @return A styled HBox containing navigation buttons and profile details.
      */
     private HBox createTopContainer() {
         ImageView imageView = createHeaderImage();
@@ -83,7 +86,9 @@ public class ActivitySignUpView extends VBox {
     }
 
     /**
-     * Creates the header image.
+     * Creates the header image for the top section of the view.
+     *
+     * @return A styled ImageView displaying the header logo.
      */
     private ImageView createHeaderImage() {
         URL imageUrl = getClass().getResource("/pairing_image.png");
@@ -98,7 +103,9 @@ public class ActivitySignUpView extends VBox {
     }
 
     /**
-     * Creates the header section with title, filters, and search field.
+     * Creates the header box containing the title, search field, and filters for activities.
+     *
+     * @return A VBox with the header content.
      */
     private VBox createHeaderBox() {
         Label titleLabel = createStyledLabel("Sign up for Activities", "header-title");
@@ -192,7 +199,9 @@ public class ActivitySignUpView extends VBox {
     }
 
     /**
-     * Creates the submit button.
+     * Creates the submit button for signing up for an activity.
+     *
+     * @return A Button styled for submission.
      */
     private Button createSubmitButton() {
         Button submitButton = new Button("Submit");
@@ -211,6 +220,9 @@ public class ActivitySignUpView extends VBox {
 
     /**
      * Displays a snackbar message for feedback.
+     *
+     * @param message The message to display.
+     * @param success True if the operation was successful, false otherwise.
      */
     private void showSnackbar(String message, boolean success) {
         Label messageLabel = new Label(message);

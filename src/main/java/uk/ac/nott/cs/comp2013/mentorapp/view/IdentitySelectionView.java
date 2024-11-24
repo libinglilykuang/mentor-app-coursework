@@ -14,16 +14,31 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import java.util.Objects;
+
 import uk.ac.nott.cs.comp2013.mentorapp.controller.MenteeController;
 import uk.ac.nott.cs.comp2013.mentorapp.model.HashMapRepository;
 import uk.ac.nott.cs.comp2013.mentorapp.model.Repository;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentee;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.User;
-import java.util.Objects;
 
+/**
+ * The IdentitySelectionView class provides the user interface for selecting
+ * an identity (Student, Mentor, or Admin) when logging in.
+ *
+ * This view includes:
+ * - A top bar with the university logo and title.
+ * - Center buttons for identity selection.
+ * - Bottom hyperlinks for new user creation or support.
+ */
 public class IdentitySelectionView extends VBox {
     private final IdentitySelectionHandler selectionHandler;
 
+    /**
+     * Constructs the IdentitySelectionView with a given handler.
+     *
+     * @param selectionHandler The handler for identity selection actions.
+     */
     public IdentitySelectionView(IdentitySelectionHandler selectionHandler) {
         this.selectionHandler = selectionHandler;
         buildView();
@@ -35,6 +50,9 @@ public class IdentitySelectionView extends VBox {
         });
     }
 
+    /**
+     * Builds the main layout of the view.
+     */
     private void buildView() {
         HBox topContainer = createTopContainer();
         VBox centerContainer = createCenterContainer();

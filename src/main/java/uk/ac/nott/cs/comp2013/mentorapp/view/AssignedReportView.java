@@ -10,11 +10,10 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import uk.ac.nott.cs.comp2013.mentorapp.controller.AdminController;
-
 import java.net.URL;
 import java.util.Objects;
 import java.util.function.Function;
+import uk.ac.nott.cs.comp2013.mentorapp.controller.AdminController;
 
 /**
  * View for displaying assigned mentor-mentee pairs and their details.

@@ -10,7 +10,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import uk.ac.nott.cs.comp2013.mentorapp.controller.AdminController;
-
 import java.util.Objects;
 
 /**

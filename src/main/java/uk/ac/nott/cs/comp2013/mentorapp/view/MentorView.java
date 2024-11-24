@@ -10,10 +10,10 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import uk.ac.nott.cs.comp2013.mentorapp.controller.MentorController;
-
 import java.util.Locale;
 import java.util.Objects;
+
+import uk.ac.nott.cs.comp2013.mentorapp.controller.MentorController;
 
 /**
  * MentorView represents the main interface for a mentor, providing navigation options to set availability,
@@ -29,9 +29,9 @@ public class MentorView extends VBox {
      */
     public MentorView(MentorController controller) {
         this.controller = controller;
-        Locale.setDefault(Locale.ENGLISH); // Ensure locale is consistent across views
-        buildView(); // Build the UI
-        addCSSListener(); // Add CSS listener for dynamic styling
+        Locale.setDefault(Locale.ENGLISH);
+        buildView();
+        addCSSListener();
     }
 
     /**
@@ -44,11 +44,9 @@ public class MentorView extends VBox {
         Button btnSetAvailability = createNavigationButton("Set Availability", e -> navigateTo(new MentorAvailabilityView(controller.getMentor()), 400, 300));
         Button btnAssignedSessions = createNavigationButton("View Assigned Sessions", e -> navigateTo(new AssignedMenteeView(controller.getMentor()), 800, 600));
         Button btnEditProfile = createNavigationButton("Edit Profile", e -> navigateToEditProfile());
-
-        // Add components to content box
         contentBox.getChildren().addAll(logoImageView, welcomeLabel, btnSetAvailability, btnAssignedSessions, btnEditProfile);
         getChildren().clear();
-        setAlignment(Pos.CENTER); // Center-align the view
+        setAlignment(Pos.CENTER);
         getChildren().add(contentBox);
     }
 
@@ -70,7 +68,7 @@ public class MentorView extends VBox {
      */
     private VBox createContentBox() {
         VBox contentBox = new VBox();
-        contentBox.getStyleClass().add("content-box"); // Apply CSS styling
+        contentBox.getStyleClass().add("content-box");
         return contentBox;
     }
 
@@ -90,7 +88,7 @@ public class MentorView extends VBox {
      */
     private Label createWelcomeLabel(String username) {
         Label welcomeLabel = new Label("Welcome, " + username + "!");
-        welcomeLabel.getStyleClass().add("welcome-label"); // Apply CSS styling
+        welcomeLabel.getStyleClass().add("welcome-label");
         return welcomeLabel;
     }
 
@@ -102,7 +100,7 @@ public class MentorView extends VBox {
      */
     private Button createNavigationButton(String text, javafx.event.EventHandler<ActionEvent> action) {
         Button button = new Button(text);
-        button.getStyleClass().add("navigation-button"); // Apply CSS styling
+        button.getStyleClass().add("navigation-button");
         button.setOnAction(action);
         return button;
     }

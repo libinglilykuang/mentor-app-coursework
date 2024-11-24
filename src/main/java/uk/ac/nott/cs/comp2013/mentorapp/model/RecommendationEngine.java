@@ -1,4 +1,4 @@
-package uk.ac.nott.cs.comp2013.mentorapp.model.logic;
+package uk.ac.nott.cs.comp2013.mentorapp.model;
 
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentee;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.MenteeType;

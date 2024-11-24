@@ -18,7 +18,7 @@ import java.util.Objects;
  * Provides options for signing up for activities, viewing assigned mentors, and editing profiles.
  */
 public class MenteeView extends VBox {
-    private final MenteeController controller; // Controller for managing mentee data and actions
+    private final MenteeController controller;
 
     public MenteeView(MenteeController controller) {
         this.controller = controller;

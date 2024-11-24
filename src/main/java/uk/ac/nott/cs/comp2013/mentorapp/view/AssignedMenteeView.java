@@ -14,7 +14,6 @@ import javafx.stage.Stage;
 import uk.ac.nott.cs.comp2013.mentorapp.controller.MentorController;
 import uk.ac.nott.cs.comp2013.mentorapp.model.session.SupportSession;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentor;
-
 import java.net.URL;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -24,8 +23,8 @@ import java.util.Objects;
  * View to display the sessions assigned to a mentor.
  */
 public class AssignedMenteeView extends VBox {
-    private final Mentor mentor; // The mentor associated with this view
-    private final ListView<String> sessionListView = new ListView<>(); // List view to display sessions
+    private final Mentor mentor;
+    private final ListView<String> sessionListView = new ListView<>();
 
     public AssignedMenteeView(Mentor mentor) {
         this.mentor = mentor;

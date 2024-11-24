@@ -8,20 +8,33 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.event.ActionEvent;
+import java.util.Objects;
+
 import uk.ac.nott.cs.comp2013.mentorapp.controller.MenteeController;
 import uk.ac.nott.cs.comp2013.mentorapp.controller.MentorController;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentee;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentor;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.MentorType;
-import javafx.event.ActionEvent;
-import java.util.Objects;
 
+/**
+ * The EditProfileView class provides a user interface for editing user profiles.
+ * It supports both mentees and mentors and allows updating username, password, and real name.
+ * For mentees, it also includes the option to set a preferred mentor grade.
+ */
 public class EditProfileView extends VBox {
     private final MenteeController menteeController;
     private final MentorController mentorController;
     private final Scene previousScene;
     private final boolean isNewUser;
 
+    /**
+     * Constructs an EditProfileView for a mentee.
+     *
+     * @param menteeController The controller for managing mentee-related data.
+     * @param previousScene    The previous scene to return to after editing.
+     * @param isNewUser        Indicates if the user is newly created.
+     */
     public EditProfileView(MenteeController menteeController, Scene previousScene, boolean isNewUser) {
         this.menteeController = menteeController;
         this.mentorController = null;
@@ -30,6 +43,13 @@ public class EditProfileView extends VBox {
         buildView();
     }
 
+    /**
+     * Constructs an EditProfileView for a mentor.
+     *
+     * @param mentorController The controller for managing mentor-related data.
+     * @param previousScene    The previous scene to return to after editing.
+     * @param isNewUser        Indicates if the user is newly created.
+     */
     public EditProfileView(MentorController mentorController, Scene previousScene, boolean isNewUser) {
         this.menteeController = null;
         this.mentorController = mentorController;
@@ -38,6 +58,9 @@ public class EditProfileView extends VBox {
         buildView();
     }
 
+    /**
+     * Builds the view layout for the profile editing interface.
+     */
     private void buildView() {
         setupContainerStyle();
         Label lblTitle = createStyledLabel("Profile");
@@ -261,10 +284,7 @@ public class EditProfileView extends VBox {
         if (password.length() < 6) {
             return false;
         }
-        if (password.contains(",") || password.contains("\n") || password.contains("\r\n") || password.contains(" ")) {
-            return false;
-        }
-        return true;
+        return !password.contains(",") && !password.contains("\n") && !password.contains("\r\n") && !password.contains(" ");
     }
 }
 

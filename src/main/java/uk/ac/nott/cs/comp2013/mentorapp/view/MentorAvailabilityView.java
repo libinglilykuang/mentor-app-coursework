@@ -10,14 +10,19 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import uk.ac.nott.cs.comp2013.mentorapp.controller.MentorController;
-import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentor;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Objects;
 
+import uk.ac.nott.cs.comp2013.mentorapp.controller.MentorController;
+import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentor;
+
+/**
+ * The MentorAvailabilityView class provides a user interface for mentors
+ * to set their available time slots for mentoring sessions.
+ */
 public class MentorAvailabilityView extends VBox {
     private final Mentor mentor;
     private final DatePicker startDatePicker = new DatePicker();
@@ -26,12 +31,20 @@ public class MentorAvailabilityView extends VBox {
     private final ComboBox<String> endTimePicker = new ComboBox<>();
     private final Label availabilityLabel = new Label("You have not set any available time yet.");
 
+    /**
+     * Constructs the MentorAvailabilityView for the given mentor.
+     *
+     * @param mentor The mentor whose availability is being managed.
+     */
     public MentorAvailabilityView(Mentor mentor) {
         this.mentor = mentor;
         buildView();
         addCSSListener();
     }
 
+    /**
+     * Builds the layout of the view.
+     */
     private void buildView() {
         HBox topContainer = createTopContainer();
         VBox headerBox = createHeaderBox();
@@ -190,6 +203,9 @@ public class MentorAvailabilityView extends VBox {
         return gridPane;
     }
 
+    /**
+     * Creates the button container for saving availability.
+     */
     private HBox createButtonBox() {
         Button saveButton = new Button("Save Availability");
         saveButton.getStyleClass().add("save-button");
@@ -215,31 +231,37 @@ public class MentorAvailabilityView extends VBox {
         return availabilityBox;
     }
 
+    /**
+     * Handles saving the availability settings.
+     * Validates the inputs and displays feedback to the user.
+     */
     private void saveAvailability() {
         LocalDate startDate = startDatePicker.getValue();
         LocalDate endDate = endDatePicker.getValue();
         String startTime = startTimePicker.getValue();
         String endTime = endTimePicker.getValue();
-
         if (startDate == null || endDate == null || startTime == null || endTime == null) {
             showSnackbar("Please fill in all fields.", false);
             return;
         }
-
         LocalDateTime startDateTime = LocalDateTime.of(startDate, LocalTime.parse(startTime));
         LocalDateTime endDateTime = LocalDateTime.of(endDate, LocalTime.parse(endTime));
-
         if (endDateTime.isBefore(startDateTime)) {
             showSnackbar("End time cannot be earlier than start time.", false);
             return;
         }
-
         String formattedStart = startDateTime.format(java.time.format.DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm"));
         String formattedEnd = endDateTime.format(java.time.format.DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm"));
         availabilityLabel.setText("From: " + formattedStart + "\n" + "To: " + formattedEnd);
         showSnackbar("Availability set successfully.", true);
     }
 
+    /**
+     * Displays a snackbar notification with feedback.
+     *
+     * @param message The message to display.
+     * @param success Whether the operation was successful.
+     */
     private void showSnackbar(String message, boolean success) {
         Label snackbar = new Label(message);
         snackbar.getStyleClass().add(success ? "snackbar-success" : "snackbar-error");

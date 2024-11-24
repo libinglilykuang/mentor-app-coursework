@@ -13,16 +13,15 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import uk.ac.nott.cs.comp2013.mentorapp.controller.MenteeController;
-
 import java.net.URL;
 import java.util.Objects;
+import uk.ac.nott.cs.comp2013.mentorapp.controller.MenteeController;
 
 /**
  * View for displaying a mentee's assigned mentors and their activities.
  */
 public class AssignedMentorView extends VBox {
-    private final MenteeController menteeController; // Controller for mentee-related actions
+    private final MenteeController menteeController;
 
     /**
      * Constructor to initialize the Assigned Mentor View.

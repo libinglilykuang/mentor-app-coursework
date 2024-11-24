@@ -106,13 +106,13 @@ public class AdminController {
     /**
      * Retrieves a list of all available mentors.
      *
-     * @return A list of available mentors.
+     * @return A list of all mentors.
      */
     public List<Mentor> getAvailableMentors() {
         return userRepository.selectAll().stream()
                 .filter(user -> user instanceof Mentor)
                 .map(user -> (Mentor) user)
-                .filter(Mentor::isAvailable)
+                .filter(mentor -> mentor.getStartAvailability() != null && mentor.getEndAvailability() != null)
                 .collect(Collectors.toList());
     }
 
