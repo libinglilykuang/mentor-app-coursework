@@ -1,4 +1,7 @@
 username,password,role,cvText,startAvailability,endAvailability,activityType,mentorType,menteeType
+mentee1,1,MENTEE,Fusce consequat. Nulla nisl. Nunc nisl.,,,Career Choice - No idea what to do,,Second Year Student
+mentor1,1,MENTOR,,2024-11-13T19:12:03Z,2025-04-18T00:36:08Z,,Alumni from the department,
+admin1,1,ADMIN,,,,,,
 fheskin5,lR7_o2!C,MENTOR,,2024-12-29T21:39:58Z,2025-10-19T14:09:36Z,,Alumni from the department,
 pmountforda,uV3>nOUy=,MENTOR,,2024-06-24T10:47:22Z,2025-06-28T17:44:37Z,,Alumni from the department,
 jbasindaleb,lI5\I}/'q_R/A,MENTOR,,2024-07-25T03:05:22Z,2024-11-14T12:48:35Z,,Alumni from the department,
@@ -30,7 +33,7 @@ mlesek2c,vW2$`ksO5{m,MENTOR,,2024-02-08T20:26:28Z,2025-04-09T23:06:08Z,,Alumni f
 rmenco2e,lD9$mxYy=DxP,MENTOR,,2024-11-19T18:37:05Z,2024-12-26T13:41:10Z,,Alumni from the department,
 tjanicek2j,zX0<irmTSw~M~(+N,MENTOR,,2024-09-24T20:35:48Z,2025-08-10T07:24:56Z,,Alumni from the department,
 hphillippo2k,"wM0=,s$>",MENTOR,,2024-05-21T22:30:57Z,2025-01-08T06:14:05Z,,Alumni from the department,
-mhazeltine2l,kY5<X>F&{?q2v,MENTOR,,2024-07-15T07:14:41Z,2025-08-16T02:15:50Z,,Alumni from the department,
+mhazeltine2l,c,MENTOR,,2024-07-15T07:14:41Z,2025-08-16T02:15:50Z,,Alumni from the department,
 cdjurkovic2n,bA6=D{o#m,MENTOR,,2024-03-22T03:00:12Z,2025-03-08T10:05:57Z,,Alumni from the department,
 aabels2p,eS6&Apt#,MENTOR,,2024-11-18T04:58:02Z,2024-11-29T23:15:30Z,,Tech Industry Professional,
 ocoady2t,gC7=v>ASNUR,MENTOR,,2024-03-01T03:17:08Z,2025-09-22T17:13:31Z,,Tech Industry Professional,
@@ -340,7 +343,6 @@ ccastellonern,hP9#Ml~{/(8L(D,MENTOR,,2024-09-06T01:03:18Z,2025-01-29T07:26:47Z,,
 gmcgourtyro,iO1!3fF(XJBN,MENTOR,,2024-03-31T04:12:37Z,2025-02-15T04:05:08Z,,Alumni from the department,
 mpietsmarp,nZ6|w`p\(,MENTOR,,2024-11-06T14:20:24Z,2025-04-03T05:01:59Z,,Alumni from the department,
 hgalerrr,eZ1.1p4_?3+i<,MENTOR,,2024-06-13T02:35:32Z,2025-02-07T11:48:08Z,,Alumni from the department,
-mentor1,1,MENTOR,,2024-11-13T19:12:03Z,2025-04-18T00:36:08Z,,Alumni from the department,
 labarough0,gC9!dK+z!Fq$,MENTEE,"Vivamus metus arcu, adipiscing molestie, hendrerit at, vulputate vitae, nisl. Aenean lectus. Pellentesque eget nunc.",,,CV Review,Tech Industry Professional,First Year Student
 lvanvuuren1,lH9!Z/<<&,MENTEE,Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nulla dapibus dolor vel est.,,,CV Review,Tech Industry Professional,First Year Student
 msalters2,cO4<hv{&s5),MENTEE,Donec quis orci eget orci vehicula condimentum. Curabitur in libero ut massa volutpat convallis.,,,CV Review,Tech Industry Professional,First Year Student
@@ -568,7 +570,7 @@ igummery9p,mX2?(j}Fb,MENTEE,"Proin risus. Praesent lectus. Vestibulum quam sapie
 bshearer9r,pR0``_216lX,MENTEE,Nunc purus. Phasellus in felis. Donec semper sapien a libero.,,,Career Choice - No idea what to do,,Second Year Student
 ireadwin9s,"yK2{&'""Fv`lc}M",MENTEE,Nulla tellus.,,,,,Second Year Student
 lcroasdale9t,hL5&?`9(,MENTEE,"Cras pellentesque volutpat dui. Maecenas tristique, est et tempus semper, est quam pharetra magna, ac consequat metus sapien ut nunc.",,,,,Second Year Student
-pcush9u,cV5}3gJV*D,MENTEE,Fusce consequat. Nulla nisl. Nunc nisl.,,,Career Choice - No idea what to do,,Second Year Student
+pcush9u,c,MENTEE,Fusce consequat. Nulla nisl. Nunc nisl.,,,Career Choice - No idea what to do,,Second Year Student
 kholmyard9v,nS8+>+~SJy`1/Ueg,MENTEE,Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Duis faucibus accumsan odio. Curabitur convallis. Duis consequat dui nec nisi volutpat eleifend. Donec ut dolor.,,,,,Second Year Student
 sforrester9x,gM7'<%j2w,MENTEE,Aenean auctor gravida sem. Praesent id massa id nisl venenatis lacinia. Aenean sit amet justo.,,,,,Second Year Student
 fjonin9y,"mP4`3""#a5HH/U",MENTEE,Maecenas tincidunt lacus at velit. Vivamus vel nulla eget eros elementum pellentesque. Quisque porta volutpat erat.,,,,,Second Year Student
@@ -978,7 +980,6 @@ eguildrj,aH2`xdU7VcO5,MENTEE,Sed ante. Vivamus tortor. Duis mattis egestas metus
 rswarbriggrk,yG6)S2w7_NI!4g6,MENTEE,"In hac habitasse platea dictumst. Morbi vestibulum, velit id pretium iaculis, diam erat fermentum justo, nec condimentum neque sapien placerat ante. Nulla justo. Aliquam quis turpis eget elit sodales scelerisque. Mauris sit amet eros.",,,Cover Letter,Tech Industry Professional,First Year Student
 tfoggorl,rF2|SLRs,MENTEE,Etiam justo. Etiam pretium iaculis justo.,,,Cover Letter,Tech Industry Professional,First Year Student
 wlardnerrq,"zN2(k""|W&~\M52Z",MENTEE,Maecenas pulvinar lobortis est.,,,Cover Letter,Tech Industry Professional,First Year Student
-mentee1,1,MENTEE,,,,,,
 sdenyakin1f,iW1*iQ)_q,ADMIN,,,,,,
 amurton29,"oQ4=h,&Z`TDAP&{V",ADMIN,,,,,,
 maizikovitch30,vI3@G>I`7,ADMIN,,,,,,
@@ -1001,4 +1002,3 @@ mblakedenmf,"gG1?u""?9U$u",ADMIN,,,,,,
 ahammerbergern8,"oT5/YCHJ/u,g",ADMIN,,,,,,
 fmorfordpp,"yE9'5qy!nWl`"")1",ADMIN,,,,,,
 ograalmansr9,xV8%*=Zngs$,ADMIN,,,,,,
-admin1,1,ADMIN,,,,,,
