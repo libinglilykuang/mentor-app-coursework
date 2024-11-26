@@ -13,7 +13,6 @@ public class ViewChangeEvent extends Event {
   public static final EventType<ViewChangeEvent> VIEW_CHANGE = new EventType<>(Event.ANY, "VIEW_CHANGE");
 
   public ViewChangeEvent(String view) {
-    //super(new EventType<>("ViewChange"));
     super(VIEW_CHANGE);
     this.view = view;
   }

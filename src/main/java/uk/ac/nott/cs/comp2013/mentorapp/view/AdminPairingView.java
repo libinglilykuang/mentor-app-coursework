@@ -486,24 +486,6 @@ public class AdminPairingView extends VBox {
     }
 
     /**
-     * Handles selection of an item in a table view.
-     *
-     * @param tableView The table view.
-     * @param selectionConsumer The action to perform on the selected item.
-     * @param <T> The type of items in the table.
-     */
-    private <T> void handleSelection(TableView<T> tableView, java.util.function.Consumer<T> selectionConsumer) {
-        T selected = tableView.getSelectionModel().getSelectedItem();
-        if (selected != null && selected.equals(selectionConsumer)) {
-            tableView.getSelectionModel().clearSelection();
-            selectionConsumer.accept(null);
-        } else {
-            selectionConsumer.accept(selected);
-        }
-        tableView.refresh();
-    }
-
-    /**
      * Creates a table column with a specified title and data extractor function.
      *
      * @param title         The title of the column.

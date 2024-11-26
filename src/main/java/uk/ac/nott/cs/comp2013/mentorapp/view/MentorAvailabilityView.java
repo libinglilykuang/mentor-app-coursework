@@ -26,9 +26,10 @@ import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentor;
 public class MentorAvailabilityView extends VBox {
     private final Mentor mentor;
     private final DatePicker startDatePicker = new DatePicker();
+    private final ComboBox<String> endTimePicker = new ComboBox<>();
     private final ComboBox<String> startTimePicker = new ComboBox<>();
     private final DatePicker endDatePicker = new DatePicker();
-    private final ComboBox<String> endTimePicker = new ComboBox<>();
+
     private final Label availabilityLabel = new Label("You have not set any available time yet.");
 
     /**
