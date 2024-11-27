@@ -21,12 +21,10 @@ import javafx.scene.layout.Pane;
 public class ViewManager {
 
   public static final String LOGIN = "login_view";
-  public static final String DUMMY = "dummy_view";
   public static final String MENTEE = "mentee_view";
   public static final String MENTOR = "mentor_view";
   public static final String ADMIN = "admin_view";
   public static final String IDENTITY_SELECTION = "identity_selection";
-
   private final Stage stage;
   private final Map<String, Parent> scenes = new HashMap<>();
 
@@ -37,13 +35,10 @@ public class ViewManager {
    */
   public ViewManager(Stage stage) {
     this.stage = stage;
-
-    // Initialize repositories
     Repository<User, String> menteeRepository = new HashMapRepository<>();
     Repository<User, String> mentorRepository = new HashMapRepository<>();
     Repository<User, String> userRepository = new HashMapRepository<>();
     LoginController loginController = new LoginController(userRepository);
-
     addView(IDENTITY_SELECTION, new IdentitySelectionView(this::handleIdentitySelection));
     addView(LOGIN, new LoginView(loginController));
     addView(MENTEE, new MenteeView(new MenteeController(menteeRepository, null)));
@@ -75,7 +70,6 @@ public class ViewManager {
       System.out.println("View not found for key: " + key);
       return;
     }
-
     Parent view = scenes.get(key);
     if (view.getScene() != null) {
       view.getScene().setRoot(new Pane());

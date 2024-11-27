@@ -26,22 +26,16 @@ public class RepositoryFactory {
      */
     public static HashMapRepository<User, String> createRepositoryFromCsv(String csvFilePath) throws IOException {
         HashMapRepository<User, String> repo = new HashMapRepository<>();
-
         try (CSVReader reader = new CSVReader(new FileReader(csvFilePath))) {
             List<String[]> records = reader.readAll();
-            // Skip the header row
-            records.remove(0);
-
+            records.removeFirst(); // Skip the header row
             for (String[] record : records) {
                 User user = parseUser(record);
                 if (user != null) {
                     repo.insert(user);
                 }
             }
-        } catch (CsvException e) {
-            throw new IOException("Failed to parse CSV file.", e);
-        }
-
+        } catch (CsvException e) {throw new IOException("Failed to parse CSV file.", e);}
         return repo;
     }
 

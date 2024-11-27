@@ -20,8 +20,8 @@ import java.util.stream.Collectors;
  * retrieving user information, and managing support sessions.
  */
 public class AdminController {
-    private Repository<User, String> userRepository;
-    private List<SupportSession> sessions = new ArrayList<>();
+    private final Repository<User, String> userRepository;
+    private final List<SupportSession> sessions = new ArrayList<>();
     private Administrator currentAdmin;
 
     /**
