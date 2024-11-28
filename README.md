@@ -44,23 +44,26 @@ The Mentor-Mentee Management System is designed to streamline the pairing and ma
 
 ## Architecture and Design
 
-The project is built using the MVC model with the following key components:
-- **View Layer**:
-   - Handles the user interface and interaction logic, implemented using JavaFX.
-- **Controller Layer**:
-   - Manages application logic and mediates between the view and model layers.
-- **Model Layer**:
-   - Represents the data and business logic of the system, including mentor and mentee entities.
+The project is built using the **MVC (Model-View-Controller) Architecture** with the following key components:
 
-### Technology Stack
-- **Frontend**: JavaFX for dynamic UI development.
-- **Backend**: Java-based logic with mock database integration.
-- **Styling**: CSS for consistent and responsive design.
+- **View Layer**:
+  - Handles the user interface (UI) and user interaction logic. It is responsible for rendering the interface and responding to user actions (e.g., button clicks, form submissions).
+  - Implemented using **JavaFX**, which provides dynamic and responsive UI elements. The View layer listens for events from the user and sends them to the Controller for processing.
+
+- **Controller Layer**:
+  - Manages the application logic and mediates between the View and Model layers. The Controller listens for user input (via the View) and updates the Model accordingly. It then updates the View with the latest data or state changes.
+  - For example, the **AdminController** handles pairing logic, while the **MenteeController** manages activity sign-ups.
+
+- **Model Layer**:
+  - Represents the core data and business logic of the system. It handles data management, such as storing and retrieving information about mentors, mentees, and their interactions.
+  - The Model includes entities like **Mentor** and **Mentee**, along with any business rules or validation logic (e.g., mentor availability, mentee preferences).
+  - The **Recommendation Engine** is a key component of the Model layer. It uses a **rule-based recommendation algorithm** to match mentees with mentors based on specific criteria such as mentor availability, mentee preferences, and mentor expertise.
+  - The Model is also responsible for communicating with the mock database or any storage solutions, ensuring that data is kept consistent and updated across the system.
 
 ---
 
 ## Usage
 
 ### Prerequisites
-- Java 17 or higher.
-- An IDE such as IntelliJ IDEA or Eclipse.
+- **Java**: Version 21 or higher.
+- **IDE**: IntelliJ IDEA or another Java-compatible IDE.
