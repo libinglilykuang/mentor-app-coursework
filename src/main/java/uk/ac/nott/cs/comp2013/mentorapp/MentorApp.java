@@ -45,6 +45,8 @@ public class MentorApp extends Application {
             stage.setMaximized(true);
             stage.setTitle("Mentor App");
             stage.show();
+            stage.setAlwaysOnTop(true);
+            stage.setAlwaysOnTop(false);
         } catch (Exception e) {
             System.err.println("Error during application start:");
             e.printStackTrace();

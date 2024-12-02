@@ -4,6 +4,7 @@ import javafx.animation.PauseTransition;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -17,6 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import uk.ac.nott.cs.comp2013.mentorapp.controller.AdminController;
 import uk.ac.nott.cs.comp2013.mentorapp.model.RecommendationEngine;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.MenteeType;
@@ -203,7 +206,8 @@ public class AdminPairingView extends VBox {
      * Configures the mentee list view.
      */
     private void configureMenteeListView() {
-        configureListView(menteeListView, "mentee-list-view", 400, 450);
+        configureListView(menteeListView, "mentee-list-view", 250, 250);
+        menteeListView.setColumnResizePolicy((param) -> true);
     }
 
     /**
@@ -221,6 +225,7 @@ public class AdminPairingView extends VBox {
         tableView.setMinWidth(minWidth);
         tableView.setPrefWidth(prefWidth);
         tableView.setMaxWidth(Double.MAX_VALUE);
+
     }
 
     private void switchToPairingView(Label adminHomeLabel, Label pairingLabel, Label viewReportLabel) {
@@ -269,75 +274,125 @@ public class AdminPairingView extends VBox {
      */
     private void setupMenteeColumns() {
         menteeListView.getColumns().clear();
-        TableColumn<Mentee, String> menteeNameColumn = createTableColumn("Mentee Name", 100, Mentee::getUsername);
+        TableColumn<Mentee, String> menteeNameColumn = createTableColumn("Mentee Name", 130, Mentee::getUsername);
         menteeListView.getColumns().add(menteeNameColumn);
 
-        TableColumn<Mentee, String> requestTypeColumn = createTableColumn("Request Type", 325, mentee -> mentee.getSupportRequest() != null
+        // Modified column for Mentee Type with custom conversion logic
+        TableColumn<Mentee, String> menteeTypeColumn = createTableColumn("Mentee Level", 100, mentee -> {
+            MenteeType menteeType = mentee.getMenteeType();
+            if (menteeType != null) {
+                return switch (menteeType) {
+                    case FIRST_YEAR_STUDENT -> "Y1";
+                    case SECOND_YEAR_STUDENT -> "Y2";
+                    case THIRD_YEAR_STUDENT -> "Y3";
+                };
+            }
+            return "Not Set";
+        });
+        menteeListView.getColumns().add(menteeTypeColumn);
+
+        TableColumn<Mentee, String> requestTypeColumn = createTableColumn("Request Type", 260, mentee -> mentee.getSupportRequest() != null
                 ? mentee.getSupportRequest().getDisplayName()
                 : "No Request");
         menteeListView.getColumns().add(requestTypeColumn);
 
-        TableColumn<Mentee, String> preferredMentorTypeColumn = createTableColumn("Preferred Mentor Type", 180, mentee -> {
+        TableColumn<Mentee, String> preferredMentorTypeColumn = createTableColumn("Preferred Type", 120, mentee -> {
             MentorType preferredType = mentee.getPreferredMentorType();
-            return preferredType != null ? preferredType.getDescription() : "Not Set";
+            if (preferredType == null) {
+                return "Not Set";
+            }
+            // Map MentorType to the desired display value
+            return switch (preferredType) {
+                case ALUMNI -> "Alumni";
+                case TECH_PROFESSIONAL -> "Professional";
+                case SECOND_YEAR_STUDENT -> "Y2 Student";
+                case THIRD_YEAR_STUDENT -> "Y3 Student";
+            };
         });
         menteeListView.getColumns().add(preferredMentorTypeColumn);
 
-        TableColumn<Mentee, String> menteeTypeColumn = createTableColumn("Mentee Type", 130, mentee -> {
-            MenteeType menteeType = mentee.getMenteeType();
-            return menteeType != null ? menteeType.getDescription() : "Not Set";
-        });
-        menteeListView.getColumns().add(menteeTypeColumn);
+        TableColumn<Mentee, String> cvModalColumn = createCVModalColumn();
+        cvModalColumn.getStyleClass().add("cv-column");
+        menteeListView.getColumns().add(cvModalColumn);
 
-        TableColumn<Mentee, String> cvSummaryColumn = createCVSummaryColumn();
-        menteeListView.getColumns().add(cvSummaryColumn);
     }
 
-    /**
-     * Creates a table column for displaying the mentee's CV summary with tooltips for full content.
-     */
-    private TableColumn<Mentee, String> createCVSummaryColumn() {
-        TableColumn<Mentee, String> cvTextColumn = new TableColumn<>("CV Summary");
-        cvTextColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getCvText()));
-        cvTextColumn.setCellFactory(column -> createTooltipTableCell());
-        return cvTextColumn;
-    }
+    private TableColumn<Mentee, String> createCVModalColumn() {
+        TableColumn<Mentee, String> cvColumn = new TableColumn<>("CV");
 
-    /**
-     * Creates a custom TableCell that displays a truncated summary of the content,
-     * with a tooltip that shows the full content when hovered over.
-     * The tooltip is configured to wrap text and have a maximum width for better readability.
-     *
-     * @param <T> The type of the items in the table.
-     * @return A customized TableCell with a tooltip for displaying long text.
-     */
-    private <T> TableCell<T, String> createTooltipTableCell() {
-        // Create a new TableCell instance with a tooltip for displaying long text.
-        return new TableCell<>() {
-            private final Tooltip tooltip = new Tooltip();  // Create a new Tooltip to display full text
+        cvColumn.setCellFactory(column -> new TableCell<>() {
+            private final Label cvLabel = new Label("CV");
+
+            {
+                cvLabel.getStyleClass().add("cv-label");
+                cvLabel.setOnMouseClicked(event -> showCVModal(getTableView().getItems().get(getIndex())));
+            }
 
             @Override
-            protected void updateItem(String fullText, boolean empty) {
-                super.updateItem(fullText, empty);  // Update the item in the TableCell
-
-                // If the item is empty or contains null text, clear the text and tooltip
-                if (empty || fullText == null) {
-                    setText(null);
-                    setTooltip(null);
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
                 } else {
-                    // If the full text is too long, show a truncated summary
-                    String summary = fullText.length() > 30 ? fullText.substring(0, 30) + "..." : fullText;
-                    setText(summary);
-
-                    // Configure the tooltip with the full text
-                    tooltip.setText(fullText);
-                    tooltip.setWrapText(true);
-                    tooltip.setMaxWidth(400);
-                    tooltip.getStyleClass().add("custom-tooltip");
-                    setTooltip(tooltip);
+                    setGraphic(cvLabel);
                 }
             }
-        };
+        });
+
+        return cvColumn;
+    }
+
+    /**
+     * Displays a modal dialog to show the full CV content of the selected mentee.
+     *
+     * @param mentee The selected Mentee object whose CV content will be displayed.
+     */
+    private void showCVModal(Mentee mentee) {
+        Stage modalStage = new Stage();
+        modalStage.initModality(Modality.APPLICATION_MODAL);
+
+        VBox modalContent = new VBox(15);
+        modalContent.setAlignment(Pos.CENTER);
+        modalContent.setPadding(new Insets(20));
+
+        /*Label cvLabel = new Label("CV Content:");
+        cvLabel.getStyleClass().add("cv-modal-label");
+
+        TextArea cvTextArea = new TextArea(mentee.getCvText());
+        cvTextArea.setEditable(false);
+        cvTextArea.setWrapText(true);
+        cvTextArea.setPrefSize(400, 300);
+        cvTextArea.getStyleClass().add("cv-modal-textarea");
+
+        Button closeButton = new Button("Close");
+        closeButton.setOnAction(e -> modalStage.close());
+        closeButton.getStyleClass().add("cv-modal-button");
+
+        modalContent.getChildren().addAll(cvLabel, cvTextArea, closeButton);
+*/
+        Label cvLabel = new Label("CV Content:");
+        cvLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #333333; -fx-padding: 10px 0;");
+
+        TextArea cvTextArea = new TextArea(mentee.getCvText());
+        cvTextArea.setEditable(false);
+        cvTextArea.setWrapText(true);
+        cvTextArea.setPrefSize(400, 300);
+        cvTextArea.setStyle("-fx-font-size: 18px; -fx-text-fill: black; -fx-background-color: #f9f9f9; -fx-border-color: #cccccc; -fx-border-radius: 5px;");
+
+        Button closeButton = new Button("Close");
+        closeButton.setOnAction(e -> modalStage.close());
+        closeButton.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: white; -fx-background-color: #0b3d61; -fx-padding: 10px 20px; -fx-border-radius: 5px; -fx-cursor: hand;");
+        closeButton.setOnMouseEntered(e -> closeButton.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: white; -fx-background-color: #04253d; -fx-padding: 10px 20px; -fx-border-radius: 5px; -fx-cursor: hand;"));
+        closeButton.setOnMouseExited(e -> closeButton.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: white; -fx-background-color: #0b3d61; -fx-padding: 10px 20px; -fx-border-radius: 5px; -fx-cursor: hand;"));
+
+        modalContent.getChildren().addAll(cvLabel, cvTextArea, closeButton);
+        modalContent.setStyle("-fx-background-color: #ffffff; -fx-padding: 20px; -fx-spacing: 15px; -fx-alignment: center;");
+
+        Scene modalScene = new Scene(modalContent);
+        modalStage.setScene(modalScene);
+        modalStage.setTitle("CV Details");
+        modalStage.setResizable(false);
+        modalStage.show();
     }
 
     /**
@@ -352,7 +407,7 @@ public class AdminPairingView extends VBox {
                 mentor -> formatAvailability(mentor.getStartAvailability(), mentor.getEndAvailability()));
         mentorListView.getColumns().add(availableTimeColumn);
 
-        TableColumn<Mentor, String> mentorTypeColumn = createTableColumn("Mentor Type", 180,
+        TableColumn<Mentor, String> mentorTypeColumn = createTableColumn("Mentor Type", 200,
                 mentor -> {
                     MentorType mentorType = mentor.getMentorType();
                     return mentorType != null ? mentorType.getDescription() : "Not Set";
@@ -564,19 +619,18 @@ public class AdminPairingView extends VBox {
      * Refreshes the mentee and mentor lists.
      */
     private void refreshLists() {
-        refreshList(menteeItems, menteeListView, adminController.getAllUnpairedMentees());
+        List<Mentee> filteredMentees = adminController.getAllUnpairedMentees().stream()
+                .filter(mentee -> mentee.getSupportRequest() != null)
+                .toList();
+
+        refreshList(menteeItems, menteeListView, filteredMentees);
         refreshList(mentorItems, mentorListView, adminController.getAvailableMentors());
     }
-
-    /**
-     * Refreshes a given list with new data.
-     */
     private <T> void refreshList(ObservableList<T> items, TableView<T> tableView, List<T> newData) {
         items.clear();
         items.addAll(newData);
         tableView.setItems(items);
     }
-
     /**
      * Formats availability times for mentors.
      */

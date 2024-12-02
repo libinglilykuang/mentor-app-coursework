@@ -13,14 +13,6 @@ public enum SupportType {
             "Career Choice - What can I do with my degree?",
             "Discusses the connection between a degree and career opportunities"
     ),
-    CAREER_CHOICE_ENTER_FIELD(
-            "Career Choice: How to enter a specific career field",
-            "The mentor will help you to understand what your career field requires, how it recruits and when, and how to approach the job market"
-    ),
-    CAREER_CHOICE_DECISIONS(
-            "Career Choice: Making decisions about different ideas",
-            "The mentor will help you to evaluate your ideas so that you can make informed choices"
-    ),
     COVER_LETTER(
             "Cover Letter",
             "The mentor will guide you in writing compelling cover letters"
