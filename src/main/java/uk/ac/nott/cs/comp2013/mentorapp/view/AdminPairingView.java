@@ -6,6 +6,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -403,15 +404,24 @@ public class AdminPairingView extends VBox {
         TableColumn<Mentor, String> mentorNameColumn = createTableColumn("Mentor Name", Mentor::getUsername);
         mentorListView.getColumns().add(mentorNameColumn);
 
-        TableColumn<Mentor, String> availableTimeColumn = createTableColumn("Available Time",
+        TableColumn<Mentor, String> availableTimeColumn = createTableColumn("Available Time", 320,
                 mentor -> formatAvailability(mentor.getStartAvailability(), mentor.getEndAvailability()));
         mentorListView.getColumns().add(availableTimeColumn);
 
-        TableColumn<Mentor, String> mentorTypeColumn = createTableColumn("Mentor Type", 200,
+        TableColumn<Mentor, String> mentorTypeColumn = createTableColumn("Mentor Type", 140,
                 mentor -> {
                     MentorType mentorType = mentor.getMentorType();
-                    return mentorType != null ? mentorType.getDescription() : "Not Set";
+                    if (mentorType == null) {
+                        return "Not Set";
+                    }
+                    return switch (mentorType) {
+                        case ALUMNI -> "Alumni";
+                        case TECH_PROFESSIONAL -> "Professional";
+                        case SECOND_YEAR_STUDENT -> "Y2 Student";
+                        case THIRD_YEAR_STUDENT -> "Y3 Student";
+                    };
                 });
+
         mentorListView.getColumns().add(mentorTypeColumn);
         mentorListView.getColumns().add(createMentorStatusColumn());
     }
@@ -475,28 +485,35 @@ public class AdminPairingView extends VBox {
      * Configures the row factory for the mentee table, adding styles based on selection state.
      */
     private void setupMenteeRowFactory() {
-        // Set a custom row factory for the mentee list view
         menteeListView.setRowFactory(tv -> new TableRow<>() {
             @Override
             protected void updateItem(Mentee item, boolean empty) {
-                super.updateItem(item, empty); // Ensure the default behavior is executed
+                super.updateItem(item, empty);
+                getStyleClass().removeAll("hovered-row", "mentee-selected", "mentee-even-row", "mentee-odd-row");
+
                 if (empty || item == null) {
-                    // If the row is empty or contains a null item, remove all custom styles
-                    getStyleClass().removeAll("mentee-selected", "mentee-even-row", "mentee-odd-row");
+                    return;
+                }
+                Mentee selectedMentee = menteeListView.getSelectionModel().getSelectedItem();
+                if (item.equals(selectedMentee)) {
+                    getStyleClass().add("mentee-selected");
                 } else {
-                    // Get the currently selected mentee from the selection model
-                    Mentee selectedMentee = menteeListView.getSelectionModel().getSelectedItem();
-                    getStyleClass().removeAll("mentee-selected", "mentee-even-row", "mentee-odd-row");
-                    // If the current row item is the selected mentee, highlight it as selected
-                    if (item.equals(selectedMentee)) {
-                        getStyleClass().add("mentee-selected");
-                    } else {
-                        // Otherwise, apply alternating row styles (even/odd rows)
+                    getStyleClass().add(getIndex() % 2 == 0 ? "mentee-even-row" : "mentee-odd-row");
+                }
+                setOnMouseEntered(event -> {
+                    if (!getStyleClass().contains("mentee-selected")) {
+                        getStyleClass().add("hovered-row");
+                    }
+                });
+                setOnMouseExited(event -> {
+                    getStyleClass().remove("hovered-row");
+                    if (!getStyleClass().contains("mentee-selected")) {
                         getStyleClass().add(getIndex() % 2 == 0 ? "mentee-even-row" : "mentee-odd-row");
                     }
-                }
+                });
             }
         });
+
         menteeListView.setOnMouseClicked(event -> {
             Mentee selectedMentee = menteeListView.getSelectionModel().getSelectedItem();
             if (selectedMentee != null && selectedMentee.equals(lastSelectedMentee)) {
@@ -516,23 +533,29 @@ public class AdminPairingView extends VBox {
             @Override
             protected void updateItem(Mentor item, boolean empty) {
                 super.updateItem(item, empty);
+                getStyleClass().removeAll("mentor-row", "mentor-selected", "mentor-recommended");
                 if (empty || item == null) {
-                    getStyleClass().removeAll("mentor-selected", "mentor-recommended", "mentor-even-row", "mentor-odd-row");
+                    setCursor(Cursor.DEFAULT);
+                    return;
+                }
+
+                setOnMouseEntered(event -> setCursor(Cursor.HAND));
+                setOnMouseExited(event -> setCursor(Cursor.DEFAULT));
+
+                Mentor selectedMentor = mentorListView.getSelectionModel().getSelectedItem();
+                if (item.equals(selectedMentor)) {
+                    getStyleClass().add("mentor-selected");
+                } else if (recommendedMentors != null && recommendedMentors.contains(item)) {
+                    getStyleClass().add("mentor-recommended");
                 } else {
-                    getStyleClass().removeAll("mentor-selected", "mentor-recommended", "mentor-even-row", "mentor-odd-row");
-                    Mentor selectedMentor = mentorListView.getSelectionModel().getSelectedItem();
-                    if (item.equals(selectedMentor)) {
-                        getStyleClass().add("mentor-selected");
-                    } else if (recommendedMentors != null && recommendedMentors.contains(item)) {
-                        getStyleClass().add("mentor-recommended");
-                    }
+                    getStyleClass().add("mentor-row");
                 }
             }
         });
         mentorListView.setOnMouseClicked(event -> {
             Mentor selectedMentor = mentorListView.getSelectionModel().getSelectedItem();
             if (selectedMentor != null && selectedMentor.equals(lastSelectedMentor)) {
-                mentorListView.getSelectionModel().clearSelection();  // Deselect if same item clicked again
+                mentorListView.getSelectionModel().clearSelection();
                 lastSelectedMentor = null;
             } else {
                 lastSelectedMentor = selectedMentor;
@@ -588,7 +611,11 @@ public class AdminPairingView extends VBox {
                 ? "Successfully paired!"
                 : "Pairing failed: Mentor \"" + selectedMentor.getUsername() + "\" is unavailable.");
 
-        if (success) refreshLists();
+        if (success) {
+            recommendedMentors.clear();
+            mentorListView.refresh();
+            refreshLists();
+        }
     }
 
     /**
