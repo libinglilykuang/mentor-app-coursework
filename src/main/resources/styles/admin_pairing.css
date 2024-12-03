@@ -49,17 +49,17 @@
 }
 
 .hovered-row {
-    -fx-background-color: #fff5e6; /* 鼠标悬停行颜色 */
+    -fx-background-color: #fff5e6;
     -fx-text-fill: black;
-    -fx-cursor: hand; /* 鼠标手形 */
-    -fx-padding: 10px; /* 与默认行一致 */
-    -fx-border-color: #cccccc; /* 与默认行一致 */
-    -fx-border-width: 1px 0 1px 0; /* 与默认行一致 */
+    -fx-cursor: hand;
+    -fx-padding: 10px;
+    -fx-border-color: #cccccc;
+    -fx-border-width: 1px 0 1px 0;
 }
 
 .hovered-row.mentee-selected {
-    -fx-background-color: #d9eff9; /* 保持选中背景色 */
-    -fx-text-fill: black; /* 确保选中文本颜色 */
+    -fx-background-color: #d9eff9;
+    -fx-text-fill: black;
         -fx-padding: 10px;
         -fx-border-color: #cccccc;
             -fx-border-width: 1px 0 1px 0;

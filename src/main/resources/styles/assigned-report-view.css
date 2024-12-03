@@ -3,45 +3,83 @@
     -fx-background-color: white;
 }
 
-/* Top container styles */
 .top-container {
-    -fx-alignment: center-left;
-    -fx-padding: 10;
+    -fx-padding: 10px;
+    -fx-background-color: white;
+    -fx-spacing: 20px;
 }
 
-/* Table view styles */
-.report-table-view {
-    -fx-border-color: #0b3d61;
-    -fx-border-width: 1px;
-    -fx-border-radius: 5px;
-    -fx-background-radius: 5px;
+.top-container-with-separator {
+    -fx-spacing: 0px;
 }
 
-.table-placeholder {
-    -fx-text-fill: gray;
-    -fx-font-size: 16px;
-    -fx-font-weight: bold;
+.image-container {
+    -fx-padding: 10px;
 }
 
-/* Navigation labels */
-.navigation-label-active {
-    -fx-font-size: 16px;
-    -fx-text-fill: #ff5722;
-    -fx-font-weight: bold;
-    -fx-underline: true;
-    -fx-cursor: hand;
+.top-separator {
+    -fx-pref-height: 1px;
+    -fx-background-color: #cccccc;
+}
+
+.label-container {
+    -fx-spacing: 20px;
 }
 
 .navigation-label-inactive {
     -fx-font-size: 16px;
-    -fx-text-fill: #0b3d61;
     -fx-font-weight: bold;
-    -fx-underline: false;
+    -fx-text-fill: #0b3d61;
     -fx-cursor: hand;
 }
 
-/* Image container styles */
-.image-container {
-    -fx-alignment: top-left;
-    -fx-padding: 10;
+.navigation-label-active {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ff5722;
+    -fx-underline: true;
+    -fx-cursor: hand;
+}
+]
+.assigned-report-table-view {
+    -fx-background-color: transparent;]
+    -fx-padding: 0;]
+    -fx-border-width: 0; ]
+    -fx-pref-width: 1200px;]
+    -fx-pref-height: 1000px; ]
+}
+
+.assigned-report-table-view .column-header {
+    -fx-background-color: #f4f4f4;
+    -fx-border-color: #cccccc;
+    -fx-border-width: 0 0 1px 0;
+    -fx-text-fill: black;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-alignment: CENTER;
+    -fx-padding: 15px;
+}
+
+.assigned-report-table-view .column-header-background {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+}
+
+.assigned-report-table-view .placeholder {
+    -fx-text-fill: gray;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-alignment: CENTER;
+}
+
+.assigned-report-table-view:focused {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+.assigned-report-table-view .table-row-cell {
+    -fx-border-color: #cccccc;
+    -fx-border-width: 1px 0px;
+    -fx-background-color: white;
+    -fx-padding: 5px;
 }

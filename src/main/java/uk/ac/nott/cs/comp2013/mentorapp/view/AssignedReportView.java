@@ -8,7 +8,6 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import java.net.URL;
 import java.util.Objects;
@@ -33,7 +32,6 @@ public class AssignedReportView extends VBox {
         this.reportTableView = new TableView<>();
         buildView();
 
-        // Add CSS styles dynamically
         this.sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (newScene != null) {
                 newScene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/styles/assigned-report-view.css")).toExternalForm());
@@ -46,11 +44,13 @@ public class AssignedReportView extends VBox {
      */
     private void buildView() {
         HBox topContainer = createTopContainer();
+        topContainer.setAlignment(Pos.CENTER_LEFT);
         setupTableView();
+        HBox centeredTableContainer = new HBox(reportTableView);
+        centeredTableContainer.setAlignment(Pos.CENTER);
         refreshReport();
-
         getStyleClass().add("assigned-report-view");
-        getChildren().addAll(topContainer, reportTableView);
+        getChildren().addAll(topContainer, centeredTableContainer);
     }
 
     /**
@@ -67,7 +67,7 @@ public class AssignedReportView extends VBox {
 
         HBox topContainer = new HBox(20, imageContainer, labelContainer);
         topContainer.getStyleClass().add("top-container");
-
+        topContainer.setAlignment(Pos.CENTER_LEFT);
         return topContainer;
     }
 
@@ -110,13 +110,13 @@ public class AssignedReportView extends VBox {
      * Configures the table view with columns for displaying mentor-mentee details.
      */
     private void setupTableView() {
-        TableColumn<Pair, String> mentorColumn = createTableColumn("Mentor", 200, Pair::getMentorName);
-        TableColumn<Pair, String> menteeColumn = createTableColumn("Mentee", 200, Pair::getMenteeName);
-        TableColumn<Pair, String> mentorTypeColumn = createTableColumn("Mentor Type", 250, pair -> {
+        TableColumn<Pair, String> mentorColumn = createTableColumn("Mentor", 150, Pair::getMentorName);
+        TableColumn<Pair, String> menteeColumn = createTableColumn("Mentee", 150, Pair::getMenteeName);
+        TableColumn<Pair, String> mentorTypeColumn = createTableColumn("Mentor Type", 230, pair -> {
             String mentorType = adminController.getMentorTypeByName(pair.getMentorName());
             return mentorType != null ? mentorType : "Not Set";
         });
-        TableColumn<Pair, String> availabilityColumn = createTableColumn("Availability", 250, pair -> {
+        TableColumn<Pair, String> availabilityColumn = createTableColumn("Availability", 300, pair -> {
             String availability = adminController.getMentorAvailabilityByName(pair.getMentorName());
             return availability != null ? availability : "Unavailable";
         });
@@ -130,7 +130,25 @@ public class AssignedReportView extends VBox {
         reportTableView.setPlaceholder(new Label("No assigned reports to display."));
         reportTableView.getStyleClass().add("report-table-view");
 
-        VBox.setVgrow(reportTableView, Priority.ALWAYS);
+        reportTableView.skinProperty().addListener((obs, oldSkin, newSkin) -> {
+            if (newSkin != null) {
+                reportTableView.lookup(".column-header-background").setStyle("-fx-border-color: #0b3d61; -fx-border-width: 2px;");
+            }
+        });
+
+        reportTableView.setRowFactory(tv -> new TableRow<>() {
+            @Override
+            protected void updateItem(Pair item, boolean empty) {
+                super.updateItem(item, empty);
+                if (!empty) {
+                    setPrefHeight(40);
+                    setStyle("-fx-border-color: #cccccc; " +
+                            "-fx-border-width: 1px 0px; " +
+                            "-fx-font-size: 14px;"+
+                            "-fx-background-color: white;");
+                }
+            }
+        });
     }
 
     /**

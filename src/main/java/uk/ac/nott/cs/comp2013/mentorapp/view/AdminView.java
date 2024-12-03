@@ -1,34 +1,30 @@
 package uk.ac.nott.cs.comp2013.mentorapp.view;
 
-import javafx.application.Platform;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import javafx.scene.layout.VBox;
 import uk.ac.nott.cs.comp2013.mentorapp.controller.AdminController;
 import java.util.Objects;
 
 /**
- * The AdminView class represents the main interface for administrators.
- * Provides options for mentor-student pairing and viewing reports.
+ * Represents the main view for administrators.
+ * Displays two interactive images that navigate to different views when clicked.
  */
 public class AdminView extends VBox {
-    private final AdminController adminController; // Controller for admin-related actions
+    private final AdminController adminController;
 
-    /**
-     * Constructs the AdminView with a given AdminController.
-     *
-     * @param adminController the controller managing admin actions.
-     */
     public AdminView(AdminController adminController) {
         this.adminController = adminController;
-        buildMainMenu();
+        buildView();
 
-        // Add stylesheet when the scene is set
+        // Add CSS dynamically when the scene changes
         this.sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (newScene != null) {
                 newScene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/styles/admin-view.css")).toExternalForm());
@@ -37,91 +33,125 @@ public class AdminView extends VBox {
     }
 
     /**
-     * Builds the main menu layout for the admin view.
+     * Builds the UI for the admin view.
      */
-    private void buildMainMenu() {
-        VBox contentBox = createContentBox(); // Main content container
-        ImageView logoImageView = createLogoImageView(); // Logo at the top
-        Label welcomeLabel = createWelcomeLabel(); // Welcome message
-        Button btnPairMentorStudent = createMenuButton("Pair Mentor and Student", this::showPairingInterface); // Pairing button
-        Button btnViewReports = createMenuButton("View Assigned Report", this::showReportInterface); // Reports button
+    private void buildView() {
+        VBox layout = new VBox();
 
-        // Add all components to the content box
-        contentBox.getChildren().addAll(logoImageView, welcomeLabel, btnPairMentorStudent, btnViewReports);
+        // Create the top navigation bar
+        HBox navBar = createNavBar();
 
-        // Set layout properties
-        getChildren().clear();
-        setAlignment(Pos.CENTER);
-        getChildren().add(contentBox);
-    }
-
-    /**
-     * Creates the main content container.
-     *
-     * @return A VBox configured as the main content container.
-     */
-    private VBox createContentBox() {
-        VBox contentBox = new VBox();
-        contentBox.setSpacing(20);
+        // Add main content (example with images)
+        HBox contentBox = new HBox();
+        contentBox.setSpacing(100);
         contentBox.setAlignment(Pos.CENTER);
-        contentBox.setMaxWidth(400);
-        contentBox.getStyleClass().add("content-box");
-        return contentBox;
+        contentBox.setPadding(new Insets(100));
+
+        ImageView pairImage = createInteractiveImage("/pair_icon.png", this::switchToPairingView);
+        ImageView reportImage = createInteractiveImage("/report_icon.png", this::switchToReportsView);
+        contentBox.getChildren().addAll(pairImage, reportImage);
+
+        // Add navigation bar and main content to layout
+        layout.getChildren().addAll(navBar, contentBox);
+
+        getChildren().clear();
+        getChildren().add(layout);
     }
 
-    /**
-     * Creates an ImageView for the logo.
-     *
-     * @return An ImageView displaying the university logo.
-     */
-    private ImageView createLogoImageView() {
-        ImageView logoImageView = new ImageView(new Image("/university-logo.png"));
-        logoImageView.setFitWidth(350);
-        logoImageView.setFitHeight(350);
-        logoImageView.setPreserveRatio(true);
-        return logoImageView;
+    private HBox createNavBar() {
+        HBox navBar = new HBox();
+        navBar.setAlignment(Pos.CENTER_LEFT);
+        navBar.setPadding(new Insets(10));
+        navBar.setSpacing(20);
+        navBar.setStyle("-fx-background-color: #0B1D32;");
+
+        // Title on the left
+        Label titleLabel = new Label("Mentor App");
+        titleLabel.setStyle("-fx-font-size: 22px; -fx-text-fill: white; -fx-font-weight: bold;");
+
+        // Icons on the right
+        HBox iconBox = new HBox();
+        iconBox.setSpacing(50);
+        iconBox.setAlignment(Pos.CENTER_RIGHT);
+        iconBox.setPadding(new Insets(0, 20, 0, 0));
+
+        ImageView homeIcon = createSmallIcon("/home_icon.png", this::switchToAdminView, 34, 34);
+        ImageView logoutIcon = createSmallIcon("/logout_icon.png", this::logout, 34, 34);
+
+        iconBox.getChildren().addAll(homeIcon, logoutIcon);
+
+        // Space between title and icons
+        navBar.getChildren().addAll(titleLabel, iconBox);
+        HBox.setHgrow(iconBox, javafx.scene.layout.Priority.ALWAYS);
+
+        return navBar;
+    }
+    private ImageView createSmallIcon(String imagePath, Runnable action, double width, double height) {
+        ImageView imageView = new ImageView();
+        try {
+            Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath)));
+            imageView.setImage(image);
+            imageView.setFitWidth(width);
+            imageView.setFitHeight(height);
+            imageView.setPreserveRatio(true);
+            imageView.setStyle("-fx-cursor: hand;");
+        } catch (Exception e) {
+            System.err.println("Failed to load image: " + imagePath);
+        }
+
+        imageView.setOnMouseClicked(e -> action.run());
+        return imageView;
     }
 
-    /**
-     * Creates the welcome label for the admin interface.
-     *
-     * @return A styled Label with the welcome message.
-     */
-    private Label createWelcomeLabel() {
-        Label welcomeLabel = new Label("Welcome, Admin!");
-        welcomeLabel.getStyleClass().add("welcome-label");
-        return welcomeLabel;
-    }
-
-    /**
-     * Creates a styled button for the menu.
-     *
-     * @param text   The button text.
-     * @param action The action to perform when the button is clicked.
-     * @return A configured Button instance.
-     */
-    private Button createMenuButton(String text, Runnable action) {
-        Button button = new Button(text);
-        button.getStyleClass().add("menu-button");
-        button.setPrefWidth(350);
-        button.setOnAction(e -> action.run());
-        return button;
-    }
-
-    /**
-     * Navigates to the pairing interface.
-     */
-    private void showPairingInterface() {
-        Scene pairingScene = new Scene(new AdminPairingView(adminController));
+    private void switchToAdminView() {
         Stage stage = (Stage) getScene().getWindow();
-        Platform.runLater(() -> stage.setScene(pairingScene));
-        stage.setMaximized(true);
+        stage.setScene(new Scene(new AdminView(adminController), 800, 600));
+    }
+
+    private void logout() {
+            Stage stage = (Stage) getScene().getWindow();
+            stage.close();
+
+    }
+    /**
+     * Creates an interactive image with a click action.
+     *
+     * @param imagePath the path to the image file
+     * @param action    the click action
+     * @return an ImageView configured for interaction
+     */
+    private ImageView createInteractiveImage(String imagePath, Runnable action) {
+        ImageView imageView = new ImageView();
+        try {
+            Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath)));
+            imageView.setImage(image);
+            imageView.setFitWidth(280); // Image width
+            imageView.setFitHeight(280); // Image height
+            imageView.setPreserveRatio(true); // Maintain aspect ratio
+            imageView.setStyle("-fx-cursor: hand;"); // Set cursor to hand
+        } catch (Exception e) {
+            System.err.println("Failed to load image: " + imagePath);
+        }
+
+        // Wrap Runnable as a MouseEvent handler
+        imageView.setOnMouseClicked(e -> action.run());
+        return imageView;
+    }
+
+
+    /**
+     * Switches to the mentor-student pairing view.
+     */
+    private void switchToPairingView() {
+        Stage stage = (Stage) getScene().getWindow();
+        stage.setScene(new Scene(new AdminPairingView(adminController), 800, 600));
     }
 
     /**
-     * Navigates to the report interface.
+     * Switches to the assigned reports view.
      */
-    private void showReportInterface() {
-        getScene().setRoot(new AssignedReportView(adminController));
+    private void switchToReportsView() {
+        Stage stage = (Stage) getScene().getWindow();
+        stage.setScene(new Scene(new AssignedReportView(adminController), 800, 600));
     }
 }

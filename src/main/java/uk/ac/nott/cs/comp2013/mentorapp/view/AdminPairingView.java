@@ -16,6 +16,7 @@ import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -401,11 +402,20 @@ public class AdminPairingView extends VBox {
      */
     private void setupMentorColumns() {
         mentorListView.getColumns().clear();
+
         TableColumn<Mentor, String> mentorNameColumn = createTableColumn("Mentor Name", Mentor::getUsername);
         mentorListView.getColumns().add(mentorNameColumn);
 
         TableColumn<Mentor, String> availableTimeColumn = createTableColumn("Available Time", 320,
                 mentor -> formatAvailability(mentor.getStartAvailability(), mentor.getEndAvailability()));
+        availableTimeColumn.setSortType(TableColumn.SortType.ASCENDING);
+        availableTimeColumn.setComparator((time1, time2) -> {
+            // 自定义时间比较器
+            LocalDateTime start1 = parseAvailabilityStart(time1);
+            LocalDateTime start2 = parseAvailabilityStart(time2);
+            return Comparator.nullsLast(LocalDateTime::compareTo).compare(start1, start2);
+        });
+
         mentorListView.getColumns().add(availableTimeColumn);
 
         TableColumn<Mentor, String> mentorTypeColumn = createTableColumn("Mentor Type", 140,
@@ -424,6 +434,32 @@ public class AdminPairingView extends VBox {
 
         mentorListView.getColumns().add(mentorTypeColumn);
         mentorListView.getColumns().add(createMentorStatusColumn());
+
+        mentorListView.setSortPolicy(tableView -> {
+            ObservableList<TableColumn<Mentor, ?>> sortOrder = tableView.getSortOrder();
+            if (!sortOrder.isEmpty()) {
+                sortOrder.get(0).setSortType(TableColumn.SortType.ASCENDING);
+            }
+            return true;
+        });
+        mentorListView.getSortOrder().add(availableTimeColumn);
+        mentorListView.sort();
+    }
+
+
+    private LocalDateTime parseAvailabilityStart(String availability) {
+        if (availability == null || availability.equals("Unavailable")) {
+            return null;
+        }
+        String[] parts = availability.split(" - ");
+        if (parts.length > 0) {
+            try {
+                return LocalDateTime.parse(parts[0], DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+            } catch (Exception e) {
+                return null;
+            }
+        }
+        return null;
     }
 
     /**
@@ -650,8 +686,13 @@ public class AdminPairingView extends VBox {
                 .filter(mentee -> mentee.getSupportRequest() != null)
                 .toList();
 
+        List<Mentor> sortedMentors = adminController.getAvailableMentors().stream()
+                .sorted(Comparator.comparing(Mentor::getStartAvailability, Comparator.nullsLast(Comparator.naturalOrder())))
+                .toList();
+
         refreshList(menteeItems, menteeListView, filteredMentees);
-        refreshList(mentorItems, mentorListView, adminController.getAvailableMentors());
+        //refreshList(mentorItems, mentorListView, adminController.getAvailableMentors());
+        refreshList(mentorItems, mentorListView, sortedMentors);
     }
     private <T> void refreshList(ObservableList<T> items, TableView<T> tableView, List<T> newData) {
         items.clear();
