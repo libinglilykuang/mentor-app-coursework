@@ -68,7 +68,7 @@ public class MenteeView extends VBox {
      * @return the logo ImageView
      */
     private ImageView createLogoImageView() {
-        ImageView logoImageView = new ImageView(new Image("/university-logo.png"));
+        ImageView logoImageView = new ImageView(new Image("/icon/university-logo.png"));
         logoImageView.setFitWidth(350);
         logoImageView.setFitHeight(350);
         logoImageView.setPreserveRatio(true);

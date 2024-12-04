@@ -1,6 +1,6 @@
 /* Background style for the homepage */
 .homepage-view {
-    -fx-background-image: url('/university.jpg');
+    -fx-background-image: url('/icon/university.jpg');
     -fx-background-size: cover;
     -fx-background-position: center;
     -fx-background-repeat: no-repeat;

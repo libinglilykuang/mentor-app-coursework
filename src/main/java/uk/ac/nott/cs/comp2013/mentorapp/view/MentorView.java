@@ -76,7 +76,7 @@ public class MentorView extends VBox {
      * Creates the university logo image view.
      */
     private ImageView createLogoImageView() {
-        ImageView imageView = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/university-logo.png"))));
+        ImageView imageView = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icon/university-logo.png"))));
         imageView.getStyleClass().add("logo-image");
         return imageView;
     }

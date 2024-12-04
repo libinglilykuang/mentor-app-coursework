@@ -75,7 +75,7 @@ public class LoginView extends VBox implements ManagedView {
   private VBox createLogoContainer() {
     ImageView logoView = null;
     try {
-      Image logo = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/university-logo.png")));
+      Image logo = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icon/university-logo.png")));
       logoView = new ImageView(logo);
       logoView.setFitWidth(350);
       logoView.setFitHeight(350);

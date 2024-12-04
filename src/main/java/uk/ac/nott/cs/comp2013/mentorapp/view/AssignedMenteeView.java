@@ -78,9 +78,9 @@ public class AssignedMenteeView extends VBox {
      * Creates a container with the logo or header image.
      */
     private VBox createImageContainer() {
-        URL imageUrl = getClass().getResource("/pairing_image.png");
+        URL imageUrl = getClass().getResource("/icon/pairing_image.png");
         if (imageUrl == null) {
-            throw new IllegalArgumentException("Image resource not found: " + "/pairing_image.png");
+            throw new IllegalArgumentException("Image resource not found: " + "/icon/pairing_image.png");
         }
         ImageView imageView = new ImageView(new Image(imageUrl.toExternalForm()));
         imageView.setFitWidth(170);
@@ -143,9 +143,9 @@ public class AssignedMenteeView extends VBox {
      * Creates the user icon for the profile button.
      */
     private ImageView createUserIcon() {
-        URL iconUrl = getClass().getResource("/user_icon.png");
+        URL iconUrl = getClass().getResource("/icon/user_icon.png");
         if (iconUrl == null) {
-            throw new IllegalArgumentException("User icon resource not found: " + "/user_icon.png");
+            throw new IllegalArgumentException("User icon resource not found: " + "/icon/user_icon.png");
         }
         ImageView userIcon = new ImageView(new Image(iconUrl.toExternalForm()));
         userIcon.setFitWidth(30);

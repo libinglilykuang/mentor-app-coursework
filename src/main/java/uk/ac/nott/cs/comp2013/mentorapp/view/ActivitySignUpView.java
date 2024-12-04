@@ -91,9 +91,9 @@ public class ActivitySignUpView extends VBox {
      * @return A styled ImageView displaying the header logo.
      */
     private ImageView createHeaderImage() {
-        URL imageUrl = getClass().getResource("/pairing_image.png");
+        URL imageUrl = getClass().getResource("/icon/pairing_image.png");
         if (imageUrl == null) {
-            throw new IllegalArgumentException("Image resource not found: " + "/pairing_image.png");
+            throw new IllegalArgumentException("Image resource not found: " + "/icon/pairing_image.png");
         }
         ImageView imageView = new ImageView(new Image(imageUrl.toExternalForm()));
         imageView.setFitWidth(170);
@@ -132,7 +132,7 @@ public class ActivitySignUpView extends VBox {
      * Creates the user profile button in the header.
      */
     private HBox createUserProfileButton() {
-        ImageView userIcon = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/user_icon.png"))));
+        ImageView userIcon = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icon/user_icon.png"))));
         userIcon.setFitWidth(30);
         userIcon.setPreserveRatio(true);
 

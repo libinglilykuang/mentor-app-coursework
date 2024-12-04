@@ -57,7 +57,7 @@ public class MentorApp extends Application {
      * Initializes the user repository by processing the CSV file.
      */
     private void initializeRepository() {
-        String csvPath = "src/main/resources/MOCK_DATA.csv";
+        String csvPath = "src/main/resources/data/MOCK_DATA.csv";
         try {
             repo = RepositoryFactory.createRepositoryFromCsv(csvPath);
         } catch (Exception e) {

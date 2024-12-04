@@ -100,7 +100,7 @@ public class HomepageView extends StackPane {
      * @return the button
      */
     private Button createVerifyButton() {
-        Button verifyButton = new Button("Sign up");
+        Button verifyButton = new Button("Sign in");
         verifyButton.getStyleClass().add("verify-button");
         verifyButton.setOnAction(event -> onVerifyIdentity.run());
         VBox.setMargin(verifyButton, new Insets(40, 0, 0, 0));

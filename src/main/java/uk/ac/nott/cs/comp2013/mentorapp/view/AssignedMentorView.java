@@ -113,9 +113,9 @@ public class AssignedMentorView extends VBox {
      * Creates an ImageView for the logo.
      */
     private ImageView createImageView() {
-        URL imageUrl = getClass().getResource("/pairing_image.png");
+        URL imageUrl = getClass().getResource("/icon/pairing_image.png");
         if (imageUrl == null) {
-            throw new IllegalArgumentException("Image resource not found: " + "/pairing_image.png");
+            throw new IllegalArgumentException("Image resource not found: " + "/icon/pairing_image.png");
         }
         ImageView imageView = new ImageView(new Image(imageUrl.toExternalForm()));
         imageView.setFitWidth(170);
@@ -149,7 +149,7 @@ public class AssignedMentorView extends VBox {
      * Creates a user profile button with an icon and username.
      */
     private HBox createUserProfileButton() {
-        ImageView userIcon = createUserIcon("/user_icon.png", 30);
+        ImageView userIcon = createUserIcon("/icon/user_icon.png", 30);
         Label usernameLabel = createUsernameLabel(menteeController.getMentee().getUsername());
         HBox profileButton = new HBox(8, userIcon, usernameLabel);
         profileButton.getStyleClass().add("profile-button");

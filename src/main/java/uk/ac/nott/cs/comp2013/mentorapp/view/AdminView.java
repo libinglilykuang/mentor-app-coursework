@@ -47,8 +47,8 @@ public class AdminView extends VBox {
         contentBox.setAlignment(Pos.CENTER);
         contentBox.setPadding(new Insets(100));
 
-        ImageView pairImage = createInteractiveImage("/pair_icon.png", this::switchToPairingView);
-        ImageView reportImage = createInteractiveImage("/report_icon.png", this::switchToReportsView);
+        ImageView pairImage = createInteractiveImage("/icon/pair_icon.png", this::switchToPairingView);
+        ImageView reportImage = createInteractiveImage("/icon/report_icon.png", this::switchToReportsView);
         contentBox.getChildren().addAll(pairImage, reportImage);
 
         // Add navigation bar and main content to layout
@@ -75,8 +75,8 @@ public class AdminView extends VBox {
         iconBox.setAlignment(Pos.CENTER_RIGHT);
         iconBox.setPadding(new Insets(0, 20, 0, 0));
 
-        ImageView homeIcon = createSmallIcon("/home_icon.png", this::switchToAdminView, 34, 34);
-        ImageView logoutIcon = createSmallIcon("/logout_icon.png", this::logout, 34, 34);
+        ImageView homeIcon = createSmallIcon("/icon/home_icon.png", this::switchToAdminView, 34, 34);
+        ImageView logoutIcon = createSmallIcon("/icon/logout_icon.png", this::logout, 34, 34);
 
         iconBox.getChildren().addAll(homeIcon, logoutIcon);
 

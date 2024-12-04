@@ -154,9 +154,9 @@ public class AdminPairingView extends VBox {
      * @return An ImageView object displaying the header image.
      */
     private ImageView createImageView() {
-        URL imageUrl = getClass().getResource("/pairing_image.png");
+        URL imageUrl = getClass().getResource("/icon/pairing_image.png");
         if (imageUrl == null) {
-            throw new IllegalArgumentException("Image resource not found: " + "/pairing_image.png");
+            throw new IllegalArgumentException("Image resource not found: " + "/icon/pairing_image.png");
         }
         Image image = new Image(imageUrl.toExternalForm());
         ImageView imageView = new ImageView(image);

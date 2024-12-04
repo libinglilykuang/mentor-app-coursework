@@ -75,9 +75,9 @@ public class AssignedReportView extends VBox {
      * Creates the image container for the top section.
      */
     private VBox createImageContainer() {
-        URL imageUrl = getClass().getResource("/pairing_image.png");
+        URL imageUrl = getClass().getResource("/icon/pairing_image.png");
         if (imageUrl == null) {
-            throw new IllegalArgumentException("Image resource not found: /pairing_image.png");
+            throw new IllegalArgumentException("Image resource not found: /icon/pairing_image.png");
         }
         ImageView imageView = new ImageView(new Image(imageUrl.toExternalForm()));
         imageView.setFitWidth(170);

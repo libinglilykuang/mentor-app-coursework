@@ -98,7 +98,7 @@ public class MentorAvailabilityView extends VBox {
      * @return HBox with the profile button.
      */
     private HBox createUserProfileButton() {
-        ImageView userIcon = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/user_icon.png"))));
+        ImageView userIcon = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icon/user_icon.png"))));
         userIcon.getStyleClass().add("profile-icon");
         Label usernameLabel = new Label(mentor.getUsername());
         usernameLabel.getStyleClass().add("profile-label");
@@ -133,9 +133,9 @@ public class MentorAvailabilityView extends VBox {
      * Creates the mentor logo.
      */
     private ImageView createImageView() {
-        URL imageUrl = getClass().getResource("/pairing_image.png");
+        URL imageUrl = getClass().getResource("/icon/pairing_image.png");
         if (imageUrl == null) {
-            throw new IllegalArgumentException("Image resource not found: " + "/pairing_image.png");
+            throw new IllegalArgumentException("Image resource not found: " + "/icon/pairing_image.png");
         }
         ImageView imageView = new ImageView(new Image(imageUrl.toExternalForm()));
         imageView.setFitWidth(170);
