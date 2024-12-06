@@ -21,9 +21,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -416,7 +413,6 @@ public class AdminPairingView extends VBox {
                 mentor -> formatAvailability(mentor.getStartAvailability(), mentor.getEndAvailability()));
         availableTimeColumn.setSortType(TableColumn.SortType.ASCENDING);
         availableTimeColumn.setComparator((time1, time2) -> {
-            // 自定义时间比较器
             LocalDateTime start1 = parseAvailabilityStart(time1);
             LocalDateTime start2 = parseAvailabilityStart(time2);
             return Comparator.nullsLast(LocalDateTime::compareTo).compare(start1, start2);
