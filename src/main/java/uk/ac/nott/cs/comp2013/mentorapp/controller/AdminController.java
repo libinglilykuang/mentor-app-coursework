@@ -100,6 +100,7 @@ public class AdminController {
     public List<Mentee> getAllUnpairedMentees() {
         return getAllMentees().stream()
                 .filter(mentee -> mentee.getAssignedMentor() == null)
+                .filter(mentee -> mentee.getSupportRequest() != null)
                 .collect(Collectors.toList());
     }
 

@@ -360,7 +360,7 @@ public class AdminPairingView extends VBox {
         modalContent.setAlignment(Pos.CENTER);
         modalContent.setPadding(new Insets(20));
 
-        /*Label cvLabel = new Label("CV Content:");
+        Label cvLabel = new Label("CV Content:");
         cvLabel.getStyleClass().add("cv-modal-label");
 
         TextArea cvTextArea = new TextArea(mentee.getCvText());
@@ -374,25 +374,6 @@ public class AdminPairingView extends VBox {
         closeButton.getStyleClass().add("cv-modal-button");
 
         modalContent.getChildren().addAll(cvLabel, cvTextArea, closeButton);
-*/
-        Label cvLabel = new Label("CV Content:");
-        cvLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #333333; -fx-padding: 10px 0;");
-
-        TextArea cvTextArea = new TextArea(mentee.getCvText());
-        cvTextArea.setEditable(false);
-        cvTextArea.setWrapText(true);
-        cvTextArea.setPrefSize(400, 300);
-        cvTextArea.setStyle("-fx-font-size: 18px; -fx-text-fill: black; -fx-background-color: #f9f9f9; -fx-border-color: #cccccc; -fx-border-radius: 5px;");
-
-        Button closeButton = new Button("Close");
-        closeButton.setOnAction(e -> modalStage.close());
-        closeButton.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: white; -fx-background-color: #0b3d61; -fx-padding: 10px 20px; -fx-border-radius: 5px; -fx-cursor: hand;");
-        closeButton.setOnMouseEntered(e -> closeButton.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: white; -fx-background-color: #04253d; -fx-padding: 10px 20px; -fx-border-radius: 5px; -fx-cursor: hand;"));
-        closeButton.setOnMouseExited(e -> closeButton.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: white; -fx-background-color: #0b3d61; -fx-padding: 10px 20px; -fx-border-radius: 5px; -fx-cursor: hand;"));
-
-        modalContent.getChildren().addAll(cvLabel, cvTextArea, closeButton);
-        modalContent.setStyle("-fx-background-color: #ffffff; -fx-padding: 20px; -fx-spacing: 15px; -fx-alignment: center;");
-
         Scene modalScene = new Scene(modalContent);
         modalStage.setScene(modalScene);
         modalStage.setTitle("CV Details");
@@ -406,7 +387,7 @@ public class AdminPairingView extends VBox {
     private void setupMentorColumns() {
         mentorListView.getColumns().clear();
 
-        TableColumn<Mentor, String> mentorNameColumn = createTableColumn("Mentor Name", Mentor::getUsername);
+        TableColumn<Mentor, String> mentorNameColumn = createTableColumn("Mentor Name", 100,Mentor::getUsername);
         mentorListView.getColumns().add(mentorNameColumn);
 
         TableColumn<Mentor, String> availableTimeColumn = createTableColumn("Available Time", 320,
