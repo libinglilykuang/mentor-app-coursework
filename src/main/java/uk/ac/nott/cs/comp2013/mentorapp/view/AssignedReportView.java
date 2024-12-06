@@ -3,6 +3,7 @@ package uk.ac.nott.cs.comp2013.mentorapp.view;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -13,6 +14,7 @@ import java.net.URL;
 import java.util.Objects;
 import java.util.function.Function;
 import uk.ac.nott.cs.comp2013.mentorapp.controller.AdminController;
+import uk.ac.nott.cs.comp2013.mentorapp.model.ThreadPoolManager;
 
 /**
  * View for displaying assigned mentor-mentee pairs and their details.
@@ -179,14 +181,33 @@ public class AssignedReportView extends VBox {
      * Refreshes the report table with the latest mentor-mentee assignment data.
      */
     private void refreshReport() {
-        ObservableList<Pair> data = FXCollections.observableArrayList();
-        adminController.getAssignedPairs().forEach(pair -> {
-            String mentor = pair.getKey().getUsername();
-            String mentee = pair.getValue().getUsername();
-            String cvText = adminController.getMenteeCVByName(mentee);
-            data.add(new Pair(mentor, mentee, cvText));
+        Task<ObservableList<Pair>> fetchReportTask = new Task<>() {
+            @Override
+            protected ObservableList<Pair> call() {
+                ObservableList<Pair> data = FXCollections.observableArrayList();
+                adminController.getAssignedPairs().forEach(pair -> {
+                    String mentor = pair.getKey().getUsername();
+                    String mentee = pair.getValue().getUsername();
+                    String cvText = adminController.getMenteeCVByName(mentee);
+                    data.add(new Pair(mentor, mentee, cvText));
+                });
+                return data;
+            }
+        };
+
+        fetchReportTask.setOnSucceeded(event -> {
+            ObservableList<Pair> data = fetchReportTask.getValue();
+            reportTableView.setItems(data);
         });
-        reportTableView.setItems(data);
+
+        fetchReportTask.setOnFailed(event -> {
+            Throwable exception = fetchReportTask.getException();
+            exception.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Failed to refresh report: " + exception.getMessage());
+            alert.show();
+        });
+
+        ThreadPoolManager.getExecutor().submit(fetchReportTask);
     }
 
     /**

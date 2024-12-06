@@ -1,9 +1,11 @@
 package uk.ac.nott.cs.comp2013.mentorapp.view;
 
 import javafx.animation.PauseTransition;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -19,11 +21,15 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+
 import uk.ac.nott.cs.comp2013.mentorapp.controller.AdminController;
 import uk.ac.nott.cs.comp2013.mentorapp.model.RecommendationEngine;
+import uk.ac.nott.cs.comp2013.mentorapp.model.ThreadPoolManager;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.MenteeType;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.MentorType;
 import uk.ac.nott.cs.comp2013.mentorapp.model.user.Mentee;
@@ -628,31 +634,46 @@ public class AdminPairingView extends VBox {
     }
 
     /**
-     * Handles the pairing of the selected mentee and mentor.
-     * Displays a success or error message based on the result of the pairing operation.
+     * Pairs the selected mentee and mentor.
+     * This method uses a background task to perform the pairing logic
+     * and updates the UI upon task completion or failure.
      */
     private void pairSelectedMenteeAndMentor() {
+        // Get the selected mentee and mentor from the respective table views
         Mentee selectedMentee = menteeListView.getSelectionModel().getSelectedItem();
         Mentor selectedMentor = mentorListView.getSelectionModel().getSelectedItem();
-
-        // Check if both a mentee and mentor are selected
         if (selectedMentee == null || selectedMentor == null) {
             displaySnackbar(false, "Please select both a mentee and a mentor to proceed.");
             return;
         }
 
-        // Attempt to pair the mentee with the selected mentor
-        boolean success = adminController.pairMenteeWithMentor(selectedMentee.getUsername(), selectedMentor.getUsername());
-        displaySnackbar(success, success
-                ? "Successfully paired!"
-                : "Pairing failed: Mentor \"" + selectedMentor.getUsername() + "\" is unavailable.");
-
-        if (success) {
-            recommendedMentors.clear();
-            mentorListView.refresh();
-            refreshLists();
-        }
+        // Create a background task for pairing logic
+        Task<Boolean> pairingTask = new Task<>() {
+            @Override
+            protected Boolean call() {
+                // Perform the pairing operation in the background
+                return adminController.pairMenteeWithMentor(selectedMentee.getUsername(), selectedMentor.getUsername());
+            }
+        };
+        // On successful completion of the task, update the UI
+        pairingTask.setOnSucceeded(event -> {
+            boolean success = pairingTask.getValue();
+            Platform.runLater(() -> {
+                displaySnackbar(success, success ? "Successfully paired!"
+                        : "Pairing failed: Mentor \"" + selectedMentor.getUsername() + "\" is unavailable.");
+                if (success) {
+                    refreshLists(); // Refresh the mentee and mentor lists
+                }
+            });
+        });
+        // Handle any errors or failures during task execution
+        pairingTask.setOnFailed(event -> Platform.runLater(() -> {
+            displaySnackbar(false, "An error occurred during pairing.");
+        }));
+        // Submit the task to the thread pool for execution
+        ThreadPoolManager.getExecutor().submit(pairingTask);
     }
+
 
     /**
      * Displays a snackbar message to provide feedback on operations.
@@ -662,38 +683,61 @@ public class AdminPairingView extends VBox {
     }
 
     /**
-     * Shows a snackbar notification at the center of the scene.
+     * Displays a snackbar message with success or error styling.
+     * The snackbar is displayed in the center of the scene and automatically removed after 3 seconds.
+     *
+     * @param message The message to display in the snackbar.
+     * @param success Whether the snackbar should use the success or error style.
      */
     private void showSnackbar(String message, boolean success) {
-        Label messageLabel = new Label(message);
-        messageLabel.getStyleClass().add(success ? "snackbar-success" : "snackbar-error");
-        Scene scene = this.getScene();
-        if (scene == null) return;
-        Pane root = (Pane) scene.getRoot();
-        StackPane snackbarPane = new StackPane(messageLabel);
-        snackbarPane.setAlignment(Pos.CENTER);
-        root.getChildren().add(snackbarPane);
-        PauseTransition delay = new PauseTransition(javafx.util.Duration.seconds(3));
-        delay.setOnFinished(event -> root.getChildren().remove(snackbarPane));
-        delay.play();
+        Platform.runLater(() -> {
+            // Create a label with the message and apply the appropriate style
+            Label messageLabel = new Label(message);
+            messageLabel.getStyleClass().add(success ? "snackbar-success" : "snackbar-error");
+
+            // Get the current scene of the view
+            Scene scene = this.getScene();
+            if (scene == null) return; // Return if the scene is not available
+            // Get the root pane of the scene
+            Pane root = (Pane) scene.getRoot();
+            // Check if a snackbar already exists, and remove it if present
+            StackPane existingSnackbar = (StackPane) root.lookup("#snackbarPane");
+            if (existingSnackbar != null) {
+                root.getChildren().remove(existingSnackbar);
+            }
+            // Create a new snackbar and add it to the root pane
+            StackPane snackbarPane = new StackPane(messageLabel);
+            snackbarPane.setId("snackbarPane"); // Set an ID for later lookup
+            snackbarPane.setAlignment(Pos.CENTER);
+            snackbarPane.getStyleClass().add("snackbar-pane");
+            root.getChildren().add(snackbarPane);
+
+            // Schedule the snackbar to be removed after 3 seconds
+            PauseTransition delay = new PauseTransition(javafx.util.Duration.seconds(3));
+            delay.setOnFinished(event -> root.getChildren().remove(snackbarPane));
+            delay.play();
+        });
     }
 
     /**
      * Refreshes the mentee and mentor lists.
      */
     private void refreshLists() {
-        List<Mentee> filteredMentees = adminController.getAllUnpairedMentees().stream()
-                .filter(mentee -> mentee.getSupportRequest() != null)
-                .toList();
-
-        List<Mentor> sortedMentors = adminController.getAvailableMentors().stream()
-                .sorted(Comparator.comparing(Mentor::getStartAvailability, Comparator.nullsLast(Comparator.naturalOrder())))
-                .toList();
-
-        refreshList(menteeItems, menteeListView, filteredMentees);
-        //refreshList(mentorItems, mentorListView, adminController.getAvailableMentors());
-        refreshList(mentorItems, mentorListView, sortedMentors);
+        Task<Void> refreshTask = new Task<>() {
+            @Override
+            protected Void call() {
+                List<Mentee> mentees = adminController.getAllUnpairedMentees();
+                List<Mentor> mentors = adminController.getAvailableMentors();
+                Platform.runLater(() -> {
+                    refreshList(menteeItems, menteeListView, mentees);
+                    refreshList(mentorItems, mentorListView, mentors);
+                });
+                return null;
+            }
+        };
+        new Thread(refreshTask).start();
     }
+
     private <T> void refreshList(ObservableList<T> items, TableView<T> tableView, List<T> newData) {
         items.clear();
         items.addAll(newData);

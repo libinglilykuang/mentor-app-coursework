@@ -166,4 +166,13 @@ public class MentorApp extends Application {
                 .findFirst()
                 .orElse(null);
     }
+
+    /**
+     * Stops the application and cleans up resources.
+     */
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+        ThreadPoolManager.shutdown();
+    }
 }
