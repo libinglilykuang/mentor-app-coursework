@@ -64,14 +64,13 @@ The project is built using the **MVC (Model-View-Controller) Architecture** with
 The system leverages Java concurrency to handle long-running tasks and ensure responsive user interfaces:
 
 - **ThreadPoolManager**:
-
 Implements a global thread pool using the Singleton Pattern for centralized task management.
 Handles concurrent tasks such as pairing logic and report generation efficiently.
 
 - **JavaFX Task**:
-
 Used for background processing (e.g., pairing mentees with mentors and refreshing reports).
 Offloads these tasks from the JavaFX Application thread, avoiding UI blocking and enhancing user experience.
+
 ---
 
 ## Usage
