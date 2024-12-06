@@ -60,6 +60,18 @@ The project is built using the **MVC (Model-View-Controller) Architecture** with
   - The **Recommendation Engine** is a key component of the Model layer. It uses a **rule-based recommendation algorithm** to match mentees with mentors based on specific criteria such as mentor availability, mentee preferences, and mentor expertise.
   - The Model is also responsible for communicating with the mock database or any storage solutions, ensuring that data is kept consistent and updated across the system.
 
+## Concurrency Management
+The system leverages Java concurrency to handle long-running tasks and ensure responsive user interfaces:
+
+- **ThreadPoolManager**:
+
+Implements a global thread pool using the Singleton Pattern for centralized task management.
+Handles concurrent tasks such as pairing logic and report generation efficiently.
+
+- **JavaFX Task**:
+
+Used for background processing (e.g., pairing mentees with mentors and refreshing reports).
+Offloads these tasks from the JavaFX Application thread, avoiding UI blocking and enhancing user experience.
 ---
 
 ## Usage
