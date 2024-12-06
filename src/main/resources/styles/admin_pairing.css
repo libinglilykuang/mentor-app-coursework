@@ -49,7 +49,7 @@
 }
 
 .hovered-row {
-    -fx-background-color: #fff5e6;
+    -fx-background-color:#ffebcc;
     -fx-text-fill: black;
     -fx-cursor: hand;
     -fx-padding: 10px;
@@ -186,7 +186,7 @@
 .mentee-selected {
     -fx-text-fill: black;
     -fx-font-weight: bold;
-    -fx-cursor: hand; /* 鼠标手形 */
+    -fx-cursor: hand;
     -fx-padding: 10px;
         -fx-border-color: #cccccc;
             -fx-border-width: 1px 0 1px 0;
