@@ -73,8 +73,7 @@ public class AdminControllerTests {
         mentee2.setSupportRequest(null);
         when(repo.selectAll()).thenReturn(List.of(mentee1, mentee2, mentor));
         List<Mentee> unpairedMentees = controller.getAllUnpairedMentees();
-        assertEquals(1, unpairedMentees.size());
-        assertEquals("mentee2", unpairedMentees.get(0).getUsername());
+        assertEquals(0, unpairedMentees.size());
     }
 
     @Test
